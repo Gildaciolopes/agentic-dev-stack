@@ -19,6 +19,13 @@ Isso é o padrão **plan big, execute small** dos cookbooks da Anthropic, estend
 
 ## Camadas
 
+![Arquitetura do agentic-dev-stack](assets/architecture.svg)
+
+> Fonte editável: [`assets/architecture.excalidraw`](assets/architecture.excalidraw) (abre em excalidraw.com).
+
+<details>
+<summary>Versão em texto</summary>
+
 ```
 ┌─ Camada 1: Lead ───────────────────────────────────────────────────────────┐
 │ Claude Code (Opus) · Spec Kit (fluxo) · graphify (mapa) · RTK + caveman    │
@@ -38,6 +45,8 @@ Isso é o padrão **plan big, execute small** dos cookbooks da Anthropic, estend
 │ Hermes Agent (Discord/Telegram, sem shell) ← coletor diário (script)       │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
+
+</details>
 
 ## Peça por peça
 

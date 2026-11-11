@@ -28,13 +28,14 @@ const svg = await page.evaluate(async (scene) => {
   const lib = await import("https://esm.sh/@excalidraw/excalidraw@0.18.1?bundle&deps=react@19.1.0,react-dom@19.1.0");
   const el = await lib.exportToSvg({
     elements: scene.elements,
-    appState: { ...scene.appState, exportBackground: true, viewBackgroundColor: "#ffffff", exportWithDarkMode: false, exportPadding: 30 },
+    appState: { ...scene.appState, exportBackground: true, exportWithDarkMode: false, exportPadding: 30 },
     files: scene.files || {},
   });
   return el.outerHTML;
 }, scene);
 fs.writeFileSync(outSvg, svg);
-await page.setContent(`<html><body style="margin:0;background:#fff">${svg}</body></html>`);
+const bg = scene.appState?.viewBackgroundColor || "#ffffff";
+await page.setContent(`<html><body style="margin:0;background:${bg}">${svg}</body></html>`);
 await page.waitForTimeout(800);
 const box = await page.locator("svg").first().boundingBox();
 await page.screenshot({ path: outPng, clip: box, fullPage: true });
