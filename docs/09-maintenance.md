@@ -21,25 +21,25 @@ Schedules: launchd on macOS, crontab on Linux, Task Scheduler on Windows. Logs l
 | 9Router | `npm update -g 9router`, then restart | the curator keeps working; check the combo |
 | Headroom | `uv tool upgrade headroom-ai` | |
 | Hermes | `hermes update` | read the changelog: gateway changes may require `hermes gateway install` again |
-| alethe | audit → change `ALETHE_COMMIT` in `~/.config/agentic-dev-stack/stack.env` → `npx github:Gildaciolopes/agentic-dev-stack install --workers` | see [03-alethe.md](03-alethe.md) |
-| The stack itself | re-run `npx github:Gildaciolopes/agentic-dev-stack install --all` | idempotent; config edits are backed up first |
+| alethe | audit → change `ALETHE_COMMIT` in `~/.config/agentic-dev-stack/stack.env` → `npx agentic-dev-stack install --workers` | see [03-alethe.md](03-alethe.md) |
+| The stack itself | re-run `npx agentic-dev-stack install --all` | idempotent; config edits are backed up first |
 
 ## Move to another PC
 
 On any OS, with Node 18+ and Claude Code installed:
 ```bash
-npx github:Gildaciolopes/agentic-dev-stack install --all
+npx agentic-dev-stack install --all
 # the config is created at ~/.config/agentic-dev-stack/stack.env: copy the old one over first if you want
-for p in ~/projects/*/; do npx github:Gildaciolopes/agentic-dev-stack add-project "$p"; done
-npx github:Gildaciolopes/agentic-dev-stack doctor
+for p in ~/projects/*/; do npx agentic-dev-stack add-project "$p"; done
+npx agentic-dev-stack doctor
 ```
-(`./install.sh --all` or `.\install.ps1 --all` from a clone also work. On Windows PowerShell, loop with `Get-ChildItem ~/projects -Directory | % { npx github:Gildaciolopes/agentic-dev-stack add-project $_.FullName }`.)
+(`./install.sh --all` or `.\install.ps1 --all` from a clone also work. On Windows PowerShell, loop with `Get-ChildItem ~/projects -Directory | % { npx agentic-dev-stack add-project $_.FullName }`.)
 
 Then redo the logins (agy, Codex), the NVIDIA key and the 9Router combo, and the bot token (or reuse the same one). Copy `~/.hermes/workspace/projects.md` and `~/.hermes/memories/` if you want to keep Hermes's memory.
 
 ## Hand the stack over to someone else
 
-They run `npx github:Gildaciolopes/agentic-dev-stack install --all` and follow [02-installation.md](02-installation.md). Nothing in it is personal: paths come from `$HOME`, projects are discovered in `PROJECTS_DIR`, and IDs and tokens are asked for during installation.
+They run `npx agentic-dev-stack install --all` and follow [02-installation.md](02-installation.md). Nothing in it is personal: paths come from `$HOME`, projects are discovered in `PROJECTS_DIR`, and IDs and tokens are asked for during installation.
 
 ## Measure whether it is paying off
 

@@ -46,7 +46,7 @@ python3 -I ~/.local/share/agentic-dev-stack/model-curator/curate.py     # rodada
 cat ~/.local/share/agentic-dev-stack/model-curator/status.json | python3 -m json.tool | less
 ```
 
-O agendamento é criado pelo `npx github:Gildaciolopes/agentic-dev-stack install --free-models` (launchd no macOS, crontab no Linux, Agendador de Tarefas no Windows), nos horários de `CURATOR_TIMES` em `~/.config/agentic-dev-stack/stack.env`. Os logs ficam em `~/.local/share/agentic-dev-stack/logs/`.
+O agendamento é criado pelo `npx agentic-dev-stack install --free-models` (launchd no macOS, crontab no Linux, Agendador de Tarefas no Windows), nos horários de `CURATOR_TIMES` em `~/.config/agentic-dev-stack/stack.env`. Os logs ficam em `~/.local/share/agentic-dev-stack/logs/`.
 
 ## Adicionar outros provedores grátis ao combo
 
@@ -70,5 +70,5 @@ O 9Router tem compressão própria (RTK embutido, compressão de saída, "lazy s
 
 - **Privacidade:** modelos grátis podem usar seus dados. Segredos nunca entram no prompt, e o `opencode-safe` garante isso no kernel. Modelos com "Contributor" no nome deixam explícito que usam os dados.
 - **Senha da WebUI:** troque a padrão `123456`. Não ligue o modo remoto/túnel com a chave padrão.
-- **Autostart:** o autostart do próprio 9Router grava o caminho absoluto do Node; se você trocar a versão do Node, ele quebra em silêncio (`EX_CONFIG`). O instalador registra o 9Router com o `node` atual: launchd no macOS, `systemd --user` no Linux e `schtasks` (`ONLOGON`) no Windows. Reinstale a fase `--free-models` (`npx github:Gildaciolopes/agentic-dev-stack install --free-models`) depois de trocar o Node.
+- **Autostart:** o autostart do próprio 9Router grava o caminho absoluto do Node; se você trocar a versão do Node, ele quebra em silêncio (`EX_CONFIG`). O instalador registra o 9Router com o `node` atual: launchd no macOS, `systemd --user` no Linux e `schtasks` (`ONLOGON`) no Windows. Reinstale a fase `--free-models` (`npx agentic-dev-stack install --free-models`) depois de trocar o Node.
 - **Sandbox do worker grátis:** macOS usa `sandbox-exec`, Linux usa `bubblewrap` (`bin/opencode-safe-linux`). No Windows não há sandbox de kernel e o worker grátis fica desligado por padrão; veja [07-seguranca.md](07-seguranca.md).

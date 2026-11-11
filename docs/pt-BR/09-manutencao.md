@@ -19,22 +19,22 @@
 | 9Router | `npm update -g 9router` e reinicie | o curador continua funcionando; confira o combo |
 | Headroom | `uv tool upgrade headroom-ai` | |
 | Hermes | `hermes update` | leia o changelog: mudanças no gateway podem exigir `hermes gateway install` de novo |
-| alethe | auditar → mudar `ALETHE_COMMIT` em `~/.config/agentic-dev-stack/stack.env` → `npx github:Gildaciolopes/agentic-dev-stack install --workers` | ver [03-alethe.md](03-alethe.md#atualizar-o-alethe-com-segurança) |
+| alethe | auditar → mudar `ALETHE_COMMIT` em `~/.config/agentic-dev-stack/stack.env` → `npx agentic-dev-stack install --workers` | ver [03-alethe.md](03-alethe.md#atualizar-o-alethe-com-segurança) |
 
 ## Levar para outro PC
 
 Em qualquer SO, com Node 18+ e Claude Code instalados:
 ```bash
-npx github:Gildaciolopes/agentic-dev-stack install --all
+npx agentic-dev-stack install --all
 # a config é criada em ~/.config/agentic-dev-stack/stack.env: copie a do PC antigo antes, se quiser
-for p in ~/projects/*/; do npx github:Gildaciolopes/agentic-dev-stack add-project "$p"; done
-npx github:Gildaciolopes/agentic-dev-stack doctor
+for p in ~/projects/*/; do npx agentic-dev-stack add-project "$p"; done
+npx agentic-dev-stack doctor
 ```
 (Também funciona `./install.sh --all` ou `.\install.ps1 --all` a partir de um clone.) Depois refaça os logins (agy, Codex), a chave da NVIDIA e o combo no 9Router, o token do bot (ou reaproveite o mesmo), e copie `~/.hermes/workspace/projects.md` e `~/.hermes/memories/` se quiser manter a memória.
 
 ## Passar para outra pessoa
 
-Ela roda `npx github:Gildaciolopes/agentic-dev-stack install --all` e segue [02-instalacao.md](02-instalacao.md). Nada aqui é pessoal: caminhos via `$HOME`, projetos descobertos em `PROJECTS_DIR`, IDs e tokens perguntados na instalação.
+Ela roda `npx agentic-dev-stack install --all` e segue [02-instalacao.md](02-instalacao.md). Nada aqui é pessoal: caminhos via `$HOME`, projetos descobertos em `PROJECTS_DIR`, IDs e tokens perguntados na instalação.
 
 ## Medir se está valendo a pena
 

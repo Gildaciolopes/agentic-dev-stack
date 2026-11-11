@@ -1,6 +1,7 @@
 # agentic-dev-stack: vibe coding inteligente com Claude Code
 
 [![CI](https://github.com/Gildaciolopes/agentic-dev-stack/actions/workflows/ci.yml/badge.svg)](https://github.com/Gildaciolopes/agentic-dev-stack/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/agentic-dev-stack)](https://www.npmjs.com/package/agentic-dev-stack)
 ![plataformas](https://img.shields.io/badge/plataforma-macOS%20%7C%20Linux%20%7C%20Windows-informational)
 ![node](https://img.shields.io/badge/node-%E2%89%A518-339933)
 [![licença](https://img.shields.io/badge/licen%C3%A7a-MIT-blue)](LICENSE)
@@ -16,7 +17,7 @@
 **🇺🇸 [Read in English](README.md)** · 📘 **[Guia do vibe coding inteligente](docs/pt-BR/00-vibe-coding-inteligente.md)** · 🧩 **[Templates de CLAUDE.md / AGENTS.md](templates/pt-BR/)**
 
 ```bash
-npx github:Gildaciolopes/agentic-dev-stack install --all
+npx agentic-dev-stack install --all
 ```
 
 ---
@@ -75,7 +76,7 @@ Detalhes: [docs/pt-BR/01-arquitetura.md](docs/pt-BR/01-arquitetura.md).
 
 | Método | Comando |
 |---|---|
-| **npx (qualquer SO)** | `npx github:Gildaciolopes/agentic-dev-stack install --all` |
+| **npx (qualquer SO)** | `npx agentic-dev-stack install --all` |
 | **macOS / Linux** | `git clone https://github.com/Gildaciolopes/agentic-dev-stack && cd agentic-dev-stack && ./install.sh --all` |
 | **Windows (PowerShell)** | `git clone https://github.com/Gildaciolopes/agentic-dev-stack; cd agentic-dev-stack; .\install.ps1 --all` |
 
@@ -87,8 +88,8 @@ Em vez de `--all`, dá para escolher as fases: `--core`, `--workers`, `--free-mo
 Depois, ligue cada projeto e confira se está tudo certo:
 
 ```bash
-npx github:Gildaciolopes/agentic-dev-stack add-project ~/projetos/meu-app --lang pt-BR
-npx github:Gildaciolopes/agentic-dev-stack doctor
+npx agentic-dev-stack add-project ~/projetos/meu-app --lang pt-BR
+npx agentic-dev-stack doctor
 ```
 
 Pré-requisitos: Node ≥ 18, git e Claude Code. O Python ≥ 3.9 também é necessário para o alethe, o curador e o coletor. Detalhes por SO e os passos manuais (logins, chaves) estão em [docs/pt-BR/02-instalacao.md](docs/pt-BR/02-instalacao.md).

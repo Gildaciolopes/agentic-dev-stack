@@ -31,7 +31,7 @@ Por quê:
 
 ## Instalação
 
-`npx github:Gildaciolopes/agentic-dev-stack install --hermes` (ou `./install.sh --hermes` / `.\install.ps1 --hermes`) faz tudo isto. À mão, seria:
+`npx agentic-dev-stack install --hermes` (ou `./install.sh --hermes` / `.\install.ps1 --hermes`) faz tudo isto. À mão, seria:
 
 ```bash
 curl -fsSL https://hermes-agent.nousresearch.com/install.sh -o /tmp/hermes-install.sh

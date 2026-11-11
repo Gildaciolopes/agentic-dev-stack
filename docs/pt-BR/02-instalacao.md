@@ -34,7 +34,7 @@ Campos importantes:
 Três métodos equivalentes:
 
 ```bash
-npx github:Gildaciolopes/agentic-dev-stack install --all   # qualquer SO, sem clonar
+npx agentic-dev-stack install --all   # qualquer SO, sem clonar
 ./install.sh --all                                         # clone, macOS/Linux
 ```
 ```powershell

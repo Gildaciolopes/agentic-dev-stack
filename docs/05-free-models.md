@@ -48,7 +48,7 @@ python3 -m json.tool ~/.local/share/agentic-dev-stack/model-curator/status.json 
 
 ### Schedule
 
-`npx github:Gildaciolopes/agentic-dev-stack install --free-models` registers the curator at the times in `CURATOR_TIMES` (default `07:30 13:30 19:30`) in `~/.config/agentic-dev-stack/stack.env`:
+`npx agentic-dev-stack install --free-models` registers the curator at the times in `CURATOR_TIMES` (default `07:30 13:30 19:30`) in `~/.config/agentic-dev-stack/stack.env`:
 
 | OS | Scheduler | Job name |
 |---|---|---|

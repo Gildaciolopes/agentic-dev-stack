@@ -11,6 +11,6 @@ $cli = Join-Path $PSScriptRoot "bin/cli.mjs"
 if ($PSScriptRoot -and (Test-Path $cli)) {
   node $cli install @Rest
 } else {
-  npx -y github:Gildaciolopes/agentic-dev-stack install @Rest
+  npx -y agentic-dev-stack@latest install @Rest
 }
 exit $LASTEXITCODE

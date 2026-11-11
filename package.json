@@ -7,14 +7,50 @@
     "agentic-dev-stack": "bin/cli.mjs",
     "ads": "bin/cli.mjs"
   },
-  "files": ["bin/", "lib/", "hooks/", "agents/", "sandbox/", "scripts/", "templates/", "config/stack.env.example"],
+  "files": [
+    "bin/",
+    "lib/",
+    "hooks/",
+    "agents/",
+    "sandbox/",
+    "scripts/",
+    "templates/",
+    "config/stack.env.example"
+  ],
   "scripts": {
     "test": "node --test test/stack.test.mjs"
   },
-  "engines": { "node": ">=18" },
-  "keywords": ["claude-code", "vibe-coding", "ai-agents", "multi-agent", "agentic-coding", "spec-driven-development", "spec-kit", "token-optimization", "llm", "claude", "anthropic", "codex", "opencode", "hermes-agent", "caveman", "rtk", "graphify", "ai-coding", "developer-tools", "orchestration"],
-  "repository": { "type": "git", "url": "git+https://github.com/Gildaciolopes/agentic-dev-stack.git" },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "claude-code",
+    "vibe-coding",
+    "ai-agents",
+    "multi-agent",
+    "agentic-coding",
+    "spec-driven-development",
+    "spec-kit",
+    "token-optimization",
+    "llm",
+    "claude",
+    "anthropic",
+    "codex",
+    "opencode",
+    "hermes-agent",
+    "caveman",
+    "rtk",
+    "graphify",
+    "ai-coding",
+    "developer-tools",
+    "orchestration"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gildaciolopes/agentic-dev-stack.git"
+  },
   "homepage": "https://github.com/Gildaciolopes/agentic-dev-stack#readme",
   "bugs": "https://github.com/Gildaciolopes/agentic-dev-stack/issues",
-  "license": "MIT"
+  "license": "MIT",
+  "author": "Gildacio Lopes (https://github.com/Gildaciolopes)"
 }

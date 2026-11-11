@@ -1,6 +1,6 @@
 # 08. Troubleshooting: Everything That Broke and How to Fix It
 
-Every item below actually happened while building the stack. Run `npx github:Gildaciolopes/agentic-dev-stack doctor` first: it checks the hook, subagents, alethe, workers, 9Router and Hermes in one pass.
+Every item below actually happened while building the stack. Run `npx agentic-dev-stack doctor` first: it checks the hook, subagents, alethe, workers, 9Router and Hermes in one pass.
 
 ## Agents and orchestration
 
@@ -17,7 +17,7 @@ All explained in the gotchas table in [03-alethe.md](03-alethe.md).
 agy's read mode cannot run shell, and the model tried `ls`/`cat`. → The brief must say "use only file-read tools, never shell".
 
 **agy: `--model gemini-x-flash-high conflicts with --effort=medium`.**
-The runner inherits the tier's effort. Gemini uses the base id (`gemini-x-flash`) plus `--effort`; Claude models in agy **do not accept** `--effort`. → `npx github:Gildaciolopes/agentic-dev-stack configure-alethe` already writes the right tiers (add `--force` to rebuild).
+The runner inherits the tier's effort. Gemini uses the base id (`gemini-x-flash`) plus `--effort`; Claude models in agy **do not accept** `--effort`. → `npx agentic-dev-stack configure-alethe` already writes the right tiers (add `--force` to rebuild).
 
 ## Free models / 9Router
 
@@ -37,7 +37,7 @@ sqlite3 ~/.9router/db/data.sqlite "UPDATE combos SET models='[\"nvidia/<id1>\",\
 ```
 
 **9Router autostart does not come up (launchd `last exit code = 78: EX_CONFIG`).**
-The plist points to a Node that no longer exists (different version or path). → `npx github:Gildaciolopes/agentic-dev-stack install --free-models` rewrites it with the current `node`. Be careful when editing by hand: `plutil -replace ProgramArguments.0` **inserts** instead of replacing; rewrite the whole array. On Linux the equivalent is the `agentic-dev-stack-9router.service` unit (`systemctl --user status agentic-dev-stack-9router`); on Windows it is the `agentic-dev-stack-9router` task.
+The plist points to a Node that no longer exists (different version or path). → `npx agentic-dev-stack install --free-models` rewrites it with the current `node`. Be careful when editing by hand: `plutil -replace ProgramArguments.0` **inserts** instead of replacing; rewrite the whole array. On Linux the equivalent is the `agentic-dev-stack-9router.service` unit (`systemctl --user status agentic-dev-stack-9router`); on Windows it is the `agentic-dev-stack-9router` task.
 
 ## Sandbox / OpenCode
 
@@ -84,7 +84,7 @@ yt-dlp --write-auto-subs --sub-langs "en-orig,en" --sub-format vtt --skip-downlo
 ## Windows
 
 **PowerShell: "running scripts is disabled on this system" when running `.\install.ps1`.**
-→ Relax the policy for the current session only: `Set-ExecutionPolicy -Scope Process Bypass`, then run it again. Or skip the script entirely: `npx github:Gildaciolopes/agentic-dev-stack install --all` is plain Node.
+→ Relax the policy for the current session only: `Set-ExecutionPolicy -Scope Process Bypass`, then run it again. Or skip the script entirely: `npx agentic-dev-stack install --all` is plain Node.
 
 **`python` opens the Microsoft Store or is not found.**
 → On Windows, use the `py` launcher: check `py -3 --version`. The CLI looks for `python` and `py` on its own; if neither works, install Python 3.9+ (python.org or `winget install Python.Python.3.12`). For manual curator runs use `py -3 -I <script>`.
@@ -104,7 +104,7 @@ yt-dlp --write-auto-subs --sub-langs "en-orig,en" --sub-format vtt --skip-downlo
 ## Quick diagnostics
 
 ```bash
-npx github:Gildaciolopes/agentic-dev-stack doctor                    # overall state
+npx agentic-dev-stack doctor                    # overall state
 launchctl list | grep agentic-dev-stack                              # schedules (macOS)
 crontab -l | grep agentic-dev-stack                                  # schedules (Linux)
 tail -n 50 ~/.local/share/agentic-dev-stack/logs/*.err               # script errors

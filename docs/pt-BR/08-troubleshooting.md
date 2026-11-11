@@ -17,7 +17,7 @@ Tudo explicado na tabela de pegadinhas de [03-alethe.md](03-alethe.md#pegadinhas
 O modo leitura do agy não roda shell, e o modelo tentou `ls`/`cat`. → O brief precisa dizer "use só ferramentas de leitura de arquivo, nunca shell".
 
 **agy: `--model gemini-x-flash-high conflicts with --effort=medium`.**
-O runner herda o effort do tier. Gemini usa o id base (`gemini-x-flash`) + `--effort`; modelos Claude do agy **não aceitam** `--effort`. → `npx github:Gildaciolopes/agentic-dev-stack configure-alethe` já escreve os tiers certos.
+O runner herda o effort do tier. Gemini usa o id base (`gemini-x-flash`) + `--effort`; modelos Claude do agy **não aceitam** `--effort`. → `npx agentic-dev-stack configure-alethe` já escreve os tiers certos.
 
 ## Modelos grátis / 9Router
 
@@ -37,7 +37,7 @@ sqlite3 ~/.9router/db/data.sqlite "UPDATE combos SET models='[\"nvidia/<id1>\",\
 ```
 
 **O autostart do 9Router não sobe (launchd `last exit code = 78: EX_CONFIG`).**
-O plist aponta para um Node que não existe mais (outra versão/caminho). → `./install.sh --free-models` (ou `npx github:Gildaciolopes/agentic-dev-stack install --free-models`) regrava com o `node` atual. No Linux o equivalente é a unit `agentic-dev-stack-9router.service` (`systemctl --user status`); no Windows, a tarefa `agentic-dev-stack-9router`. Cuidado ao editar à mão: `plutil -replace ProgramArguments.0` **insere** em vez de substituir; reescreva o array inteiro.
+O plist aponta para um Node que não existe mais (outra versão/caminho). → `./install.sh --free-models` (ou `npx agentic-dev-stack install --free-models`) regrava com o `node` atual. No Linux o equivalente é a unit `agentic-dev-stack-9router.service` (`systemctl --user status`); no Windows, a tarefa `agentic-dev-stack-9router`. Cuidado ao editar à mão: `plutil -replace ProgramArguments.0` **insere** em vez de substituir; reescreva o array inteiro.
 
 ## Sandbox / OpenCode
 
@@ -78,7 +78,7 @@ yt-dlp --write-auto-subs --sub-langs "pt-orig,pt" --sub-format vtt --skip-downlo
 ## Windows
 
 **PowerShell: "running scripts is disabled on this system" ao rodar `.\install.ps1`.**
-→ Libere só na sessão atual: `Set-ExecutionPolicy -Scope Process Bypass`, e rode de novo. Ou use `npx github:Gildaciolopes/agentic-dev-stack install --all`, que não passa por script `.ps1`.
+→ Libere só na sessão atual: `Set-ExecutionPolicy -Scope Process Bypass`, e rode de novo. Ou use `npx agentic-dev-stack install --all`, que não passa por script `.ps1`.
 
 **`python` abre a Microsoft Store ou não é encontrado.**
 → O Windows usa o launcher `py`: teste `py -3 --version`. O CLI detecta `python`/`py` sozinho; se nenhum funcionar, instale o Python 3.9+ (python.org ou `winget install Python.Python.3.12`).
@@ -98,7 +98,7 @@ yt-dlp --write-auto-subs --sub-langs "pt-orig,pt" --sub-format vtt --skip-downlo
 ## Diagnóstico rápido
 
 ```bash
-npx github:Gildaciolopes/agentic-dev-stack doctor                    # estado geral
+npx agentic-dev-stack doctor                    # estado geral
 launchctl list | grep agentic-dev-stack                              # agendamentos (macOS)
 crontab -l | grep agentic-dev-stack                                  # agendamentos (Linux)
 tail -n 50 ~/.local/share/agentic-dev-stack/logs/*.err               # erros dos scripts

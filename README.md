@@ -1,6 +1,7 @@
 # agentic-dev-stack: smart vibe coding with Claude Code
 
 [![CI](https://github.com/Gildaciolopes/agentic-dev-stack/actions/workflows/ci.yml/badge.svg)](https://github.com/Gildaciolopes/agentic-dev-stack/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/agentic-dev-stack)](https://www.npmjs.com/package/agentic-dev-stack)
 ![platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-informational)
 ![node](https://img.shields.io/badge/node-%E2%89%A518-339933)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
@@ -16,7 +17,7 @@
 **🇧🇷 [Leia em português](README.pt-BR.md)** · 📘 **[The smart vibe coding guide](docs/00-smart-vibe-coding.md)** · 🧩 **[CLAUDE.md / AGENTS.md templates](templates/)**
 
 ```bash
-npx github:Gildaciolopes/agentic-dev-stack install --all
+npx agentic-dev-stack install --all
 ```
 
 ---
@@ -75,7 +76,7 @@ Details: [docs/01-architecture.md](docs/01-architecture.md).
 
 | Method | Command |
 |---|---|
-| **npx (any OS)** | `npx github:Gildaciolopes/agentic-dev-stack install --all` |
+| **npx (any OS)** | `npx agentic-dev-stack install --all` |
 | **macOS / Linux** | `git clone https://github.com/Gildaciolopes/agentic-dev-stack && cd agentic-dev-stack && ./install.sh --all` |
 | **Windows (PowerShell)** | `git clone https://github.com/Gildaciolopes/agentic-dev-stack; cd agentic-dev-stack; .\install.ps1 --all` |
 
@@ -87,8 +88,8 @@ Instead of `--all`, you can pick phases: `--core`, `--workers`, `--free-models`,
 Then wire each project and check the result:
 
 ```bash
-npx github:Gildaciolopes/agentic-dev-stack add-project ~/code/my-app   # --lang pt-BR for Portuguese blocks
-npx github:Gildaciolopes/agentic-dev-stack doctor
+npx agentic-dev-stack add-project ~/code/my-app   # --lang pt-BR for Portuguese blocks
+npx agentic-dev-stack doctor
 ```
 
 Prerequisites: Node ≥ 18, git and Claude Code. Python ≥ 3.9 is also needed for alethe, the curator and the digest. Per-OS details and the manual steps (logins, keys) are in [docs/02-installation.md](docs/02-installation.md).

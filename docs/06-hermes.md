@@ -32,7 +32,7 @@ Why:
 ## Install Hermes (hardened)
 
 ```bash
-npx github:Gildaciolopes/agentic-dev-stack install --hermes     # or ./install.sh --hermes
+npx agentic-dev-stack install --hermes     # or ./install.sh --hermes
 ```
 
 This does everything below. By hand, it would be:

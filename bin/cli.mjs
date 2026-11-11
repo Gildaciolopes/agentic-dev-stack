@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // agentic-dev-stack CLI. Cross-platform (macOS, Linux, Windows), zero dependencies.
-//   npx github:Gildaciolopes/agentic-dev-stack install --all
+//   npx agentic-dev-stack install --all
 import fs from "node:fs";
 import { addProject } from "../lib/add-project.mjs";
 import { aletheDir, configureAlethe } from "../lib/alethe.mjs";

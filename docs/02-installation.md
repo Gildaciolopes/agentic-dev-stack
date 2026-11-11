@@ -21,7 +21,7 @@ All three methods run the same CLI and accept the same flags.
 
 ### Method A: `npx` (any OS, nothing to clone)
 ```bash
-npx github:Gildaciolopes/agentic-dev-stack install --all
+npx agentic-dev-stack install --all
 ```
 
 ### Method B: clone and run the wrapper
@@ -103,7 +103,7 @@ Native Windows works for everything **except** the kernel sandbox:
 **Recommended:** install WSL2 (`wsl --install -d Ubuntu`) and follow the Linux instructions inside it. You get bubblewrap sandboxing, cron and systemd, and the same behavior as the reference setup.
 
 ```powershell
-npx github:Gildaciolopes/agentic-dev-stack install --all
+npx agentic-dev-stack install --all
 # or, from a clone
 .\install.ps1 --all
 ```

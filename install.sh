@@ -11,4 +11,4 @@ DIR="$(cd "$(dirname "$0")" 2>/dev/null && pwd || echo "")"
 if [ -n "$DIR" ] && [ -f "$DIR/bin/cli.mjs" ]; then
   exec node "$DIR/bin/cli.mjs" install "$@"
 fi
-exec npx -y github:Gildaciolopes/agentic-dev-stack install "$@"
+exec npx -y agentic-dev-stack@latest install "$@"
