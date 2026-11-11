@@ -13,10 +13,12 @@
 | **Goal** | Quão ansioso por delegar: `passive` (padrão), `save`, `balanced`, `max`, `freestyle`. |
 
 Arquivos (globais, valem para todos os projetos):
-- `~/.config/alethe/alethe-playbooks.yaml`: playbooks, tiers, perfis, adapters (gerado pelo `configure-alethe.py`)
+- `~/.config/alethe/alethe-playbooks.yaml`: playbooks, tiers, perfis, adapters (gerado por `npx agentic-dev-stack configure-alethe`)
 - `~/.config/alethe/orchestrate.json`: política (ordem de provedores, troca automática, `trust.cwdRoots`)
 - `~/.config/alethe/alethe-prices.json`: billing por provedor (`subscription` ou `api`)
 - `~/.config/alethe/orchestrations/`: cada orquestração (planos, resultados, diffs, relatório)
+
+Para regerar o perfil: `npx agentic-dev-stack configure-alethe [--force]` (no clone: `node bin/cli.mjs configure-alethe`). O antigo `scripts/configure-alethe.py` não existe mais.
 
 ## O perfil `base` do stack
 
@@ -54,6 +56,8 @@ python3 $A run plan.json --in current --detach && python3 $A wait --timeout 540
 python3 $A report            # ou: report --format html
 ```
 
+No Windows use `py -3` (ou `python`) no lugar de `python3`.
+
 ### Exemplo de plano (2 workers: scout agy + writer grátis isolado)
 
 ```json
@@ -83,7 +87,7 @@ python3 $A report            # ou: report --format html
 | cota "5h unknown, week unknown" | nenhuma leitura ainda | `usage --refresh-claude --refresh-agy` (o coletor diário faz isso todo dia) |
 | `mode must be read-only or write` | escreveu `"read"` | só `"read-only"` ou `"write"` |
 | `scaffold` não aceita `review-gate` | scaffold recebe **strategy**, não playbook | `plan-execute`→`economy` · `parallel-worktrees`→`parallel` · `review-gate`→`research` (revisores) e `economy` (fix) · `cascade`→`economy` |
-| `cwd ... is outside the lead checkout` | worktree fora do repo | o `configure-alethe.py` libera `/tmp` e `PROJECTS_DIR` em `trust.cwdRoots` |
+| `cwd ... is outside the lead checkout` | worktree fora do repo | o `configure-alethe` libera `/tmp` e `PROJECTS_DIR` em `trust.cwdRoots` |
 | agy termina com "Please review and approve" | modo plano do agy pede aprovação | o brief termina com "NÃO crie plano nem peça aprovação" (princípio já no perfil) |
 | agy `permission denied: RunCommand` | o modo leitura do agy não roda shell | o brief diz "use só ferramentas de leitura de arquivo"; para unidade com shell, use claude |
 | `--model X conflicts with --effort` | modelos Claude do agy não aceitam effort; Gemini usa id base + effort | já resolvido nos tiers (`gemini-x-flash` + `effort: high`) |
@@ -107,5 +111,5 @@ O `agent-model-guard` garante que o nativo nunca caia no Opus por acidente.
 
 1. `git clone` do repo e `git log ab81104..HEAD` para ver o que mudou.
 2. Audite: hooks, chamadas de rede, flags de bypass, `shell=True` (ver [07-seguranca.md](07-seguranca.md)).
-3. Mude `ALETHE_COMMIT` no `config/stack.env` e rode `./install.sh --workers`.
-4. Se o `configure-alethe.py` acusar "anchor not found", o formato dos playbooks mudou upstream: ajuste o script.
+3. Mude `ALETHE_COMMIT` no `~/.config/agentic-dev-stack/stack.env` e rode `./install.sh --workers` (ou `npx agentic-dev-stack install --workers`).
+4. Se o `configure-alethe` acusar "anchor not found", o formato dos playbooks mudou upstream: ajuste o `lib/alethe.mjs`.

@@ -19,9 +19,9 @@ Isso é o padrão **plan big, execute small** dos cookbooks da Anthropic, estend
 
 ## Camadas
 
-![Arquitetura do agentic-dev-stack](../assets/architecture.svg)
+![Arquitetura do agentic-dev-stack](../assets/architecture.pt-BR.svg)
 
-> Fonte editável: [`assets/architecture.excalidraw`](../assets/architecture.excalidraw) (abre em excalidraw.com).
+> Fonte editável: [`assets/architecture.excalidraw`](../assets/architecture.pt-BR.excalidraw) (abre em excalidraw.com).
 
 <details>
 <summary>Versão em texto</summary>
@@ -62,12 +62,12 @@ Definidos em `~/.claude/agents/*.md`, com o modelo fixado no frontmatter.
 Use quando a unidade precisa do contexto da conversa ou é rápida. Para várias unidades, workers de outro provedor ou relatório de custo, use o alethe.
 
 ### agent-model-guard (hook)
-`PreToolUse` no tool `Agent`. Os tipos genéricos de subagente (`general-purpose`, `Explore`, `Plan`) **herdam o modelo da sessão**, ou seja, rodam em Opus sem você perceber. Num caso real, 18 de 26 subagentes lançados rodaram em Opus mesmo com o CLAUDE.md mandando o contrário. O hook nega:
+`PreToolUse` no tool `Agent`, escrito em Node (`hooks/agent-model-guard.mjs`) e registrado como `node "~/.claude/hooks/agent-model-guard.mjs"`. Os tipos genéricos de subagente (`general-purpose`, `Explore`, `Plan`) **herdam o modelo da sessão**, ou seja, rodam em Opus sem você perceber. Num caso real, 18 de 26 subagentes lançados rodaram em Opus mesmo com o CLAUDE.md mandando o contrário. O hook nega:
 - tipo genérico sem `model: "haiku"`/`"sonnet"`;
 - qualquer `model: "opus"`/`"fable"` explícito;
 - `fork` (sempre herda o lead).
 
-A mensagem de negação ensina o caminho certo. Para uma exceção deliberada, abra o claude com `ALLOW_OPUS_SUBAGENT=1`. Complemento: `CLAUDE_CODE_SUBAGENT_MODEL=sonnet` no `settings.json` faz quem não informar modelo cair no Sonnet. Atenção: esse env **não** afeta Explore/Plan sem `_FORCE`, e é por isso que o hook existe.
+A mensagem de negação ensina o caminho certo. Para fixar outros agentes com modelo próprio, liste-os em `AGENT_GUARD_ALLOW`. Para uma exceção deliberada, abra o claude com `ALLOW_OPUS_SUBAGENT=1`. Complemento: `CLAUDE_CODE_SUBAGENT_MODEL=sonnet` no `settings.json` faz quem não informar modelo cair no Sonnet. Atenção: esse env **não** afeta Explore/Plan sem `_FORCE`, e é por isso que o hook existe.
 
 ### alethe
 Skill de orquestração (open source, [Kc1t/alethe-orchestrate-skill](https://github.com/Kc1t/alethe-orchestrate-skill)) que roda CLIs de agente como workers:
@@ -89,10 +89,10 @@ Duas pegadinhas: modelos Claude do agy recusam `--effort`, e no modo plano o agy
 ### OpenCode + `opencode-safe`
 CLI de agente open source que fala com qualquer endpoint OpenAI-compatível. Aqui ele usa o combo `free` do 9Router (custo zero) para edições mecânicas. Roda sempre:
 1. em **worktree isolada** (o `git worktree` não copia `.env`, que é ignorado pelo git);
-2. dentro de `sandbox-exec` (kernel do macOS) que **nega leitura** de `.env*`, chaves, credentials, `~/.ssh`, `~/.aws`, Keychain;
+2. dentro de um sandbox do sistema que **nega leitura** de `.env*`, chaves, credentials, `~/.ssh`, `~/.aws`, Keychain: `sandbox-exec` no macOS (`bin/opencode-safe`) e bubblewrap no Linux (`bin/opencode-safe-linux`, instalado como `~/.local/bin/opencode-safe`);
 3. com `--standalone`, porque sem isso o `opencode run` delega as ferramentas a um serviço de fundo que roda **fora** do sandbox.
 
-Ver [07-seguranca.md](07-seguranca.md) para os testes de vazamento.
+No Windows não há sandbox de kernel: o worker grátis fica **desligado por padrão**; `ALLOW_UNSANDBOXED_FREE_WORKER=1` cria um `opencode-safe.cmd` **sem sandbox** (prefira WSL2). Ver [07-seguranca.md](07-seguranca.md) para os testes de vazamento.
 
 ### 9Router + curador
 O 9Router é um roteador local (`http://127.0.0.1:20128/v1`) que junta vários provedores grátis num "combo" com fallback. O problema: modelos grátis morrem sem aviso (descontinuados com 410, 404 por conta, 503, timeout). O **curador** (`scripts/model-curator/curate.py`) roda 3x/dia:
@@ -101,7 +101,7 @@ O 9Router é um roteador local (`http://127.0.0.1:20128/v1`) que junta vários p
 - ordena por família e velocidade e grava os 4 melhores no combo (com backup);
 - se nada passar, **não mexe**.
 
-Ver [05-modelos-gratis.md](05-modelos-gratis.md).
+O 9Router sobe no login via launchd (macOS), `systemd --user` (Linux) ou tarefa `ONLOGON` do Agendador de Tarefas (Windows); os agendamentos do curador e do resumo usam launchd, crontab e Agendador de Tarefas, respectivamente. Ver [05-modelos-gratis.md](05-modelos-gratis.md).
 
 ### Spec Kit
 Fluxo spec-driven ([github/spec-kit](https://github.com/github/spec-kit)): `specify → clarify → plan → tasks → analyze → implement`. Encaixe com o alethe: as fases de decisão ficam no lead; o `tasks.md` vira as unidades; tasks `[P]` viram `parallel-worktrees`; o diff final passa por `review-gate`.

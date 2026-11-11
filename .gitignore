@@ -1,4 +1,4 @@
-config/stack.env
 __pycache__/
-*.pyc
 .DS_Store
+*.pyc
+config/stack.env

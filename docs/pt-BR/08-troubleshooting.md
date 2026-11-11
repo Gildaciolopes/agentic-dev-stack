@@ -17,7 +17,7 @@ Tudo explicado na tabela de pegadinhas de [03-alethe.md](03-alethe.md#pegadinhas
 O modo leitura do agy não roda shell, e o modelo tentou `ls`/`cat`. → O brief precisa dizer "use só ferramentas de leitura de arquivo, nunca shell".
 
 **agy: `--model gemini-x-flash-high conflicts with --effort=medium`.**
-O runner herda o effort do tier. Gemini usa o id base (`gemini-x-flash`) + `--effort`; modelos Claude do agy **não aceitam** `--effort`. → O `configure-alethe.py` já escreve os tiers certos.
+O runner herda o effort do tier. Gemini usa o id base (`gemini-x-flash`) + `--effort`; modelos Claude do agy **não aceitam** `--effort`. → `npx github:Gildaciolopes/agentic-dev-stack configure-alethe` já escreve os tiers certos.
 
 ## Modelos grátis / 9Router
 
@@ -37,7 +37,7 @@ sqlite3 ~/.9router/db/data.sqlite "UPDATE combos SET models='[\"nvidia/<id1>\",\
 ```
 
 **O autostart do 9Router não sobe (launchd `last exit code = 78: EX_CONFIG`).**
-O plist aponta para um Node que não existe mais (outra versão/caminho). → `./install.sh --free-models` regrava com o `node` atual. Cuidado ao editar à mão: `plutil -replace ProgramArguments.0` **insere** em vez de substituir; reescreva o array inteiro.
+O plist aponta para um Node que não existe mais (outra versão/caminho). → `./install.sh --free-models` (ou `npx github:Gildaciolopes/agentic-dev-stack install --free-models`) regrava com o `node` atual. No Linux o equivalente é a unit `agentic-dev-stack-9router.service` (`systemctl --user status`); no Windows, a tarefa `agentic-dev-stack-9router`. Cuidado ao editar à mão: `plutil -replace ProgramArguments.0` **insere** em vez de substituir; reescreva o array inteiro.
 
 ## Sandbox / OpenCode
 
@@ -62,7 +62,7 @@ Ele cria uma thread por mensagem e leva rate limit. → `hermes config set disco
 Vem das skills Apple que vêm junto e de buscas amplas. → Clique **Não permitir** (a resposta fica salva) e desative as skills que não usa. Evite dar Acesso Total ao Disco (ver [06-hermes.md](06-hermes.md)).
 
 **O plano do dia sugere projeto parado, ou interpreta errado.**
-→ Crie `~/.hermes/workspace/projetos.md` com o status de cada projeto; o prompt lê esse arquivo.
+→ Crie `~/.hermes/workspace/projects.md` com o status de cada projeto; o prompt lê esse arquivo.
 
 ## Coleta de dados
 
@@ -75,10 +75,32 @@ yt-dlp --write-auto-subs --sub-langs "pt-orig,pt" --sub-format vtt --skip-downlo
 **Python 3.15 (ou muito novo) quebra a instalação de ferramentas Python.**
 → Instale isolado com `uv tool install --python 3.12 <pacote>`.
 
+## Windows
+
+**PowerShell: "running scripts is disabled on this system" ao rodar `.\install.ps1`.**
+→ Libere só na sessão atual: `Set-ExecutionPolicy -Scope Process Bypass`, e rode de novo. Ou use `npx github:Gildaciolopes/agentic-dev-stack install --all`, que não passa por script `.ps1`.
+
+**`python` abre a Microsoft Store ou não é encontrado.**
+→ O Windows usa o launcher `py`: teste `py -3 --version`. O CLI detecta `python`/`py` sozinho; se nenhum funcionar, instale o Python 3.9+ (python.org ou `winget install Python.Python.3.12`).
+
+**`EPERM`/"symlink not allowed" no `add-project`.**
+→ Criar symlink exige Modo Desenvolvedor ou admin. O CLI usa uma *junction* e, se também falhar, **copia** o alethe para o projeto (aviso no log). Para symlink de verdade, ative o Modo Desenvolvedor.
+
+**Agendamentos (`schtasks`).**
+→ Liste com `schtasks /Query /FO LIST | findstr agentic-dev-stack`. Se `/Create` falhar, abra o terminal como o mesmo usuário que roda o Claude Code e rode a fase de novo. Logs em `%USERPROFILE%\.local\share\agentic-dev-stack\logs\`.
+
+**Worker grátis "desligado" no Windows.**
+→ Esperado: não há sandbox de kernel. Use WSL2 ou veja `ALLOW_UNSANDBOXED_FREE_WORKER` em [07-seguranca.md](07-seguranca.md).
+
+**Hermes não instala no Windows.**
+→ O instalador não é automatizado lá. Use a documentação oficial ou o WSL2 ([06-hermes.md](06-hermes.md)).
+
 ## Diagnóstico rápido
 
 ```bash
-launchctl list | grep agentic-dev-stack                              # agendamentos
+npx github:Gildaciolopes/agentic-dev-stack doctor                    # estado geral
+launchctl list | grep agentic-dev-stack                              # agendamentos (macOS)
+crontab -l | grep agentic-dev-stack                                  # agendamentos (Linux)
 tail -n 50 ~/.local/share/agentic-dev-stack/logs/*.err               # erros dos scripts
 python3 -I ~/.agents/skills/alethe/scripts/orchestrate.py doctor
 curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:20128/v1/models   # 9Router

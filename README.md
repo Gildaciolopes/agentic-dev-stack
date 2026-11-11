@@ -1,121 +1,183 @@
-# agentic-dev-stack
+# agentic-dev-stack: smart vibe coding with Claude Code
 
-> Um setup de desenvolvimento com IA para **parar de usar um agente por vez**: o modelo caro planeja, os baratos (ou grátis) executam, um revisor independente confere, e tudo gasta o mínimo de tokens possível. Com um assistente sempre ligado (Hermes) que te avisa no Discord/Telegram.
+[![CI](https://github.com/Gildaciolopes/agentic-dev-stack/actions/workflows/ci.yml/badge.svg)](https://github.com/Gildaciolopes/agentic-dev-stack/actions/workflows/ci.yml)
+![platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-informational)
+![node](https://img.shields.io/badge/node-%E2%89%A518-339933)
+[![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-Funciona em cima do **Claude Code** e encaixa **Antigravity (agy)**, **OpenCode**, **Codex** e qualquer CLI de agente. Instalação em um comando, idempotente, pensada para replicar em outro PC ou entregar para outra pessoa.
+> **Stop running one AI agent at a time.** This is a production-ready setup for Claude Code:
+> - the expensive model (Opus) plans;
+> - cheap and free models execute;
+> - a reviewer from another provider checks the diff;
+> - every turn spends the minimum number of tokens.
+>
+> It includes spec-driven development with GitHub Spec Kit, token savings with caveman + RTK + graphify, multi-agent orchestration with alethe, kernel-sandboxed secrets, self-healing free models through 9Router, and an always-on Hermes assistant on Discord or Telegram. **One command on macOS, Linux and Windows.**
+
+**🇧🇷 [Leia em português](README.pt-BR.md)** · 📘 **[The smart vibe coding guide](docs/00-smart-vibe-coding.md)** · 🧩 **[CLAUDE.md / AGENTS.md templates](templates/)**
+
+```bash
+npx github:Gildaciolopes/agentic-dev-stack install --all
+```
 
 ---
 
-## O problema que isso resolve
+## Why
 
-| Sem o stack | Com o stack |
+| Without the stack | With the stack |
 |---|---|
-| Um agente por vez, você vira o gargalo | Lead planeja e dispara vários workers em paralelo, cada um em worktree isolada |
-| Subagentes herdam o modelo mais caro (Opus) sem você perceber | Hook bloqueia subagente em Opus; padrão vira Sonnet; leitura vai pro Haiku/Gemini |
-| Cota do Claude acaba no meio do dia | Leitura pesada vai pra cota do Google (agy) e tarefas mecânicas pra modelos grátis (NVIDIA via 9Router) |
-| "Modelo grátis" quebra toda semana (descontinuado, 404, timeout) | Curador testa os modelos 3x/dia e reescreve o combo sozinho |
-| Saída de terminal e contexto inflando tokens | RTK comprime comandos, caveman corta resposta, Headroom (opcional) comprime contexto |
-| Regras só no CLAUDE.md, que o modelo esquece | Regras viram enforcement: hook, sandbox de kernel, política do alethe |
-| Você só sabe o estado das coisas abrindo o PC | Hermes manda resumo diário + plano do dia no Discord/Telegram |
+| One agent at a time; **you** are the bottleneck | The lead plans and fans out parallel workers, each in an isolated git worktree |
+| Subagents silently inherit Opus | A hook **blocks** Opus subagents; the default becomes Sonnet; reading goes to Haiku/Gemini |
+| Claude quota runs out mid-day | Heavy reading uses Google quota (agy); mechanical edits use free models (NVIDIA via 9Router) |
+| "Free models" break every week (410, 404, timeouts) | A curator probes models 3×/day and rewrites the combo on its own |
+| Terminal output and context bloat every turn | RTK compresses shell output, caveman trims replies, graphify replaces broad reads |
+| Rules live in CLAUDE.md and get ignored | Rules become enforcement: hooks, kernel sandbox, orchestrator policy |
+| No spec, giant prompts, blind diffs | Spec Kit SDD: specify → clarify → plan → tasks → analyze → implement → review → verify |
+| You only know what happened by opening the laptop | Hermes sends a daily digest + plan of the day to Discord/Telegram |
 
----
+## Architecture
 
-## Arquitetura em uma imagem
+![agentic-dev-stack architecture: Opus lead, native subagents, alethe orchestrator, workers, free models, Hermes, token economy layer](docs/assets/architecture.svg)
 
-![Arquitetura do agentic-dev-stack](docs/assets/architecture.svg)
+<sub>Editable source: [`docs/assets/architecture.excalidraw`](docs/assets/architecture.excalidraw) (open at excalidraw.com).</sub>
 
-> Fonte editável: [`docs/assets/architecture.excalidraw`](docs/assets/architecture.excalidraw). Abra em [excalidraw.com](https://excalidraw.com) (File → Open) ou regenere com `python3 docs/assets/build_architecture.py`.
+## The workflow
 
-> O Codex aparece tracejado: não vem instalado, mas é provedor nativo do alethe. Ver [docs/04-codex-e-outros-clis.md](docs/04-codex-e-outros-clis.md).
+![Smart vibe coding workflow: Spec Kit decisions with the lead, delegated execution, review gate, token savings on every turn](docs/assets/workflow.svg)
 
----
+The full guide, **[Smart vibe coding: the complete guide](docs/00-smart-vibe-coding.md)**, covers:
+- how caveman, RTK, graphify and Spec Kit SDD fit together;
+- a day in the life;
+- prompting patterns and anti-patterns;
+- checklists.
 
-## Quem faz o quê
+## Who does what
 
-| Peça | Papel | Por que essa escolha |
+| Piece | Role | Why |
 |---|---|---|
-| **Claude Code (Opus)** | Lead: planeja, decide design, integra, valida o final | Melhor raciocínio; gasto concentrado onde importa |
-| **Sonnet** (subagent `builder` / worker alethe) | Implementa unidades já planejadas; Opus só em unidade `deep`/`risky` | Custo médio, qualidade alta para código guiado por plano |
-| **Haiku** (subagent `scout`) | Leitura e busca que precisa de shell | Barato e rápido para varrer código |
-| **agy Gemini Flash** | Scout de leitura pesada (só ferramentas de arquivo) | Gasta cota do Google, não a do Claude |
-| **agy Claude Opus 4.x** | Revisão independente (caça a bugs) | Outro provedor = segunda opinião real |
-| **OpenCode + 9Router `free`** | Edições mecânicas com check automático (rename, boilerplate, i18n, testes) | Custo zero; roda em worktree isolada e sandbox de kernel |
-| **Codex** (opcional) | Worker/revisor alternativo, fallback quando o Claude está baixo | Cota da assinatura ChatGPT que expira se não usar |
-| **alethe** | Orquestrador: escolhe playbook, modelo por tarefa, vigia cota, troca de provedor | Transforma "use vários agentes" em plano reproduzível com relatório de custo |
-| **Spec Kit** | Fluxo spec → plan → tasks → implement | `tasks.md` vira as unidades que o alethe distribui |
-| **graphify** | Grafo de conhecimento do código | Scouts consultam o grafo antes de grep: menos leitura |
-| **RTK** | Comprime saída de comandos do terminal | Hook transparente, ~15–30% menos tokens de entrada |
-| **caveman** | Corta enrolação nas respostas | Menos tokens de saída e de contexto relido |
-| **Headroom** (opcional) | Proxy que comprime o contexto inteiro | Para sessões de leitura pesada; troca um pouco de fidelidade por token |
-| **9Router** | Roteador de modelos com fallback | Um endpoint OpenAI-compatível para vários modelos grátis |
-| **Curador** | Testa modelos grátis 3x/dia (responde + tool call + latência) e reescreve o combo | Modelo grátis morre sem aviso; script determinístico resolve |
-| **Hermes Agent** | Assistente sempre ligado no Discord/Telegram, sem shell | Resumo diário, avisos, perguntas pelo celular |
-| **agent-model-guard** | Hook que nega subagente em Opus | Regra em texto não funciona; enforcement funciona |
-| **opencode-safe** | `sandbox-exec` que bloqueia leitura de `.env`/chaves no kernel | Modelo grátis + acesso a arquivo = risco de vazamento; o kernel não negocia |
+| **Claude Code (Opus)** | Lead: plans, decides, integrates, validates | Best reasoning, spent only where it matters |
+| **Sonnet** (`builder`) | Implements planned units; Opus only for `deep`/`risky` ones | High quality at mid cost |
+| **Haiku** (`scout`) | Reading and search that needs a shell | Cheap and fast |
+| **agy · Gemini Flash** | Heavy read-only scouting | Uses Google quota, not Claude's |
+| **agy · Claude Opus** / **Codex** | Independent bug-hunting review | A different provider is a real second opinion |
+| **OpenCode + 9Router `free`** | Mechanical edits gated by tests | Zero cost; isolated worktree + kernel sandbox |
+| **alethe** | Orchestrator: playbooks, model per task, quota watch, provider switch, cost report | Turns "use more agents" into a reproducible plan |
+| **GitHub Spec Kit** | Spec-driven development | `tasks.md` becomes the parallel units |
+| **graphify** | Code knowledge graph | Scouts query the graph instead of reading the repo |
+| **RTK** | Compresses shell output | 15–30% fewer input tokens, transparent |
+| **caveman** | Terse replies | Fewer output tokens and less re-read context |
+| **Hermes Agent** | Always-on assistant (no shell) | Digest, alerts and questions from your phone |
+| **agent-model-guard** | Hook that denies Opus subagents | Text rules don't work; enforcement does |
+| **opencode-safe** | Kernel sandbox that denies `.env`/keys | Free model + file access = leak risk |
 
-Detalhes em [docs/01-arquitetura.md](docs/01-arquitetura.md).
+Details: [docs/01-architecture.md](docs/01-architecture.md).
 
----
+## Install
 
-## Instalação rápida
-
-Pré-requisitos: macOS (Apple Silicon ou Intel) com [Homebrew](https://brew.sh), Claude Code logado, Node ≥ 20, Python ≥ 3.10, git. Linux funciona com ressalvas (sem `sandbox-exec`; ver docs).
-
-```bash
-git clone <este-repo> ~/agentic-dev-stack
-cd ~/agentic-dev-stack
-cp config/stack.env.example config/stack.env   # ajuste horários, pasta de projetos, canal do Hermes
-./install.sh --all            # ou escolha fases: --core --workers --free-models --hermes
-```
-
-Depois, em cada projeto:
-
-```bash
-./scripts/add-project.py ~/projects/meu-projeto   # instala alethe, hook passivo, blocos no CLAUDE.md/AGENTS.md
-```
-
-Passos manuais inevitáveis (logins e chaves): ver [docs/02-instalacao.md](docs/02-instalacao.md).
-
----
-
-## Fases do instalador
-
-| Fase | O que instala |
+| Method | Command |
 |---|---|
-| `--core` | RTK (hook global), agentes `scout/builder/reviewer`, `agent-model-guard`, modelo padrão de subagente, bloco no `~/.claude/CLAUDE.md` |
-| `--workers` | OpenCode, Antigravity CLI (`agy`), claude-squad + tmux, sandbox `opencode-safe`, permissões do OpenCode, alethe (commit auditado) + perfil |
-| `--free-models` | 9Router (+ autostart), curador de modelos (3x/dia) |
-| `--extras` | Headroom (isolado via `uv`, telemetria off), yt-dlp |
-| `--hermes` | Hermes Agent endurecido + coletor diário + rotinas |
-| `--all` | Tudo acima |
+| **npx (any OS)** | `npx github:Gildaciolopes/agentic-dev-stack install --all` |
+| **macOS / Linux** | `git clone https://github.com/Gildaciolopes/agentic-dev-stack && cd agentic-dev-stack && ./install.sh --all` |
+| **Windows (PowerShell)** | `git clone https://github.com/Gildaciolopes/agentic-dev-stack; cd agentic-dev-stack; .\install.ps1 --all` |
 
-Cada fase é idempotente: rodar de novo não duplica nada.
+Instead of `--all`, you can pick phases: `--core`, `--workers`, `--free-models`, `--extras`, `--hermes`. Add `--dry-run` to preview. The installer:
+- can be re-run safely (nothing is duplicated);
+- backs up any config it edits;
+- never deletes your content.
 
----
+Then wire each project and check the result:
 
-## Documentação
+```bash
+npx github:Gildaciolopes/agentic-dev-stack add-project ~/code/my-app   # --lang pt-BR for Portuguese blocks
+npx github:Gildaciolopes/agentic-dev-stack doctor
+```
 
-1. [Arquitetura e papel de cada peça](docs/01-arquitetura.md)
-2. [Instalação passo a passo (inclui logins)](docs/02-instalacao.md)
-3. [alethe: orquestração, playbooks e receita de comandos](docs/03-alethe.md)
-4. [Codex, Gemini, Kiro, Copilot: onde encaixar outros CLIs](docs/04-codex-e-outros-clis.md)
-5. [Modelos grátis: 9Router, NVIDIA NIM e o curador](docs/05-modelos-gratis.md)
-6. [Hermes: o que é, Discord/Telegram e 10 usos produtivos](docs/06-hermes.md)
-7. [Segurança: sandbox, segredos, auditoria](docs/07-seguranca.md)
-8. [Troubleshooting: tudo que quebrou e como resolver](docs/08-troubleshooting.md)
-9. [Manutenção e atualização](docs/09-manutencao.md)
+Prerequisites: Node ≥ 18, git and Claude Code. Python ≥ 3.9 is also needed for alethe, the curator and the digest. Per-OS details and the manual steps (logins, keys) are in [docs/02-installation.md](docs/02-installation.md).
 
----
+| Platform | Support |
+|---|---|
+| macOS | Full (launchd, `sandbox-exec` for the free worker) |
+| Linux | Full (crontab/systemd, bubblewrap sandbox) |
+| Windows | Core, workers, alethe, 9Router, Task Scheduler. The free worker is off by default (no kernel sandbox; use WSL2). Hermes via WSL2 |
 
-## Princípios
+CI runs the test suite and a real `--core` install on **Ubuntu, macOS and Windows (PowerShell)**, on Node 20 and 22.
 
-1. **Plan big, execute small** ([Anthropic cookbook](https://github.com/anthropics/claude-cookbooks)): modelo forte nas decisões, barato no volume.
-2. **Delegar só quando paga**: tarefa pequena (≤ 3 arquivos) ou acoplada fica com o lead.
-3. **Enforcement > instrução**: o que importa vira hook, sandbox ou política, não frase no CLAUDE.md.
-4. **Segredo nunca sai da máquina**: `.env*`, chaves e credentials não entram em brief nem em worktree.
-5. **Determinístico onde dá**: escolher modelo, coletar dados e trocar combo é script; LLM só resume e decide.
-6. **Auditar antes de instalar**: tudo de terceiro foi lido antes (alethe fixado num commit auditado).
+## Templates for your projects
 
-## Licença
+- [`templates/project/CLAUDE.md`](templates/project/CLAUDE.md): a starter CLAUDE.md covering SDD, token economy, delegation and definition of done.
+- [`templates/project/AGENTS.md`](templates/project/AGENTS.md): the cross-agent version (Codex, OpenCode, Antigravity, Cursor), with the worker contract.
+- Portuguese versions are in [`templates/pt-BR/`](templates/pt-BR/).
 
-MIT. Ferramentas de terceiros mantêm suas próprias licenças.
+## Hermes: your always-on dev assistant
+
+Scripts collect the data; Hermes summarizes it. Every morning you get a digest with:
+- free-model status, token usage and available updates;
+- Spec Kit progress and an AI radar;
+- yesterday's work and hours per project;
+- **3 priorities for today**.
+
+The docs also include 10 productive recipes: CI triage, uptime/SSL checks, weekly CVEs, a phone inbox that becomes tasks, billable hours, client-friendly release notes and more. Works on Discord or Telegram. → [docs/06-hermes.md](docs/06-hermes.md)
+
+## Documentation
+
+| | English | Português |
+|---|---|---|
+| 0 | [Smart vibe coding: the complete guide](docs/00-smart-vibe-coding.md) | [Vibe coding inteligente: o guia completo](docs/pt-BR/00-vibe-coding-inteligente.md) |
+| 1 | [Architecture](docs/01-architecture.md) | [Arquitetura](docs/pt-BR/01-arquitetura.md) |
+| 2 | [Installation (macOS, Linux, Windows)](docs/02-installation.md) | [Instalação](docs/pt-BR/02-instalacao.md) |
+| 3 | [alethe orchestration](docs/03-alethe.md) | [alethe](docs/pt-BR/03-alethe.md) |
+| 4 | [Codex and other CLIs](docs/04-codex-and-other-clis.md) | [Codex e outros CLIs](docs/pt-BR/04-codex-e-outros-clis.md) |
+| 5 | [Free models: 9Router + curator](docs/05-free-models.md) | [Modelos grátis](docs/pt-BR/05-modelos-gratis.md) |
+| 6 | [Hermes + 10 use cases](docs/06-hermes.md) | [Hermes + 10 usos](docs/pt-BR/06-hermes.md) |
+| 7 | [Security: sandbox, secrets, audits](docs/07-security.md) | [Segurança](docs/pt-BR/07-seguranca.md) |
+| 8 | [Troubleshooting](docs/08-troubleshooting.md) | [Troubleshooting](docs/pt-BR/08-troubleshooting.md) |
+| 9 | [Maintenance](docs/09-maintenance.md) | [Manutenção](docs/pt-BR/09-manutencao.md) |
+
+## FAQ
+
+**What is "smart vibe coding"?**
+You steer intent and decisions; agents do the typing. "Smart" means spec first, cheap models for volume, independent review, verification before "done", and minimal tokens. See the [guide](docs/00-smart-vibe-coding.md).
+
+**How do I save tokens in Claude Code?**
+Stack four things:
+1. RTK, for shell output;
+2. caveman, for replies;
+3. graphify, for reading code;
+4. a lean CLAUDE.md, with one topic per chat.
+
+Then stop paying Opus prices for reading and boilerplate: delegate those to Haiku, Gemini, Sonnet and free models.
+
+**Can I use free models with Claude Code?**
+Yes, as workers: OpenCode + 9Router with free NVIDIA NIM models. The curator keeps them healthy, and the sandbox makes sure they never see your secrets.
+
+**How do I run multiple Claude Code agents in parallel?**
+Two ways: native subagents (`scout`/`builder`/`reviewer`) with worktree isolation, or alethe playbooks such as `parallel-worktrees` for Spec Kit `[P]` tasks.
+
+**Does it work with Codex, Gemini, Kiro or Copilot CLI?**
+Codex is a native alethe provider (`WITH_CODEX=1`); the others plug in as custom workers. See [docs/04](docs/04-codex-and-other-clis.md).
+
+**Does it work on Windows?**
+Yes for the core, workers, orchestration and schedules (PowerShell, Task Scheduler). The free-model worker needs a kernel sandbox, so on Windows run it under WSL2.
+
+**Is it safe?**
+- Third-party pieces were audited and pinned to a reviewed version.
+- The free worker is blocked from reading secrets at the kernel level.
+- Hermes runs without a shell.
+
+See [docs/07-security.md](docs/07-security.md).
+
+## Principles
+
+1. **Plan big, execute small**: strong model for decisions, cheap model for volume.
+2. **Delegate only when it pays**: small or coupled tasks stay with the lead.
+3. **Enforcement over instructions**: hooks, sandboxes and policies, not sentences in CLAUDE.md.
+4. **Secrets never leave the machine.**
+5. **Deterministic where possible**: scripts collect and decide; models summarize and reason.
+6. **Audit before installing**: third-party code is read and pinned.
+
+## Contributing
+
+Issues and PRs are welcome: new worker adapters, Linux/Windows sandboxes, Hermes recipes, translations. Run `npm test` before opening a PR.
+
+## License
+
+MIT. Third-party tools keep their own licenses.

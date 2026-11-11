@@ -8,10 +8,11 @@ O Codex é um **provedor nativo do alethe** (read-only via sandbox, write via `w
 
 ### Instalar
 ```bash
-# em config/stack.env: WITH_CODEX=1
-./install.sh --workers          # brew install codex + rtk init -g --codex
-codex login                     # conta ChatGPT
-./scripts/configure-alethe.py --force   # reconstrói o perfil já com Codex
+# em ~/.config/agentic-dev-stack/stack.env: WITH_CODEX=1
+npx agentic-dev-stack install --workers   # ou ./install.sh --workers
+                                          # instala @openai/codex via npm + rtk init -g --codex
+codex login                               # conta ChatGPT
+npx agentic-dev-stack configure-alethe --force   # reconstrói o perfil já com Codex
 ```
 
 ### O que muda no perfil
@@ -25,7 +26,7 @@ O alethe funciona igual com o Codex como lead: a skill é universal e o Codex l�
 ```bash
 npx skills add Kc1t/alethe-orchestrate-skill    # escolha Codex; ou: codex plugin marketplace add Kc1t/alethe-orchestrate-skill
 ```
-O bloco `AGENTS.md` que o `add-project.py` gera já traz as regras de worker. No `new`, use `--lead codex:<modelo>`.
+O bloco `AGENTS.md` que o `npx agentic-dev-stack add-project` gera já traz as regras de worker. No `new`, use `--lead codex:<modelo>`.
 
 ### Economia de tokens no Codex
 - `rtk init -g --codex` (feito pelo instalador)
@@ -65,7 +66,7 @@ Regras do alethe para custom:
 - flags que aprovam tudo (`--yolo`, `--trust-all-tools`, `--allow-all-tools`, `--auto`, `-y`) são **recusadas**, a menos que a policy tenha `trust.allowUnsafe: true`, coisa que só você deve ligar;
 - se o CLI tiver acesso a arquivo, embrulhe num sandbox como o `opencode-safe` (troque o binário no wrapper).
 
-Rode `./scripts/configure-alethe.py` só para Claude/agy/Codex/OpenCode. Customs entram à mão, uma vez.
+Rode `npx agentic-dev-stack configure-alethe` só para Claude/agy/Codex/OpenCode. Customs entram à mão, uma vez.
 
 ## Kimi Code
 

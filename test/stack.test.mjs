@@ -131,12 +131,12 @@ test("add-project --lang pt-BR uses Portuguese templates", () => {
 
 test("integration: real alethe clone + profile (set ALETHE_IT=1)", { skip: process.env.ALETHE_IT !== "1" }, async () => {
   fs.rmSync(path.join(HOME, ".agents", "skills", "alethe"), { recursive: true, force: true });
-  const { installAlethe, configureAlethe } = await import("../lib/alethe.mjs");
+  const { installAlethe, configureAlethe, aletheCfgDir } = await import("../lib/alethe.mjs");
   const cfg = loadConfig();
   installAlethe(cfg, {});
   const valid = configureAlethe(cfg, { detect: { codex: true, opencode: false, agy: { ids: ["gemini-9-flash-high", "claude-opus-9"], gem: "gemini-9-flash", opus: "claude-opus-9", sonnet: null } } });
   assert.equal(valid, true);
-  const pb = fs.readFileSync(path.join(HOME, ".config", "alethe", "alethe-playbooks.yaml"), "utf8");
+  const pb = fs.readFileSync(path.join(aletheCfgDir(), "alethe-playbooks.yaml"), "utf8");
   assert.match(pb, /providers: \[claude, agy, codex\]/);
   assert.match(pb, /provider: agy/);
 });

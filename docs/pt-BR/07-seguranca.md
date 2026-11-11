@@ -12,7 +12,7 @@ Um setup multi-agente amplia três riscos:
 | Camada | Protege contra | Onde |
 |---|---|---|
 | Worktree isolada | o worker não enxerga `.env` (o git não copia ignorados) | alethe `isolate: true`; sem `seedPaths` de segredo |
-| `sandbox-exec` (kernel) | leitura de `.env*`, chaves, credentials, `~/.ssh`, `~/.aws`, Keychain, **qualquer que seja o comando** | `bin/opencode-safe` + `sandbox/deny-secrets.sb.template` |
+| `sandbox-exec` (macOS) / `bubblewrap` (Linux) | leitura de `.env*`, chaves, credentials, `~/.ssh`, `~/.aws`, Keychain, **qualquer que seja o comando** | `bin/opencode-safe` + `sandbox/deny-secrets.sb.template` (macOS), `bin/opencode-safe-linux` (Linux) |
 | `--standalone` | o serviço de fundo do OpenCode rodando fora do sandbox | `bin/opencode-safe` |
 | Permissões do OpenCode | 2ª camada (bypassável, ex.: `grep -r KEY .`) | `templates/opencode-permissions.json` |
 | Filtro de env do alethe | vars `*_TOKEN/_KEY/_SECRET/_PASSWORD` removidas dos workers | nativo do alethe |
@@ -46,18 +46,21 @@ Lição: **filtro por padrão de comando é decorativo**. Só o kernel (ou um co
 /usr/bin/sandbox-exec -f ~/.config/agentic-dev-stack/deny-secrets.sb cat /tmp/leak/.env   # → Operation not permitted
 ```
 
-## Linux: equivalente com bubblewrap
+## Linux: bubblewrap
 
-```bash
-#!/bin/sh
-# ~/.local/bin/opencode-safe (Linux): monta o repo atual, esconde segredos com tmpfs/bind vazio
-exec bwrap --ro-bind / / --dev /dev --proc /proc --tmpfs /tmp \
-  --bind "$PWD" "$PWD" --bind "$HOME/.local/share/opencode" "$HOME/.local/share/opencode" \
-  --tmpfs "$HOME/.ssh" --tmpfs "$HOME/.aws" --tmpfs "$HOME/.config/gcloud" \
-  $(find "$PWD" -name '.env*' ! -name '*.example' -printf '--ro-bind /dev/null %p ') \
-  opencode --standalone "$@"
-```
-Ou rode o worker num container sem montar segredos.
+O repo traz `bin/opencode-safe-linux`, que o instalador copia para `~/.local/bin/opencode-safe` quando o `bwrap` existe (`apt install bubblewrap`). Ele:
+- mascara todo `.env*`, `*.pem`, `*.key`, `*credentials*.json` e `*service-account*.json` do repo atual com `--ro-bind /dev/null`;
+- esconde `~/.ssh`, `~/.aws`, `~/.config/gcloud`, `~/.gemini` e `~/.codex` com `tmpfs` vazio;
+- passa `--standalone` ao OpenCode (mesma razão do macOS).
+
+Sem `bwrap`, a fase `--workers` desliga o worker grátis e avisa. Teste igual ao do macOS: `cat /tmp/leak/.env` dentro do wrapper deve mostrar o arquivo vazio.
+
+## Windows: sem sandbox de kernel
+
+O Windows não tem um equivalente de `sandbox-exec`/`bwrap` acessível a um usuário comum (AppContainer e Job Objects não bloqueiam leitura de arquivo por caminho de forma prática para uma CLI qualquer). Por isso:
+- **Padrão:** o worker grátis (`opencode-safe`) fica **desligado** no Windows.
+- **Recomendado:** rode o stack no **WSL2** e use o caminho Linux acima.
+- **`ALLOW_UNSANDBOXED_FREE_WORKER=1`** em `stack.env` instala um `opencode-safe.cmd` **sem sandbox**: só worktree isolada (o `.env` não é copiado) e as permissões do OpenCode protegem você. Como o teste de vazamento mostrou, permissão por padrão de comando é contornável (`grep -r` com caminho absoluto). Aceite o risco apenas em máquinas sem segredos fora do repo.
 
 ## Auditoria de terceiros (o que foi verificado)
 

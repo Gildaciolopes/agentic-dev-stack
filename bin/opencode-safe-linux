@@ -6,10 +6,7 @@ command -v bwrap >/dev/null 2>&1 || { echo "opencode-safe: bubblewrap (bwrap) no
 OPENCODE_BIN="${OPENCODE_BIN:-$(command -v opencode)}"
 [ -n "$OPENCODE_BIN" ] || { echo "opencode-safe: opencode not found on PATH" >&2; exit 1; }
 set -- --standalone "$@"
-MASKS=""
-for f in $(find "$PWD" -maxdepth 6 \( -name node_modules -o -name .git \) -prune -o -type f \( -name '.env' -o -name '.env.*' -o -name '*.pem' -o -name '*.key' -o -name '*credentials*.json' -o -name '*service-account*.json' \) ! -name '*.example' -print 2>/dev/null); do
-  MASKS="$MASKS --ro-bind /dev/null $f"
-done
+MASKS="$(find "$PWD" -maxdepth 6 \( -name node_modules -o -name .git \) -prune -o -type f \( -name '.env' -o -name '.env.*' -o -name '*.pem' -o -name '*.key' -o -name '*credentials*.json' -o -name '*service-account*.json' \) ! -name '*.example' -print 2>/dev/null | while IFS= read -r f; do printf -- '--ro-bind /dev/null %s ' "$f"; done)"
 for d in .ssh .aws .config/gcloud .gemini .codex; do
   [ -d "$HOME/$d" ] && MASKS="$MASKS --tmpfs $HOME/$d"
 done
