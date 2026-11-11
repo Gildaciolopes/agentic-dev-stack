@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: ${{ matrix.os }} · node ${{ matrix.node }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: [20, 22]
+    env:
+      NO_COLOR: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Syntax check (Node + Python)
+        shell: bash
+        run: |
+          for f in bin/cli.mjs lib/*.mjs hooks/*.mjs test/*.mjs; do node --check "$f"; done
+          python -m py_compile scripts/model-curator/curate.py scripts/daily-digest/collect.py
+
+      - name: Unit + integration tests (real alethe clone, fake HOME)
+        env:
+          ALETHE_IT: "1"
+        run: npm test
+
+      - name: install.sh --core (macOS/Linux, throwaway HOME)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          export ADS_HOME="$(mktemp -d)" ADS_SKIP_INSTALLS=1
+          ./install.sh --core
+          ./install.sh --core
+          node bin/cli.mjs doctor
+          test "$(grep -c 'BEGIN AGENTIC-DEV-STACK' "$ADS_HOME/.claude/CLAUDE.md")" = 1
+          echo '{"tool_input":{"subagent_type":"Explore"}}' | node "$ADS_HOME/.claude/hooks/agent-model-guard.mjs" | grep -q '"deny"'
+
+      - name: install.ps1 --core (Windows PowerShell, throwaway HOME)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $env:ADS_HOME = Join-Path $env:RUNNER_TEMP "ads-home"
+          $env:ADS_SKIP_INSTALLS = "1"
+          ./install.ps1 --core
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          ./install.ps1 --core
+          node bin/cli.mjs doctor
+          $md = Get-Content (Join-Path $env:ADS_HOME ".claude/CLAUDE.md") -Raw
+          if (([regex]::Matches($md, "BEGIN AGENTIC-DEV-STACK")).Count -ne 1) { throw "block duplicated" }
+          $out = '{"tool_input":{"subagent_type":"Explore"}}' | node (Join-Path $env:ADS_HOME ".claude/hooks/agent-model-guard.mjs")
+          if ($out -notmatch '"deny"') { throw "guard did not deny" }
+
+      - name: install --all --dry-run
+        shell: bash
+        env:
+          ADS_SKIP_INSTALLS: "1"
+        run: ADS_HOME="$(mktemp -d)" node bin/cli.mjs install --all --dry-run
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: shellcheck
+        run: shellcheck -S warning install.sh bin/opencode-safe bin/opencode-safe-linux
+      - name: npx entrypoint from the repo
+        run: |
+          npm pack --dry-run
+          npx --yes . --help | head -3

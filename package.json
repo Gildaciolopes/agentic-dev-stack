@@ -1,0 +1,20 @@
+{
+  "name": "agentic-dev-stack",
+  "version": "1.0.0",
+  "description": "Smart vibe coding stack for Claude Code: multi-agent orchestration (Opus plans, cheap/free models execute), Spec Kit SDD, caveman + RTK token savings, graphify, sandboxed secrets and an always-on Hermes assistant. macOS, Linux, Windows.",
+  "type": "module",
+  "bin": {
+    "agentic-dev-stack": "bin/cli.mjs",
+    "ads": "bin/cli.mjs"
+  },
+  "files": ["bin/", "lib/", "hooks/", "agents/", "sandbox/", "scripts/", "templates/", "config/stack.env.example"],
+  "scripts": {
+    "test": "node --test test/stack.test.mjs"
+  },
+  "engines": { "node": ">=18" },
+  "keywords": ["claude-code", "vibe-coding", "ai-agents", "multi-agent", "agentic-coding", "spec-driven-development", "spec-kit", "token-optimization", "llm", "claude", "anthropic", "codex", "opencode", "hermes-agent", "caveman", "rtk", "graphify", "ai-coding", "developer-tools", "orchestration"],
+  "repository": { "type": "git", "url": "git+https://github.com/Gildaciolopes/agentic-dev-stack.git" },
+  "homepage": "https://github.com/Gildaciolopes/agentic-dev-stack#readme",
+  "bugs": "https://github.com/Gildaciolopes/agentic-dev-stack/issues",
+  "license": "MIT"
+}

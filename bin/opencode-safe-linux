@@ -1,0 +1,17 @@
+#!/bin/sh
+# opencode inside a bubblewrap sandbox (Linux). Secrets are masked: every .env* in the current
+# repo is bound to /dev/null, and ~/.ssh, ~/.aws, ~/.config/gcloud, ~/.gemini, ~/.codex are empty tmpfs.
+# --standalone keeps tool execution inside the sandbox (no background service).
+command -v bwrap >/dev/null 2>&1 || { echo "opencode-safe: bubblewrap (bwrap) not installed" >&2; exit 1; }
+OPENCODE_BIN="${OPENCODE_BIN:-$(command -v opencode)}"
+[ -n "$OPENCODE_BIN" ] || { echo "opencode-safe: opencode not found on PATH" >&2; exit 1; }
+set -- --standalone "$@"
+MASKS=""
+for f in $(find "$PWD" -maxdepth 6 \( -name node_modules -o -name .git \) -prune -o -type f \( -name '.env' -o -name '.env.*' -o -name '*.pem' -o -name '*.key' -o -name '*credentials*.json' -o -name '*service-account*.json' \) ! -name '*.example' -print 2>/dev/null); do
+  MASKS="$MASKS --ro-bind /dev/null $f"
+done
+for d in .ssh .aws .config/gcloud .gemini .codex; do
+  [ -d "$HOME/$d" ] && MASKS="$MASKS --tmpfs $HOME/$d"
+done
+# shellcheck disable=SC2086
+exec bwrap --dev-bind / / --proc /proc --tmpfs /tmp $MASKS "$OPENCODE_BIN" "$@"

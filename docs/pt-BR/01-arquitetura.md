@@ -19,9 +19,9 @@ Isso é o padrão **plan big, execute small** dos cookbooks da Anthropic, estend
 
 ## Camadas
 
-![Arquitetura do agentic-dev-stack](assets/architecture.svg)
+![Arquitetura do agentic-dev-stack](../assets/architecture.svg)
 
-> Fonte editável: [`assets/architecture.excalidraw`](assets/architecture.excalidraw) (abre em excalidraw.com).
+> Fonte editável: [`assets/architecture.excalidraw`](../assets/architecture.excalidraw) (abre em excalidraw.com).
 
 <details>
 <summary>Versão em texto</summary>
