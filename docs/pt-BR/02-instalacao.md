@@ -81,8 +81,34 @@ Para cada repo:
 npx agentic-dev-stack add-project ~/projects/meu-app --dry-run   # veja o bloco que seria anexado
 npx agentic-dev-stack add-project ~/projects/meu-app
 ```
-No clone: `node bin/cli.mjs add-project ...`. Opções: `--dry-run`, `--no-docs`, `--lang en|pt-BR`.
-Revise no fim do `CLAUDE.md` do projeto os **Gates** (comandos de check) e as **Unidades de paralelização**: elas são detectadas automaticamente a partir de Makefile, package.json e pyproject.
+No clone: `node bin/cli.mjs add-project ...`. Opções: `--dry-run`, `--no-docs`, `--lang en|pt-BR`, `--refresh`, `--remove`.
+Revise no fim do `CLAUDE.md` do projeto os **Gates** (comandos de check) e as **Unidades de paralelização**: elas são detectadas automaticamente a partir de Makefile, package.json, pyproject, Cargo e go.mod.
+
+**Nada da pasta é apagado.** Um `CLAUDE.md`/`AGENTS.md` que já existe só ganha um bloco no fim, entre os marcadores `BEGIN/END ALETHE ORCHESTRATION`; se não existe, é criado. O `.claude/settings.local.json` é mesclado. Rodar duas vezes não muda nada.
+
+#### Projeto novo do zero
+O bloco é gerado a partir do que a pasta tem *naquele momento*; numa pasta vazia, os gates saem genéricos. Dois jeitos de acertar:
+
+```bash
+mkdir loja && cd loja && git init      # git primeiro: os arquivos locais já entram no git exclude
+# base do projeto: package.json/pyproject com scripts de test, lint, typecheck
+specify init .                         # opcional: Spec Kit -> o bloco já sai no fluxo SDD
+npx agentic-dev-stack add-project . --lang pt-BR
+```
+
+Ou ligue no primeiro dia e atualize depois da base pronta:
+
+```bash
+npx agentic-dev-stack add-project . --lang pt-BR            # dia 1, pasta vazia
+# ...base do projeto, scripts, specify init...
+npx agentic-dev-stack add-project . --lang pt-BR --refresh  # regera só o nosso bloco; o seu texto em volta fica
+```
+
+#### Desligar um projeto
+```bash
+npx agentic-dev-stack add-project ~/projects/meu-app --remove   # --dry-run para ver antes
+```
+Remove o nosso bloco, o link do alethe, os hooks do alethe no `settings.local.json` e as nossas linhas no `.git/info/exclude`. Um `CLAUDE.md`/`AGENTS.md` que só tinha o nosso bloco é apagado; o que você escreveu fica.
 
 > **Repos versionados:** o bloco é anexado ao `CLAUDE.md`/`AGENTS.md`, que normalmente estão no git, então aparece no `git status`. Commite se o time usa o stack, ou não commite se é só seu. A skill, o hook e a pasta `.alethe/` já ficam fora do git via `.git/info/exclude`.
 
@@ -108,16 +134,18 @@ Teste do guard: dentro do claude, peça "lance um subagente Explore para listar 
 ## 5. Desinstalar
 
 ```bash
-# agendamentos (macOS)
-for l in model-curator daily-digest 9router; do launchctl bootout gui/$(id -u)/com.agentic-dev-stack.$l 2>/dev/null; rm -f ~/Library/LaunchAgents/com.agentic-dev-stack.$l.plist; done
-~/.local/bin/hermes gateway uninstall; ~/.local/bin/hermes uninstall
-# Claude Code: remova o bloco AGENTIC-DEV-STACK de ~/.claude/CLAUDE.md, o hook e o env de ~/.claude/settings.json
-rm -rf ~/.agents/skills/alethe ~/.config/alethe ~/.config/agentic-dev-stack ~/.local/bin/opencode-safe
-# Projetos: remova o symlink .claude/skills/alethe e o bloco ALETHE ORCHESTRATION do CLAUDE.md/AGENTS.md
+npx agentic-dev-stack uninstall --dry-run   # veja o que seria removido
+npx agentic-dev-stack uninstall             # --purge remove também a skill do alethe e o seu stack.env
 ```
-Nomes dos agendamentos a remover: `com.agentic-dev-stack.model-curator`, `com.agentic-dev-stack.daily-digest` e `com.agentic-dev-stack.9router` (launchd); no Linux e no Windows o autostart do 9Router se chama `agentic-dev-stack-9router` (unit `systemd --user` / tarefa `schtasks`), e o curador e o resumo ficam no `crontab -e` / Agendador de Tarefas.
 
-Os backups ficam em `~/.local/share/agentic-dev-stack/backups/`.
+Remove só o que o instalador criou ou anexou:
+- o bloco `AGENTIC-DEV-STACK` do `~/.claude/CLAUDE.md` (o seu texto fica);
+- o hook do guard e o `CLAUDE_CODE_SUBAGENT_MODEL=sonnet` do `~/.claude/settings.json` (as outras chaves ficam; um modelo diferente que você escolheu fica);
+- o script do guard e os subagentes `scout`/`builder`/`reviewer`, **a menos que você tenha editado**;
+- os agendamentos do curador, do resumo e do 9Router (launchd, crontab/systemd ou Agendador de Tarefas);
+- o `opencode-safe`, o perfil do sandbox e os scripts agendados.
+
+Todo arquivo editado ganha backup antes, em `~/.local/share/agentic-dev-stack/backups/<data>/`, mantendo o caminho original. As ferramentas de terceiros continuam instaladas; o comando mostra como remover cada uma (hook do RTK: `rtk init -g --uninstall`; rotinas do Hermes: `hermes cron list`). Projetos ligados são desligados um a um com `add-project <pasta> --remove`.
 
 ## Notas por sistema
 

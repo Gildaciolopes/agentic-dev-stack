@@ -1,6 +1,6 @@
 {
   "name": "agentic-dev-stack",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Smart vibe coding stack for Claude Code: multi-agent orchestration (Opus plans, cheap/free models execute), Spec Kit SDD, caveman + RTK token savings, graphify, sandboxed secrets and an always-on Hermes assistant. macOS, Linux, Windows.",
   "type": "module",
   "bin": {

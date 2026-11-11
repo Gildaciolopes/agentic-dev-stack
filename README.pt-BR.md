@@ -20,6 +20,8 @@
 npx agentic-dev-stack install --all
 ```
 
+![Demo: instalar o stack, ligar um projeto, orquestrar workers em paralelo com review, verificar com doctor](docs/assets/demo.gif)
+
 ---
 
 ## Por quê
@@ -34,6 +36,26 @@ npx agentic-dev-stack install --all
 | Regras no CLAUDE.md que o modelo ignora | Regras viram enforcement: hook, sandbox de kernel, política do orquestrador |
 | Sem spec, prompt gigante, diff aceito no escuro | Spec Kit SDD: specify → clarify → plan → tasks → analyze → implement → review → verificar |
 | Você só sabe o que aconteceu abrindo o notebook | O Hermes manda resumo diário + plano do dia no Discord/Telegram |
+
+## Medido, não prometido
+
+Números reais da máquina do autor, direto do `rtk gain --monthly` (24.431 comandos de shell rodados pelos agentes):
+
+| Mês | Comandos | Tokens que não entraram no contexto | Economia |
+|---|---:|---:|---:|
+| 2026-09 | 10.215 | 330K | 11,9% |
+| 2026-10 | 10.898 | 686K | 14,1% |
+| 2026-11 (stack montado no início do mês, parcial) | 3.318 | 261K | **24,2%** |
+| **Total** | **24.431** | **1,3M** | **14,6%** |
+
+É um dev e uma carga de trabalho, e novembro está pela metade: leia como tendência, não como benchmark. A economia da delegação (subagentes, alethe) e do caveman ainda não está medida aqui. Meça a sua depois de 1–2 semanas:
+
+```bash
+rtk gain --monthly                                                  # economia na saída do shell
+python3 -I ~/.agents/skills/alethe/scripts/orchestrate.py report    # custo, modelos e provedores por execução
+```
+
+Compartilhe os seus números numa issue: uma tabela de resultados reais de setups diferentes vale mais que qualquer promessa.
 
 ## Arquitetura
 
@@ -91,6 +113,8 @@ Depois, ligue cada projeto e confira se está tudo certo:
 npx agentic-dev-stack add-project ~/projetos/meu-app --lang pt-BR
 npx agentic-dev-stack doctor
 ```
+
+O `add-project` nunca apaga nada: ele anexa um bloco marcado ao `CLAUDE.md`/`AGENTS.md`. Projeto novo, pasta vazia? Ligue agora e rode `add-project . --refresh` depois de montar a base, para detectar de novo os comandos de test/lint e o Spec Kit. Para desfazer: `add-project <pasta> --remove` num projeto, `uninstall` no stack inteiro (os dois fazem backup do que tocam e aceitam `--dry-run`).
 
 Pré-requisitos: Node ≥ 18, git e Claude Code. O Python ≥ 3.9 também é necessário para o alethe, o curador e o coletor. Detalhes por SO e os passos manuais (logins, chaves) estão em [docs/pt-BR/02-instalacao.md](docs/pt-BR/02-instalacao.md).
 
@@ -159,6 +183,9 @@ O Codex é provedor nativo do alethe (`WITH_CODEX=1`); os outros entram como wor
 **Funciona no Windows?**
 Sim, para o core, os workers, a orquestração e os agendamentos (PowerShell, Agendador de Tarefas). O worker grátis precisa de sandbox de kernel, então no Windows rode ele no WSL2.
 
+**Ele apaga ou sobrescreve os meus arquivos?**
+Não. Ele só anexa blocos entre marcadores `BEGIN/END`, mescla configs JSON e faz backup de todo arquivo que edita em `~/.local/share/agentic-dev-stack/backups/`. O `uninstall` e o `add-project --remove` tiram só esses blocos e entradas.
+
 **É seguro?**
 - As peças de terceiros foram auditadas e fixadas numa versão revisada.
 - O worker grátis é bloqueado no kernel de ler segredos.
@@ -177,7 +204,7 @@ Veja [docs/pt-BR/07-seguranca.md](docs/pt-BR/07-seguranca.md).
 
 ## Contribuindo
 
-Issues e PRs são bem-vindos: novos adaptadores de worker, sandboxes para Linux e Windows, receitas para o Hermes, traduções. Rode `npm test` antes de abrir o PR.
+Issues e PRs são bem-vindos: novos adaptadores de worker, sandboxes para Linux e Windows, receitas para o Hermes, traduções. Comece pelo [CONTRIBUTING.md](CONTRIBUTING.md); falhas de segurança vão pelo [SECURITY.md](SECURITY.md) (em privado). Novidades: [CHANGELOG.md](CHANGELOG.md).
 
 ## Licença
 

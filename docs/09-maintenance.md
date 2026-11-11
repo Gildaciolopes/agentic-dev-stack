@@ -24,6 +24,14 @@ Schedules: launchd on macOS, crontab on Linux, Task Scheduler on Windows. Logs l
 | alethe | audit → change `ALETHE_COMMIT` in `~/.config/agentic-dev-stack/stack.env` → `npx agentic-dev-stack install --workers` | see [03-alethe.md](03-alethe.md) |
 | The stack itself | re-run `npx agentic-dev-stack install --all` | idempotent; config edits are backed up first |
 
+## Update the stack
+
+```bash
+npx agentic-dev-stack@latest install --all                        # idempotent: only applies what changed
+npx agentic-dev-stack@latest add-project ~/projects/my-app --refresh   # bring a project's block up to the new template
+```
+Release notes: [CHANGELOG.md](../CHANGELOG.md). `--refresh` rewrites only the text between the `ALETHE ORCHESTRATION` markers, so your own notes in `CLAUDE.md` survive.
+
 ## Move to another PC
 
 On any OS, with Node 18+ and Claude Code installed:

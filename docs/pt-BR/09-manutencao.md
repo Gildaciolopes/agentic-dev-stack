@@ -21,6 +21,14 @@
 | Hermes | `hermes update` | leia o changelog: mudanças no gateway podem exigir `hermes gateway install` de novo |
 | alethe | auditar → mudar `ALETHE_COMMIT` em `~/.config/agentic-dev-stack/stack.env` → `npx agentic-dev-stack install --workers` | ver [03-alethe.md](03-alethe.md#atualizar-o-alethe-com-segurança) |
 
+## Atualizar o stack
+
+```bash
+npx agentic-dev-stack@latest install --all                             # idempotente: só aplica o que mudou
+npx agentic-dev-stack@latest add-project ~/projects/meu-app --refresh  # leva o bloco do projeto ao template novo
+```
+Novidades: [CHANGELOG.md](../../CHANGELOG.md). O `--refresh` reescreve só o texto entre os marcadores `ALETHE ORCHESTRATION`, então as suas notas no `CLAUDE.md` ficam.
+
 ## Levar para outro PC
 
 Em qualquer SO, com Node 18+ e Claude Code instalados:

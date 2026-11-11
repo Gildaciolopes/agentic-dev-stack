@@ -2,10 +2,11 @@
 // agentic-dev-stack CLI. Cross-platform (macOS, Linux, Windows), zero dependencies.
 //   npx agentic-dev-stack install --all
 import fs from "node:fs";
-import { addProject } from "../lib/add-project.mjs";
+import { addProject, removeProject } from "../lib/add-project.mjs";
 import { aletheDir, configureAlethe } from "../lib/alethe.mjs";
 import { phaseCore } from "../lib/core.mjs";
 import { phaseExtras, phaseFreeModels, phaseHermes, phaseWorkers } from "../lib/phases.mjs";
+import { uninstall } from "../lib/uninstall.mjs";
 import { IS_LINUX, IS_MAC, IS_WIN, REPO, TODOS, backupLocation, has, home, loadConfig, log, p, python, readJSON } from "../lib/util.mjs";
 
 const VERSION = readJSON(p(REPO, "package.json")).version;
@@ -13,9 +14,18 @@ const HELP = `agentic-dev-stack ${VERSION}: smart vibe coding stack for Claude C
 
 Usage:
   agentic-dev-stack install [phases] [--dry-run] [--config <file>]
-  agentic-dev-stack add-project <dir> [--dry-run] [--no-docs] [--lang en|pt-BR]
+  agentic-dev-stack add-project <dir> [--refresh | --remove] [--dry-run] [--no-docs] [--lang en|pt-BR]
   agentic-dev-stack configure-alethe [--force]
   agentic-dev-stack doctor
+  agentic-dev-stack uninstall [--dry-run] [--purge]
+
+add-project:
+  (default)      append the orchestration block to CLAUDE.md/AGENTS.md (never rewrites your content)
+  --refresh      regenerate only that block (re-detects gates, units, Spec Kit); run after scaffolding
+  --remove       unwire the project: drop the block, the alethe link, its hooks and git-exclude lines
+
+uninstall:       removes only what the installer created/appended (backups kept); --purge also removes
+                 the alethe skill and your stack.env. Third-party tools stay installed.
 
 Phases (install):
   --core         RTK, subagents scout/builder/reviewer, agent-model-guard hook, default subagent model, global CLAUDE.md block
@@ -37,6 +47,9 @@ function parse(argv) {
     else if (x === "--dry-run") a.dryRun = true;
     else if (x === "--force") a.force = true;
     else if (x === "--no-docs") a.noDocs = true;
+    else if (x === "--refresh") a.refresh = true;
+    else if (x === "--remove") a.remove = true;
+    else if (x === "--purge") a.purge = true;
     else if (x === "--config") a.config = argv[++i];
     else if (x === "--lang") a.lang = argv[++i];
     else if (x === "-h" || x === "--help") a.help = true;
@@ -85,6 +98,14 @@ async function main() {
   if (cmd === "install") {
     if (!a.phases.length) return console.log(HELP);
     preflight();
+    // first real run: give the user an editable copy of the defaults
+    const userCfg = p(home(), ".config", "agentic-dev-stack", "stack.env");
+    if (!a.config && !a.dryRun && !fs.existsSync(userCfg)) {
+      fs.mkdirSync(p(home(), ".config", "agentic-dev-stack"), { recursive: true });
+      fs.copyFileSync(p(REPO, "config", "stack.env.example"), userCfg);
+      Object.assign(cfg, loadConfig());
+      log.ok(`config created: ${userCfg} (edit it and re-run to change defaults)`);
+    }
     for (const ph of a.phases) {
       if (ph === "core") phaseCore({ dryRun: a.dryRun });
       if (ph === "workers") phaseWorkers(cfg, { dryRun: a.dryRun });
@@ -101,11 +122,14 @@ async function main() {
     console.log(`\nConfig: ${cfg.__file}\nDocs:   https://github.com/Gildaciolopes/agentic-dev-stack/tree/main/docs`);
   } else if (cmd === "add-project") {
     if (!a._[1]) throw new Error("usage: add-project <dir>");
-    addProject(a._[1], { dryRun: a.dryRun, noDocs: a.noDocs, lang: a.lang || cfg.PROJECT_DOCS_LANG || "en" });
+    if (a.remove) removeProject(a._[1], { dryRun: a.dryRun });
+    else addProject(a._[1], { dryRun: a.dryRun, noDocs: a.noDocs, refresh: a.refresh, lang: a.lang || cfg.PROJECT_DOCS_LANG || "en" });
   } else if (cmd === "configure-alethe") {
     configureAlethe(cfg, { force: a.force });
   } else if (cmd === "doctor") {
     doctor();
+  } else if (cmd === "uninstall") {
+    uninstall({ dryRun: a.dryRun, purge: a.purge });
   } else {
     console.log(HELP);
     process.exitCode = 1;

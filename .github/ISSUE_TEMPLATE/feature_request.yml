@@ -1,0 +1,22 @@
+name: Feature request
+description: A new worker, Hermes recipe, platform improvement or doc
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What slows you down or costs too many tokens today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: How should it work? Which OS does it affect?
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Contribution
+      options:
+        - label: I'd like to open a PR for this

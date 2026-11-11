@@ -20,6 +20,8 @@
 npx agentic-dev-stack install --all
 ```
 
+![Demo: install the stack, wire a project, orchestrate parallel workers with a review gate, verify with doctor](docs/assets/demo.gif)
+
 ---
 
 ## Why
@@ -34,6 +36,26 @@ npx agentic-dev-stack install --all
 | Rules live in CLAUDE.md and get ignored | Rules become enforcement: hooks, kernel sandbox, orchestrator policy |
 | No spec, giant prompts, blind diffs | Spec Kit SDD: specify → clarify → plan → tasks → analyze → implement → review → verify |
 | You only know what happened by opening the laptop | Hermes sends a daily digest + plan of the day to Discord/Telegram |
+
+## Measured, not promised
+
+Real numbers from the author's machine, straight from `rtk gain --monthly` (24,431 shell commands run by agents):
+
+| Month | Commands | Tokens kept out of context | Saved |
+|---|---:|---:|---:|
+| 2026-09 | 10,215 | 330K | 11.9% |
+| 2026-10 | 10,898 | 686K | 14.1% |
+| 2026-11 (stack set up early in the month, partial) | 3,318 | 261K | **24.2%** |
+| **Total** | **24,431** | **1.3M** | **14.6%** |
+
+That is one developer and one workload, and November is a partial month, so read it as a trend, not a benchmark. Savings from delegation (subagents, alethe) and caveman are not measured here yet. Measure your own after a week or two:
+
+```bash
+rtk gain --monthly                                                  # shell output savings
+python3 -I ~/.agents/skills/alethe/scripts/orchestrate.py report    # per-run cost, models and providers
+```
+
+Share your numbers in an issue: a table of real results from different setups is worth more than any claim.
 
 ## Architecture
 
@@ -91,6 +113,8 @@ Then wire each project and check the result:
 npx agentic-dev-stack add-project ~/code/my-app   # --lang pt-BR for Portuguese blocks
 npx agentic-dev-stack doctor
 ```
+
+`add-project` never deletes anything: it appends a marked block to `CLAUDE.md`/`AGENTS.md`. Brand-new, empty project? Wire it now and run `add-project . --refresh` after scaffolding to re-detect test/lint commands and Spec Kit. To undo: `add-project <dir> --remove` for a project, `uninstall` for the whole stack (both back up what they touch, and both accept `--dry-run`).
 
 Prerequisites: Node ≥ 18, git and Claude Code. Python ≥ 3.9 is also needed for alethe, the curator and the digest. Per-OS details and the manual steps (logins, keys) are in [docs/02-installation.md](docs/02-installation.md).
 
@@ -159,6 +183,9 @@ Codex is a native alethe provider (`WITH_CODEX=1`); the others plug in as custom
 **Does it work on Windows?**
 Yes for the core, workers, orchestration and schedules (PowerShell, Task Scheduler). The free-model worker needs a kernel sandbox, so on Windows run it under WSL2.
 
+**Will it delete or overwrite my files?**
+No. It only appends blocks between `BEGIN/END` markers, merges JSON settings, and backs up every file it edits to `~/.local/share/agentic-dev-stack/backups/`. `uninstall` and `add-project --remove` take out only those blocks and entries.
+
 **Is it safe?**
 - Third-party pieces were audited and pinned to a reviewed version.
 - The free worker is blocked from reading secrets at the kernel level.
@@ -177,7 +204,7 @@ See [docs/07-security.md](docs/07-security.md).
 
 ## Contributing
 
-Issues and PRs are welcome: new worker adapters, Linux/Windows sandboxes, Hermes recipes, translations. Run `npm test` before opening a PR.
+Issues and PRs are welcome: new worker adapters, Linux/Windows sandboxes, Hermes recipes, translations. Start with [CONTRIBUTING.md](CONTRIBUTING.md); security reports go through [SECURITY.md](SECURITY.md) (privately). Release notes: [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 

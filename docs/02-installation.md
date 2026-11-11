@@ -141,9 +141,35 @@ For each repo:
 npx agentic-dev-stack add-project ~/projects/my-app --dry-run   # preview the block that would be appended
 npx agentic-dev-stack add-project ~/projects/my-app
 ```
-From a local clone, use `node bin/cli.mjs add-project ...`. Options: `--dry-run`, `--no-docs` (skip the docs block), `--lang en|pt-BR`.
+From a local clone, use `node bin/cli.mjs add-project ...`. Options: `--dry-run`, `--no-docs` (skip the docs block), `--lang en|pt-BR`, `--refresh`, `--remove`.
 
-Review the **Gates** (check commands) and **Parallelization units** at the end of the project's `CLAUDE.md`: they are detected automatically from Makefile, package.json and pyproject.
+Review the **Gates** (check commands) and **Parallelization units** at the end of the project's `CLAUDE.md`: they are detected automatically from Makefile, package.json, pyproject, Cargo and go.mod.
+
+**Nothing in the folder is deleted.** Existing `CLAUDE.md`/`AGENTS.md` only get a block appended between `BEGIN/END ALETHE ORCHESTRATION` markers; missing ones are created. `.claude/settings.local.json` is merged. Running it twice changes nothing.
+
+#### Starting a brand-new project
+The block is generated from what the folder contains *at that moment*, so an empty folder gets generic gates. Two ways to get it right:
+
+```bash
+mkdir shop && cd shop && git init      # git first: local files are then git-excluded automatically
+# scaffold: package.json/pyproject with test, lint, typecheck scripts
+specify init .                         # optional: Spec Kit -> the block switches to the SDD flow
+npx agentic-dev-stack add-project .
+```
+
+Or wire it on day one and refresh after scaffolding:
+
+```bash
+npx agentic-dev-stack add-project .            # day one, empty folder
+# ...scaffold, add scripts, specify init...
+npx agentic-dev-stack add-project . --refresh  # regenerates only our block; your text above and below it stays
+```
+
+#### Unwiring a project
+```bash
+npx agentic-dev-stack add-project ~/projects/my-app --remove   # add --dry-run to preview
+```
+It removes our block, the alethe link, the alethe hooks in `settings.local.json` and our `.git/info/exclude` lines. A `CLAUDE.md`/`AGENTS.md` that only contained our block is deleted; anything you wrote stays.
 
 > **Versioned repos:** the block is appended to `CLAUDE.md`/`AGENTS.md`, which are usually tracked by git, so it shows up in `git status`. Commit it if your team uses the stack; skip it if it is just yours. The skill, the hook and the `.alethe/` folder are kept out of git through `.git/info/exclude`.
 
@@ -169,20 +195,18 @@ Guard test: inside claude, ask "launch an Explore subagent to list files". It mu
 ## 5. Uninstall
 
 ```bash
-# macOS schedules
-for l in model-curator daily-digest 9router; do launchctl bootout gui/$(id -u)/com.agentic-dev-stack.$l 2>/dev/null; rm -f ~/Library/LaunchAgents/com.agentic-dev-stack.$l.plist; done
-~/.local/bin/hermes gateway uninstall; ~/.local/bin/hermes uninstall
-# Claude Code: remove the AGENTIC-DEV-STACK block from ~/.claude/CLAUDE.md, plus the hook and env entries in ~/.claude/settings.json
-rm -rf ~/.agents/skills/alethe ~/.config/alethe ~/.config/agentic-dev-stack ~/.local/bin/opencode-safe
-# Projects: remove the .claude/skills/alethe symlink and the ALETHE ORCHESTRATION block from CLAUDE.md/AGENTS.md
+npx agentic-dev-stack uninstall --dry-run   # see what would be removed
+npx agentic-dev-stack uninstall             # add --purge to also remove the alethe skill and your stack.env
 ```
 
-Scheduled task names to remove on each OS:
-- macOS (launchd): `com.agentic-dev-stack.model-curator`, `com.agentic-dev-stack.daily-digest`, `com.agentic-dev-stack.9router`.
-- Linux: the matching `crontab -e` lines for the curator and digest, and `systemctl --user disable --now agentic-dev-stack-9router`.
-- Windows: `schtasks /Delete /TN agentic-dev-stack-9router /F`, plus the curator and digest tasks (`schtasks /Query` lists them by name).
+It removes only what the installer created or appended:
+- the `AGENTIC-DEV-STACK` block in `~/.claude/CLAUDE.md` (your text stays);
+- the guard hook and `CLAUDE_CODE_SUBAGENT_MODEL=sonnet` in `~/.claude/settings.json` (other keys stay; a different model value you set stays);
+- the guard script and the `scout`/`builder`/`reviewer` subagents, **unless you edited them**;
+- the curator, digest and 9Router schedules (launchd, crontab/systemd or Task Scheduler);
+- `opencode-safe`, the sandbox profile and the scheduled scripts.
 
-Backups stay in `~/.local/share/agentic-dev-stack/backups/`.
+Every edited file is backed up first to `~/.local/share/agentic-dev-stack/backups/<timestamp>/`, keeping its original path. Third-party tools stay installed; the command prints how to remove each one (RTK hook: `rtk init -g --uninstall`; Hermes routines: `hermes cron list`). Wired projects are unwired one by one with `add-project <dir> --remove`.
 
 ## Troubleshooting
 

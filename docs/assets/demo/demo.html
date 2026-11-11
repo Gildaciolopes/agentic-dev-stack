@@ -1,0 +1,169 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0e10;--win:#151518;--bar:#1c1c20;--line:#2a2a30;--fg:#e9ecef;--dim:#868e96;--mut:#adb5bd;
+--yel:#ffd43b;--grn:#8ce99a;--blu:#74c0fc;--pur:#b197fc;--red:#ff8787;--cya:#66d9e8;--org:#ffa94d}
+*{box-sizing:border-box;margin:0;font-variant-ligatures:none}
+body{width:1280px;height:760px;overflow:hidden;background:radial-gradient(1200px 600px at 20% -10%,#1f1d2b 0%,transparent 60%),radial-gradient(900px 500px at 110% 110%,#13261f 0%,transparent 60%),var(--bg);font-family:Inter,sans-serif;color:var(--fg)}
+.top{height:74px;display:flex;align-items:center;justify-content:space-between;padding:0 44px}
+.brand{font-weight:800;font-size:22px;letter-spacing:-.5px}.brand span{color:var(--yel)}
+.steps{display:flex;gap:8px}
+.step{font-family:'JetBrains Mono';font-size:14px;padding:6px 12px;border-radius:999px;border:1.5px solid var(--line);color:var(--dim);transition:none}
+.step.on{color:#121212;background:var(--yel);border-color:var(--yel);font-weight:700}
+.step.done{color:var(--grn);border-color:#8ce99a55}
+.win{position:absolute;left:44px;right:44px;top:74px;bottom:34px;background:var(--win);border:1px solid var(--line);border-radius:14px;box-shadow:0 30px 80px #0008,0 0 0 1px #ffffff08 inset;overflow:hidden}
+.bar{height:40px;background:var(--bar);border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 16px;gap:8px}
+.dot{width:12px;height:12px;border-radius:50%}
+.title{flex:1;text-align:center;font-family:'JetBrains Mono';font-size:13px;color:var(--dim);margin-right:52px}
+.term{padding:22px 28px;font-family:'JetBrains Mono';font-size:17px;line-height:1.55;white-space:pre;color:var(--fg)}
+.p{color:var(--grn)}.c{color:var(--fg)}.d{color:var(--dim)}.y{color:var(--yel)}.g{color:var(--grn)}.b{color:var(--blu)}.u{color:var(--pur)}.r{color:var(--red)}.k{color:var(--cya)}.o{color:var(--org)}
+.h{color:var(--blu);font-weight:700}
+.cur{display:inline-block;width:10px;height:20px;background:var(--fg);vertical-align:-4px;margin-left:1px}
+.foot{position:absolute;bottom:8px;left:44px;right:44px;display:flex;justify-content:space-between;font-family:'JetBrains Mono';font-size:12px;color:#5c636a}
+/* orchestration board */
+.board{padding:18px 28px;font-family:'JetBrains Mono';font-size:15.5px}
+.chat{line-height:1.5;margin-bottom:12px;white-space:pre-wrap}
+.lane{display:grid;grid-template-columns:30px 300px 250px 1fr 120px;align-items:center;gap:12px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:#ffffff05}
+.badge{font-size:13px;padding:3px 9px;border-radius:6px;border:1.5px solid;display:inline-block}
+.prog{height:10px;background:#ffffff10;border-radius:6px;overflow:hidden}
+.prog i{display:block;height:100%;border-radius:6px}
+.st{text-align:right;font-size:14px}
+.endcard{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:var(--win)}
+.endcard h1{font-size:64px;font-weight:800;letter-spacing:-2px}.endcard h1 span{color:var(--yel)}
+.endcard .cmd{font-family:'JetBrains Mono';font-size:24px;padding:14px 26px;border:1.5px solid #ffd43b66;border-radius:12px;background:#ffd43b10;color:var(--yel)}
+.endcard p{font-size:21px;color:var(--mut)}
+.chips{display:flex;gap:10px}.chips span{font-family:'JetBrains Mono';font-size:15px;padding:6px 12px;border-radius:999px;border:1.5px solid var(--line);color:var(--mut)}
+</style></head>
+<body>
+<div class="top"><div class="brand">agentic-dev-<span>stack</span></div><div class="steps" id="steps"></div></div>
+<div class="win"><div class="bar"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><div class="title" id="title"></div></div><div id="body"></div></div>
+<div class="foot"><span id="note"></span><span>github.com/Gildaciolopes/agentic-dev-stack</span></div>
+<script>
+const STEPS = ["1 install", "2 wire a project", "3 orchestrate", "4 verify"];
+const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+// span helper: [cls, text]
+const L = (...parts) => parts.map((x) => typeof x === "string" ? esc(x) : `<span class="${x[0]}">${esc(x[1])}</span>`).join("");
+const ok = (t) => L(["g", "  ✓ "], t);
+
+// ---- terminal scenes: real CLI output (lines printed by bin/cli.mjs) ----
+const S1 = { start: 0, end: 8.6, step: 0, title: "~ — zsh", prompt: "~", cmd: "npx agentic-dev-stack install --all", typeAt: 0.5, typeDur: 1.6, lines: [
+  [2.5, L(["h", "==> Preflight"], ["d", " (darwin, node v22)"])],
+  [2.7, ok("git   ✓ claude   ✓ npm   ✓ python3")],
+  [3.1, L(["h", "==> core"], ["d", ": RTK · subagents · agent-model-guard · CLAUDE.md block"])],
+  [3.4, ok("builder.md  reviewer.md  scout.md")],
+  [3.6, ok("PreToolUse(Agent|Task) guard + CLAUDE_CODE_SUBAGENT_MODEL=sonnet")],
+  [4.1, L(["h", "==> workers"], ["d", ": opencode-safe (sandboxed free-model worker)"])],
+  [4.3, ok("~/.local/bin/opencode-safe (sandbox-exec + --standalone)")],
+  [4.6, L(["h", "==> workers"], ["d", ": alethe orchestrator (audited commit ab81104)"])],
+  [4.8, ok("alethe profile: providers=claude,agy")],
+  [5.0, ok("alethe doctor: playbooks valid")],
+  [5.4, L(["h", "==> free-models"], ["d", ": curator (probes models, rewrites the combo at 07:30 13:30 19:30)"])],
+  [5.6, ok("9Router autostart (launchd)")],
+  [6.1, L(["h", "==> hermes"], ["d", ": always-on assistant (Discord/Telegram)"])],
+  [6.3, ok("telemetry off, manual approvals, no shell on chat platforms")],
+  [6.5, ok("routines: daily-digest + combo-alert (silent when nothing changed)")],
+  [7.0, L(["h", "==> Done"])],
+  [7.2, L(["g", "  ✓ "], "backups of edited configs: ", ["d", "~/.local/share/agentic-dev-stack/backups"])],
+]};
+const S2 = { start: 8.6, end: 15.6, step: 1, title: "~/code/shop — zsh", prompt: "~/code/shop", cmd: "npx agentic-dev-stack add-project .", typeAt: 9.0, typeDur: 1.3, lines: [
+  [10.7, ok("alethe wired in: .")],
+  [10.9, ok("CLAUDE.md: appended | AGENTS.md: created")],
+  [11.1, L(["d", "    Review the block at the end of CLAUDE.md: gates and units were auto-detected."])],
+  [11.7, L(["p", "❯ "], "cat CLAUDE.md")],
+  [11.9, L(["d", "# shop · Our rules.   (your content, untouched)"])],
+  [12.1, L(["d", "<!-- BEGIN ALETHE ORCHESTRATION -->"])],
+  [12.3, L(["y", "### Gates"], ["d", " (checks that accept a worker's output)"])],
+  [12.5, L("- ", ["k", "`pnpm test` · `pnpm lint` · `pnpm typecheck`"])],
+  [12.8, L(["y", "### Natural parallel units"])],
+  [13.0, L("- ", ["k", "`apps/*`"], ": one builder per package, disjoint paths.")],
+  [13.3, L(["y", "### How it plugs into the existing flow"], ["d", " (Spec Kit + graphify + RTK)"])],
+  [13.5, L("- ", ["d", "implement: independent "], "[P]", ["d", " tasks -> "], ["k", "parallel-worktrees"])],
+]};
+const S4 = { start: 26.6, end: 31.4, step: 3, title: "~/code/shop — zsh", prompt: "~/code/shop", cmd: "npx agentic-dev-stack doctor", typeAt: 26.9, typeDur: 1.0, lines: [
+  [28.2, L(["h", "==> doctor"])],
+  [28.4, ok("Claude Code          ✓ RTK")],
+  [28.6, ok("agent-model-guard    ✓ default subagent model = sonnet")],
+  [28.8, ok("subagents scout/builder/reviewer")],
+  [29.0, ok("alethe (audited)     ✓ Antigravity CLI (agy)")],
+  [29.2, ok("OpenCode             ✓ opencode-safe (sandboxed)")],
+  [29.4, ok("9Router              ✓ Hermes Agent")],
+]};
+
+function termScene(s, t) {
+  const typed = Math.max(0, Math.min(s.cmd.length, Math.floor(((t - s.typeAt) / s.typeDur) * s.cmd.length)));
+  const doneTyping = t >= s.typeAt + s.typeDur + 0.25;
+  const blink = Math.floor(t * 2) % 2 === 0;
+  let out = L(["p", "❯ "], ["d", s.prompt + " "], ["c", s.cmd.slice(0, typed)]);
+  if (!doneTyping) out += `<span class="cur" style="opacity:${blink || typed < s.cmd.length ? 1 : 0}"></span>`;
+  const fade = (at) => Math.min(1, (t - at) / 0.18).toFixed(2);
+  const shown = s.lines.filter(([at]) => t >= at).map(([at, h]) => `<span style="opacity:${fade(at)}">${h}</span>`);
+  if (shown.length) out += "\n" + shown.join("\n");
+  const last = s.lines[s.lines.length - 1][0];
+  if (t >= last + 0.4) out += "\n" + L(["p", "❯ "]) + `<span class="cur" style="opacity:${blink ? 1 : 0}"></span>`;
+  return `<div class="term">${out}</div>`;
+}
+
+// ---- orchestration scene (illustrative run of the alethe flow) ----
+const LANES = [
+  ["T1", "apps/web checkout form", ["Sonnet · builder", "grn"], 18.6, 22.4, "pnpm test ✓"],
+  ["T2", "apps/api POST /orders", ["Sonnet · builder", "grn"], 18.8, 23.0, "pnpm test ✓"],
+  ["T3", "i18n strings pt-BR/en", ["free · 9router (sandboxed)", "pur"], 19.0, 21.4, "lint ✓"],
+  ["T4", "test scaffolding", ["free · 9router (sandboxed)", "pur"], 19.2, 21.9, "typecheck ✓"],
+];
+const C = { grn: "#8ce99a", pur: "#b197fc", blu: "#74c0fc", red: "#ff8787", yel: "#ffd43b" };
+function orch(t) {
+  const chat = [
+    [15.9, L(["p", "❯ "], ["c", "/speckit.implement"])],
+    [16.6, L(["y", "● lead (Opus) "], ["d", "· tasks.md has 4 [P] tasks → playbook "], ["k", "parallel-worktrees"])],
+    [17.2, L(["b", "● scout (agy Gemini) "], ["d", "· mapped checkout + orders via graphify "], ["g", "✓"])],
+    [17.8, L(["d", "  dry-run: 4 workers · 2 Sonnet + 2 free · quota ok → running in isolated worktrees"])],
+  ];
+  const fade = (a) => Math.min(1, (t - a) / 0.2).toFixed(2);
+  let h = `<div class="chat">${chat.filter(([a]) => t >= a).map(([a, x]) => `<span style="opacity:${fade(a)}">${x}</span>`).join("\n")}</div>`;
+  if (t >= 18.3) for (const [k, [id, name, [who, col], a, b, gate]] of LANES.entries()) {
+    const p = Math.max(0, Math.min(1, (t - a) / (b - a)));
+    const done = p >= 1;
+    h += `<div class="lane" style="opacity:${Math.min(1, (t - 18.3 - k * 0.08) / 0.25).toFixed(2)}"><span class="d">${id}</span><span>${esc(name)}</span><span><span class="badge" style="color:${C[col]};border-color:${C[col]}66">${esc(who)}</span></span>
+      <div class="prog"><i style="width:${(p * 100).toFixed(1)}%;background:${done ? C.grn : C[col]}"></i></div>
+      <span class="st ${done ? "g" : "d"}">${done ? esc(gate) : t >= a ? "working…" : "queued"}</span></div>`;
+  }
+  const tail = [
+    [23.5, L(["r", "● review-gate (agy Opus) "], ["d", "· full diff · 1 finding: missing 422 on empty cart"])],
+    [24.3, L(["g", "● builder (Sonnet) "], ["d", "· fix + test "], ["g", "✓"])],
+    [25.1, L(["y", "● lead (Opus) "], ["d", "· integrated 4 units · gates green · "], ["c", "Opus spent on plan + review only"])],
+  ];
+  const tl = tail.filter(([a]) => t >= a).map(([a, x]) => `<span style="opacity:${fade(a)}">${x}</span>`).join("\n");
+  if (tl) h += `<div class="chat" style="margin-top:10px">${tl}</div>`;
+  return `<div class="board">${h}</div>`;
+}
+
+function endcard(t) {
+  return `<div class="endcard"><h1>agentic-dev-<span>stack</span></h1>
+  <p>Opus plans · cheap &amp; free models execute · another provider reviews</p>
+  <div class="cmd">npx agentic-dev-stack install --all</div>
+  <div class="chips"><span>Spec Kit SDD</span><span>caveman</span><span>RTK</span><span>graphify</span><span>alethe</span><span>Hermes</span></div>
+  <p style="font-size:16px;color:#868e96">macOS · Linux · Windows</p></div>`;
+}
+
+const TOTAL = 34.5;
+window.TOTAL = TOTAL;
+window.render = (t) => {
+  let step, title, body, note = "";
+  if (t < S1.end) { step = 0; title = S1.title; body = termScene(S1, t); }
+  else if (t < S2.end) { step = 1; title = S2.title; body = termScene(S2, t); }
+  else if (t < S4.start) { step = 2; title = "~/code/shop — claude"; body = orch(t); note = "illustrative run of the orchestration flow"; }
+  else if (t < S4.end) { step = 3; title = S4.title; body = termScene(S4, t); }
+  else { step = 4; title = "agentic-dev-stack"; body = endcard(t); }
+  document.getElementById("steps").innerHTML = STEPS.map((s, i) => `<span class="step ${i === step ? "on" : i < step ? "done" : ""}">${i < step ? "✓ " : ""}${s}</span>`).join("");
+  document.getElementById("title").textContent = title;
+  const b = document.getElementById("body");
+  b.innerHTML = body;
+  const starts = [S1.start, S2.start, S2.end, S4.start, S4.end];
+  const since = t - Math.max(...starts.filter((x) => x <= t));
+  b.style.opacity = t < 0.3 ? 1 : Math.min(1, since / 0.3).toFixed(2);
+  document.getElementById("note").textContent = note;
+};
+render(0);
+</script>
+</body></html>

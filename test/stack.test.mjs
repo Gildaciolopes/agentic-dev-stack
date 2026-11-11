@@ -17,7 +17,7 @@ process.env.NO_COLOR = "1";
 const { decide } = await import("../hooks/agent-model-guard.mjs");
 const { appendBlock, loadConfig } = await import("../lib/util.mjs");
 const { mergeClaudeSettings, phaseCore } = await import("../lib/core.mjs");
-const { addProject, detectGates, detectUnits } = await import("../lib/add-project.mjs");
+const { addProject, detectGates, detectUnits, removeProject } = await import("../lib/add-project.mjs");
 
 const cli = (...args) => spawnSync(process.execPath, [path.join(REPO, "bin", "cli.mjs"), ...args],
   { encoding: "utf8", env: { ...process.env, ADS_HOME: HOME, ADS_SKIP_INSTALLS: "1", NO_COLOR: "1" } });
@@ -82,6 +82,7 @@ test("install --core (real run in fake HOME) is idempotent", () => {
   }
   for (const a of ["scout", "builder", "reviewer"]) assert.ok(fs.existsSync(path.join(HOME, ".claude", "agents", `${a}.md`)));
   assert.ok(fs.existsSync(path.join(HOME, ".claude", "hooks", "agent-model-guard.mjs")));
+  assert.ok(fs.existsSync(path.join(HOME, ".config", "agentic-dev-stack", "stack.env")), "editable config created");
   const md = fs.readFileSync(path.join(HOME, ".claude", "CLAUDE.md"), "utf8");
   assert.equal(md.match(/BEGIN AGENTIC-DEV-STACK/g).length, 1);
   const s = JSON.parse(fs.readFileSync(path.join(HOME, ".claude", "settings.json"), "utf8"));
@@ -127,6 +128,53 @@ test("add-project --lang pt-BR uses Portuguese templates", () => {
   git(proj, "init", "-q");
   addProject(proj, { lang: "pt-BR" });
   assert.match(fs.readFileSync(path.join(proj, "CLAUDE.md"), "utf8"), /Orquestração multi-agente/);
+});
+
+test("add-project --refresh regenerates only the block; --remove unwires the project", () => {
+  const proj = fs.mkdtempSync(path.join(os.tmpdir(), "ads-proj-rf-"));
+  git(proj, "init", "-q");
+  fs.writeFileSync(path.join(proj, "CLAUDE.md"), "# keep me\n");
+  addProject(proj, {});
+  const first = fs.readFileSync(path.join(proj, "CLAUDE.md"), "utf8");
+  assert.doesNotMatch(first, /pnpm test/);
+  // project gets scaffolded after wiring -> refresh picks up the new gates
+  fs.writeFileSync(path.join(proj, "package.json"), JSON.stringify({ scripts: { test: "x" } }));
+  fs.writeFileSync(path.join(proj, "pnpm-lock.yaml"), "");
+  fs.appendFileSync(path.join(proj, "CLAUDE.md"), "\n## my notes after the block\n");
+  addProject(proj, { refresh: true });
+  const md = fs.readFileSync(path.join(proj, "CLAUDE.md"), "utf8");
+  assert.ok(md.startsWith("# keep me\n"));
+  assert.match(md, /pnpm test/);
+  assert.match(md, /## my notes after the block/);
+  assert.equal(md.match(/BEGIN ALETHE ORCHESTRATION/g).length, 1);
+
+  removeProject(proj, {});
+  assert.equal(fs.readFileSync(path.join(proj, "CLAUDE.md"), "utf8"), "# keep me\n\n## my notes after the block\n");
+  assert.equal(fs.existsSync(path.join(proj, "AGENTS.md")), false, "AGENTS.md we created is gone");
+  assert.equal(fs.existsSync(path.join(proj, ".claude", "skills", "alethe")), false);
+  assert.equal(fs.existsSync(path.join(proj, ".claude", "settings.local.json")), false);
+  assert.doesNotMatch(fs.readFileSync(path.join(proj, ".git", "info", "exclude"), "utf8"), /alethe/);
+});
+
+test("uninstall removes only what the installer added", () => {
+  const md = path.join(HOME, ".claude", "CLAUDE.md");
+  fs.writeFileSync(md, "# mine\nkeep\n\n" + fs.readFileSync(md, "utf8"));
+  const sf = path.join(HOME, ".claude", "settings.json");
+  fs.writeFileSync(sf, JSON.stringify({ ...JSON.parse(fs.readFileSync(sf, "utf8")), theme: "dark" }));
+  fs.appendFileSync(path.join(HOME, ".claude", "agents", "builder.md"), "\nmy tweak\n");
+  const dry = cli("uninstall", "--dry-run");
+  assert.equal(dry.status, 0, dry.stderr + dry.stdout);
+  assert.match(fs.readFileSync(md, "utf8"), /BEGIN AGENTIC-DEV-STACK/, "dry-run changes nothing");
+  const r = cli("uninstall");
+  assert.equal(r.status, 0, r.stderr + r.stdout);
+  assert.equal(fs.readFileSync(md, "utf8"), "# mine\nkeep\n");
+  const s = JSON.parse(fs.readFileSync(sf, "utf8"));
+  assert.equal(s.theme, "dark");
+  assert.doesNotMatch(JSON.stringify(s), /agent-model-guard|CLAUDE_CODE_SUBAGENT_MODEL/);
+  assert.equal(fs.existsSync(path.join(HOME, ".claude", "agents", "scout.md")), false);
+  assert.ok(fs.existsSync(path.join(HOME, ".claude", "agents", "builder.md")), "edited subagent is kept");
+  assert.equal(fs.existsSync(path.join(HOME, ".claude", "hooks", "agent-model-guard.mjs")), false);
+  assert.ok(fs.readdirSync(path.join(HOME, ".local", "share", "agentic-dev-stack", "backups")).length > 0);
 });
 
 test("integration: real alethe clone + profile (set ALETHE_IT=1)", { skip: process.env.ALETHE_IT !== "1" }, async () => {
