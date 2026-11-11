@@ -22,29 +22,11 @@ Funciona em cima do **Claude Code** e encaixa **Antigravity (agy)**, **OpenCode*
 
 ## Arquitetura em uma imagem
 
-```
-                         ┌──────────────────────────────────────────────┐
-  você ──────────────▶   │  LEAD: Claude Code (Opus)                    │
-                         │  planeja · decide · integra · valida         │
-                         │  Spec Kit + graphify + RTK + caveman         │
-                         └───────┬───────────────┬───────────────┬──────┘
-                 subagentes nativos       alethe (orquestrador)   │
-                 (Agent tool, guardado)   playbooks + cota        │
-                         │                       │                │
-        ┌────────────────┼──────────┐   ┌────────┼─────────────┐  │
-        ▼                ▼          ▼   ▼        ▼             ▼  │
-     scout           builder    reviewer  agy           opencode  codex*
-     (Haiku)         (Sonnet)   (Sonnet)  Gemini/Opus   9router/free (plugável)
-     leitura         implementa revisa    scout+review  mecânico, em sandbox
-                                                │
-                                    9Router ◀───┘  combo "free" (NVIDIA NIM…)
-                                       ▲
-                          curador 3x/dia testa e reescreve o combo
-                                       │
-   Hermes (sempre ligado, sem shell) ──┴── resumo 08:00 · avisos · perguntas pelo celular
-```
+![Arquitetura do agentic-dev-stack](docs/assets/architecture.svg)
 
-\* Codex não vem instalado, mas é provedor nativo do alethe. Ver [docs/04-codex-e-outros-clis.md](docs/04-codex-e-outros-clis.md).
+> Fonte editável: [`docs/assets/architecture.excalidraw`](docs/assets/architecture.excalidraw). Abra em [excalidraw.com](https://excalidraw.com) (File → Open) ou regenere com `python3 docs/assets/build_architecture.py`.
+
+> O Codex aparece tracejado: não vem instalado, mas é provedor nativo do alethe. Ver [docs/04-codex-e-outros-clis.md](docs/04-codex-e-outros-clis.md).
 
 ---
 
