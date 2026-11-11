@@ -1,0 +1,26 @@
+{
+  "_comment": "Merged into ~/.config/opencode/opencode.json by install.sh. Second layer only: shell pattern matching is bypassable (e.g. `grep -r KEY .`), the real protection is bin/opencode-safe (kernel sandbox) + isolated worktrees without .env.",
+  "permission": {
+    "read": {
+      "*": "allow",
+      "*.env": "deny", "*.env.*": "deny", ".env*": "deny",
+      "*.pem": "deny", "*.key": "deny", "*.p12": "deny", "*.pfx": "deny", "*id_rsa*": "deny",
+      "*service-account*.json": "deny", "*service_account*.json": "deny", "*credentials*.json": "deny",
+      "*secret*": "deny", "*.npmrc": "deny",
+      "*.env.example": "allow"
+    },
+    "edit": {
+      "*": "allow",
+      "*.env": "deny", "*.env.*": "deny", ".env*": "deny", "*.pem": "deny", "*.key": "deny",
+      "*credentials*.json": "deny", "*service-account*.json": "deny"
+    },
+    "bash": {
+      "*": "allow",
+      "*.env*": "deny", "*.pem*": "deny", "*.key*": "deny", "*id_rsa*": "deny",
+      "*service-account*": "deny", "*service_account*": "deny", "*credentials*": "deny", "*secret*": "deny",
+      "env": "deny", "env *": "deny", "printenv*": "deny", "*printenv*": "deny", "set": "deny", "export -p": "deny"
+    },
+    "external_directory": "deny",
+    "webfetch": "deny"
+  }
+}

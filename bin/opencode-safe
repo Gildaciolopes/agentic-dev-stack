@@ -1,0 +1,10 @@
+#!/bin/sh
+# opencode inside a macOS kernel sandbox (sandbox-exec) that denies reading .env*/keys/credentials.
+# --standalone matters: without it, `opencode run` hands tool execution to a background
+# service (`opencode serve --service`) that runs OUTSIDE the sandbox.
+# Used by alethe as the free-model worker. Linux: see docs/07-seguranca.md (bubblewrap/firejail).
+PROFILE="${OPENCODE_SAFE_PROFILE:-$HOME/.config/agentic-dev-stack/deny-secrets.sb}"
+OPENCODE_BIN="${OPENCODE_BIN:-$(command -v opencode)}"
+if [ ! -f "$PROFILE" ]; then echo "opencode-safe: sandbox profile not found: $PROFILE" >&2; exit 1; fi
+if [ -z "$OPENCODE_BIN" ]; then echo "opencode-safe: opencode not found on PATH" >&2; exit 1; fi
+exec /usr/bin/sandbox-exec -f "$PROFILE" "$OPENCODE_BIN" --standalone "$@"
