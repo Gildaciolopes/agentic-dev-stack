@@ -1,0 +1,8 @@
+{
+  "$comment": "Third-party tools are installed at these exact versions (never from a moving branch). .github/workflows/pins.yml opens a PR weekly when a newer release (at least 3 days old) exists; override one locally with PIN_<NAME> in stack.env (e.g. PIN_SPECKIT=v1.5.0).",
+  "speckit": { "version": "v1.4.0", "source": "github-tags", "repo": "github/spec-kit" },
+  "rtk": { "version": "v1.2.0", "source": "github-tags", "repo": "rtk-ai/rtk" },
+  "caveman": { "version": "v4.1.0", "source": "github-tags", "repo": "JuliusBrussee/caveman" },
+  "graphify": { "version": "0.9.107", "source": "pypi", "package": "graphifyy" },
+  "ninerouter": { "version": "0.5.116", "source": "npm", "package": "9router" }
+}

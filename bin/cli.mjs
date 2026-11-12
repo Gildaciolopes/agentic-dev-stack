@@ -3,13 +3,16 @@
 //   npx agentic-dev-stack install --all
 import fs from "node:fs";
 import { addProject, removeProject } from "../lib/add-project.mjs";
-import { aletheDir, configureAlethe } from "../lib/alethe.mjs";
+import { adoptExisting, keepAllFound } from "../lib/adopt.mjs";
+import { configureAlethe } from "../lib/alethe.mjs";
+import { doctor } from "../lib/doctor.mjs";
+import { checkForUpdate, updateNotice } from "../lib/update-check.mjs";
 import { phaseCore } from "../lib/core.mjs";
 import { phaseExtras, phaseFreeModels, phaseHermes, phaseWorkers } from "../lib/phases.mjs";
 import { uninstall } from "../lib/uninstall.mjs";
-import { newProject, wizard } from "../lib/wizard.mjs";
+import { newProject, wizard, writeConfig } from "../lib/wizard.mjs";
 import { interactive } from "../lib/prompt.mjs";
-import { IS_LINUX, IS_MAC, IS_WIN, REPO, TODOS, backupLocation, has, home, loadConfig, log, p, python, readJSON } from "../lib/util.mjs";
+import { REPO, TODOS, backupLocation, has, home, loadConfig, log, p, python, readJSON } from "../lib/util.mjs";
 
 const VERSION = readJSON(p(REPO, "package.json")).version;
 const HELP = `agentic-dev-stack ${VERSION}: smart vibe coding stack for Claude Code
@@ -21,7 +24,9 @@ Usage:
   agentic-dev-stack install [phases] [--dry-run] [--config <file>]
   agentic-dev-stack add-project <dir> [--refresh | --remove] [--dry-run] [--no-docs] [--lang en|pt-BR]
   agentic-dev-stack configure-alethe [--force]
-  agentic-dev-stack doctor
+  agentic-dev-stack doctor [--fix]       check everything; --fix re-runs only what is broken
+  agentic-dev-stack adopt [--dry-run]    find a setup you already run by hand (jobs, Hermes routines, CLAUDE.md
+                                         section) and choose, for each, replace with the stack's or keep yours
   agentic-dev-stack uninstall [--dry-run] [--purge]
 
 add-project:
@@ -55,6 +60,7 @@ function parse(argv) {
     else if (x === "--refresh") a.refresh = true;
     else if (x === "--remove") a.remove = true;
     else if (x === "--purge") a.purge = true;
+    else if (x === "--fix") a.fix = true;
     else if (x === "--yes" || x === "-y") a.yes = true;
     else if (x === "--config") a.config = argv[++i];
     else if (x === "--lang") a.lang = argv[++i];
@@ -72,26 +78,6 @@ function preflight() {
   for (const [cmd, why] of [["git", "required"], ["claude", "Claude Code: https://docs.claude.com/en/docs/claude-code"], ["npm", "required for npm-based tools"]])
     has(cmd) ? log.ok(cmd) : log.warn(`${cmd} not found (${why})`);
   python() ? log.ok(`python: ${python()}`) : log.warn("Python >= 3.9 not found (needed by alethe, curator and digest collector)");
-}
-
-function doctor() {
-  const row = (ok, name, hint = "") => console.log(`  ${ok ? "✓" : "✗"} ${name}${!ok && hint ? `  -> ${hint}` : ""}`);
-  log.step("doctor");
-  const settings = readJSON(p(home(), ".claude", "settings.json"));
-  const pre = JSON.stringify(settings.hooks?.PreToolUse || []);
-  row(has("claude"), "Claude Code", "install Claude Code");
-  row(has("rtk"), "RTK", "install --core");
-  row(pre.includes("agent-model-guard"), "agent-model-guard hook", "install --core");
-  row(settings.env?.CLAUDE_CODE_SUBAGENT_MODEL === "sonnet", "default subagent model = sonnet", "install --core");
-  row(["scout", "builder", "reviewer"].every((a) => fs.existsSync(p(home(), ".claude", "agents", `${a}.md`))), "subagents scout/builder/reviewer", "install --core");
-  row(fs.existsSync(p(aletheDir(), ".audited-commit")), "alethe (audited)", "install --workers");
-  row(has("agy"), "Antigravity CLI (agy)", "optional");
-  row(has("opencode"), "OpenCode", "optional");
-  row(fs.existsSync(p(home(), ".local", "bin", IS_WIN ? "opencode-safe.cmd" : "opencode-safe")), "opencode-safe (sandboxed free worker)", IS_WIN ? "use WSL2" : "install --workers");
-  row(has("codex"), "Codex", "optional (WITH_CODEX=1)");
-  row(has("9router"), "9Router", "install --free-models");
-  row(has("hermes") || fs.existsSync(p(home(), ".local", "bin", "hermes")), "Hermes Agent", "install --hermes");
-  console.log(`\n  platform: ${IS_MAC ? "macOS" : IS_LINUX ? "Linux" : IS_WIN ? "Windows" : process.platform}`);
 }
 
 async function main() {
@@ -118,6 +104,12 @@ async function main() {
       Object.assign(cfg, loadConfig());
       log.ok(`config created: ${userCfg} (edit it and re-run to change defaults)`);
     }
+    // a hand-made setup already running here: keep it (no questions in `install`), never run a second copy
+    const kept = keepAllFound(String(cfg.KEEP_EXISTING || "").split(",").map((x) => x.trim()).filter(Boolean));
+    if (kept) {
+      cfg.KEEP_EXISTING = kept.join(",");
+      if (!a.dryRun && !a.config) writeConfig({ KEEP_EXISTING: cfg.KEEP_EXISTING });
+    }
     for (const ph of a.phases) {
       if (ph === "core") phaseCore({ dryRun: a.dryRun, cfg });
       if (ph === "workers") phaseWorkers(cfg, { dryRun: a.dryRun });
@@ -139,7 +131,12 @@ async function main() {
   } else if (cmd === "configure-alethe") {
     configureAlethe(cfg, { force: a.force });
   } else if (cmd === "doctor") {
-    doctor();
+    await doctor({ fix: a.fix, cfg });
+  } else if (cmd === "adopt") {
+    const before = String(cfg.KEEP_EXISTING || "").split(",").map((x) => x.trim()).filter(Boolean);
+    const keep = await adoptExisting({ dryRun: a.dryRun, keep: before, all: true });
+    if (!a.dryRun && keep.join(",") !== before.join(",")) log.ok(`saved KEEP_EXISTING="${keep.join(",")}" in ${writeConfig({ KEEP_EXISTING: keep.join(",") })}`);
+    if (!a.dryRun) log.info("next: npx agentic-dev-stack  ->  Update / repair (installs the stack's versions of what you replaced)");
   } else if (cmd === "uninstall") {
     uninstall({ dryRun: a.dryRun, purge: a.purge });
   } else {
@@ -148,4 +145,8 @@ async function main() {
   }
 }
 
-main().catch((e) => { log.err(e.message); process.exit(1); });
+const update = process.argv.includes("uninstall") ? Promise.resolve(null) : checkForUpdate(VERSION).catch(() => null);
+main().then(async () => {
+  const latest = await Promise.race([update, new Promise((r) => setTimeout(() => r(null), 1500).unref())]);
+  if (latest) console.log(updateNotice(VERSION, latest));
+}).catch((e) => { log.err(e.message); process.exit(1); });

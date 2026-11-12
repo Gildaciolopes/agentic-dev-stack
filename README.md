@@ -112,9 +112,10 @@ The wizard asks only what it cannot detect, verifies what you type (NVIDIA key, 
 | By phase, no questions | `npx agentic-dev-stack install --core --workers --free-models --extras --hermes` (or `--all`, `--dry-run`) |
 | From a clone | `./install.sh --all` (macOS/Linux) · `.\install.ps1 --all` (Windows) |
 | One project | `npx agentic-dev-stack add-project <dir>` (`--refresh`, `--remove`, `--lang pt-BR`) |
-| Check / undo | `npx agentic-dev-stack doctor` · `npx agentic-dev-stack uninstall` |
+| Already set something up by hand | `npx agentic-dev-stack adopt` (finds jobs, Hermes routines and CLAUDE.md sections that would run twice; replace or keep each) |
+| Check / repair / undo | `npx agentic-dev-stack doctor [--fix]` · `npx agentic-dev-stack uninstall` |
 
-Everything is re-runnable, backs up what it edits and never deletes your content. Prerequisites: Node ≥ 18, git and Claude Code; Python ≥ 3.9 for alethe, the curator and the digest. Per-OS details: [docs/02-installation.md](docs/02-installation.md).
+Everything is re-runnable, backs up what it edits and never deletes your content. Third-party tools are installed at pinned versions ([config/versions.json](config/versions.json)), and the CLI tells you when a new release of the stack is out. Prerequisites: Node ≥ 18, git and Claude Code; Python ≥ 3.9 for alethe, the curator and the digest. Per-OS details: [docs/02-installation.md](docs/02-installation.md).
 
 | Platform | Support |
 |---|---|

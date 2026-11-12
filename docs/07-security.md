@@ -88,6 +88,10 @@ A local proxy that all API traffic flows through. Telemetry and beacon are disab
 ### 9Router
 The `postinstall` only pre-warms dependencies (SQLite, wreq-js); it is safe to skip. The web UI ships with a default password (change it). Remote/tunnel mode exposes the API, so do not enable it without changing the key.
 
+## Pinned versions (supply chain)
+
+Every third-party tool the stack installs from source is pinned in [config/versions.json](../config/versions.json): Spec Kit (`git+…spec-kit.git@<tag>`), RTK (`cargo install --tag`, when not from Homebrew), caveman (marketplace `JuliusBrussee/caveman#<tag>`), graphify (`graphifyy==<version>`) and 9Router (`9router@<version>`); alethe is pinned by commit (`ALETHE_COMMIT`). A compromised `main` branch upstream therefore never reaches a machine running the wizard. `.github/workflows/pins.yml` proposes bumps weekly, only for releases at least 3 days old, after running the tests; GitHub Actions themselves are updated by Dependabot. Not pinned on purpose: Homebrew formulas and the official vendor CLIs (OpenCode, Codex, agy, Claude Code), which update themselves.
+
 ## Checklist before adding a new tool
 
 1. Read the installer before any `curl | bash`.

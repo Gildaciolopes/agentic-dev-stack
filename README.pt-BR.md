@@ -112,9 +112,10 @@ O wizard só pergunta o que não consegue detectar, valida o que você digita (c
 | Por fases, sem perguntas | `npx agentic-dev-stack install --core --workers --free-models --extras --hermes` (ou `--all`, `--dry-run`) |
 | A partir do clone | `./install.sh --all` (macOS/Linux) · `.\install.ps1 --all` (Windows) |
 | Um projeto | `npx agentic-dev-stack add-project <pasta>` (`--refresh`, `--remove`, `--lang pt-BR`) |
-| Conferir / desfazer | `npx agentic-dev-stack doctor` · `npx agentic-dev-stack uninstall` |
+| Já montou algo à mão | `npx agentic-dev-stack adopt` (acha jobs, rotinas do Hermes e seções do CLAUDE.md que rodariam em dobro; troque ou mantenha cada um) |
+| Conferir / consertar / desfazer | `npx agentic-dev-stack doctor [--fix]` · `npx agentic-dev-stack uninstall` |
 
-Tudo pode ser rodado de novo, faz backup do que edita e nunca apaga conteúdo seu. Pré-requisitos: Node ≥ 18, git e Claude Code; Python ≥ 3.9 para o alethe, o curador e o coletor. Detalhes por SO: [docs/pt-BR/02-instalacao.md](docs/pt-BR/02-instalacao.md).
+Tudo pode ser rodado de novo, faz backup do que edita e nunca apaga conteúdo seu. As ferramentas de terceiros são instaladas em versões fixas ([config/versions.json](config/versions.json)), e o CLI avisa quando sai versão nova do stack. Pré-requisitos: Node ≥ 18, git e Claude Code; Python ≥ 3.9 para o alethe, o curador e o coletor. Detalhes por SO: [docs/pt-BR/02-instalacao.md](docs/pt-BR/02-instalacao.md).
 
 | Plataforma | Suporte |
 |---|---|

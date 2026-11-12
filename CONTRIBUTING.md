@@ -40,6 +40,10 @@ The tests never touch your real `~`: `ADS_HOME` points every path at a temp dir 
 - Add a line to the `Unreleased` section of [CHANGELOG.md](CHANGELOG.md).
 - Conventional commit prefixes (`feat:`, `fix:`, `docs:`, `chore:`, `test:`) are preferred.
 
+## Pinned tools (maintainers)
+
+Third-party versions live in `config/versions.json`. `.github/workflows/pins.yml` checks weekly (`node scripts/maintainer/check-pins.mjs` locally) and opens a PR for releases at least 3 days old. Read each tool's release notes before merging: CI does not re-run on PRs opened by that workflow, the test step inside it is the check. The workflow needs **Settings → Actions → General → Allow GitHub Actions to create and approve pull requests**.
+
 ## Releasing (maintainers)
 
 ```bash

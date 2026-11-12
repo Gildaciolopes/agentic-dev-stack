@@ -35,6 +35,22 @@ O que ele pergunta, e o que ele faz sozinho:
 
 Nada é gravado antes de você confirmar o resumo; recusar não deixa rastro. As respostas vão para `~/.config/agentic-dev-stack/stack.env` (segredos não: tokens vão para `~/.hermes/.env` com permissão 600, a chave da NVIDIA só para o 9Router).
 
+### Já roda um setup que você montou à mão?
+
+Se você já montou curador, resumo, autostart do 9Router ou rotinas do Hermes por conta própria (ou com uma cópia antiga destes scripts), o stack rodaria uma segunda cópia ao lado da sua. O wizard confere isso antes de instalar, e dá para rodar a checagem sozinha:
+
+```bash
+npx agentic-dev-stack adopt --dry-run   # só lista o que achou
+npx agentic-dev-stack adopt             # para cada um: trocar pela versão do stack, ou manter a sua
+```
+
+Ele olha jobs agendados (launchd, crontab, units do systemd do usuário, Agendador de Tarefas) que rodam curador, coletor do resumo ou 9Router; rotinas do Hermes cujo prompt lê a pasta do resumo ou o status do curador; e uma seção "Orchestration: plan big, execute small" no `~/.claude/CLAUDE.md` fora do bloco do stack.
+
+- **Trocar**: a sua ganha backup antes (`~/.local/share/agentic-dev-stack/backups/`) e depois é desativada. Rotinas do Hermes são renomeadas para o nome do stack, então o histórico fica e a próxima instalação atualiza no lugar.
+- **Manter**: nada seu muda; o stack pula a cópia dele (salvo como `KEEP_EXISTING` no `stack.env`, sem perguntar de novo).
+
+Rodadas sem interação (`--yes`, `ADS_ANSWERS`) e o `install` sempre mantêm, a não ser que o arquivo de respostas diga `"adopt_<tipo>": "replace"`.
+
 ### Sem interação (CI, dotfiles, várias máquinas)
 
 ```bash
@@ -164,6 +180,7 @@ Ver [04-codex-e-outros-clis.md](04-codex-e-outros-clis.md).
 
 ```bash
 npx agentic-dev-stack doctor                                     # ferramentas, hooks, config e agendamentos
+npx agentic-dev-stack doctor --fix                               # roda de novo só as fases das checagens que falharam
 rtk gain                                                         # RTK contando economia
 python3 -I ~/.agents/skills/alethe/scripts/orchestrate.py doctor # alethe: playbooks/policy válidos
 python3 -I ~/.agents/skills/alethe/scripts/orchestrate.py usage --refresh-claude --refresh-agy

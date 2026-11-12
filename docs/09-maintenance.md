@@ -30,6 +30,10 @@ Schedules: launchd on macOS, crontab on Linux, Task Scheduler on Windows. Logs l
 npx agentic-dev-stack@latest install --all                        # idempotent: only applies what changed
 npx agentic-dev-stack@latest add-project ~/projects/my-app --refresh   # bring a project's block up to the new template
 ```
+When a new version is out, any command prints `Update available x → y` (checked at most once a day, 1.5 s budget, silent offline; turn it off with `NO_UPDATE_NOTIFIER=1`). Something broke after an update? `npx agentic-dev-stack doctor --fix`.
+
+Third-party tools (Spec Kit, RTK, caveman, graphify, 9Router) are installed at the versions in [config/versions.json](../config/versions.json), never from a moving branch. A weekly workflow opens a PR when a newer release, at least 3 days old, exists; it is merged by a person. To try another version on your machine only: `PIN_SPECKIT=v1.5.0` (or `PIN_RTK`, `PIN_CAVEMAN`, `PIN_GRAPHIFY`, `PIN_NINEROUTER`) in `stack.env`.
+
 Release notes: [CHANGELOG.md](../CHANGELOG.md). `--refresh` rewrites only the text between the `ALETHE ORCHESTRATION` markers, so your own notes in `CLAUDE.md` survive.
 
 ## Move to another PC

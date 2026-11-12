@@ -83,6 +83,10 @@ Proxy local por onde passa todo o tráfego da API. Telemetria e beacon desligado
 ### 9Router
 O `postinstall` só pré-aquece dependências (SQLite, wreq-js); é seguro pular. A WebUI tem senha padrão (troque). O modo remoto/túnel expõe a API, então não ligue sem trocar a chave.
 
+## Versões fixas (cadeia de suprimentos)
+
+Toda ferramenta de terceiros que o stack instala a partir do código-fonte tem versão fixa no [config/versions.json](../../config/versions.json): Spec Kit (`git+…spec-kit.git@<tag>`), RTK (`cargo install --tag`, quando não vem do Homebrew), caveman (marketplace `JuliusBrussee/caveman#<tag>`), graphify (`graphifyy==<versão>`) e 9Router (`9router@<versão>`); o alethe é fixado por commit (`ALETHE_COMMIT`). Assim, um branch `main` comprometido lá fora nunca chega a uma máquina que roda o wizard. O `.github/workflows/pins.yml` propõe atualizações toda semana, só para releases com pelo menos 3 dias, depois de rodar os testes; as GitHub Actions são atualizadas pelo Dependabot. Sem versão fixa de propósito: fórmulas do Homebrew e os CLIs oficiais dos fornecedores (OpenCode, Codex, agy, Claude Code), que se atualizam sozinhos.
+
 ## Checklist ao adicionar uma ferramenta nova
 
 1. Leia o instalador antes do `curl | bash`.

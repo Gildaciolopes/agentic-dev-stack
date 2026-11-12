@@ -27,6 +27,10 @@
 npx agentic-dev-stack@latest install --all                             # idempotente: só aplica o que mudou
 npx agentic-dev-stack@latest add-project ~/projects/meu-app --refresh  # leva o bloco do projeto ao template novo
 ```
+Quando sai versão nova, qualquer comando mostra `Update available x → y` (no máximo uma checagem por dia, limite de 1,5 s, silencioso offline; desligue com `NO_UPDATE_NOTIFIER=1`). Algo quebrou depois de atualizar? `npx agentic-dev-stack doctor --fix`.
+
+As ferramentas de terceiros (Spec Kit, RTK, caveman, graphify, 9Router) são instaladas nas versões do [config/versions.json](../../config/versions.json), nunca de um branch que muda. Um workflow semanal abre PR quando existe release mais nova com pelo menos 3 dias; quem faz o merge é uma pessoa. Para testar outra versão só na sua máquina: `PIN_SPECKIT=v1.5.0` (ou `PIN_RTK`, `PIN_CAVEMAN`, `PIN_GRAPHIFY`, `PIN_NINEROUTER`) no `stack.env`.
+
 Novidades: [CHANGELOG.md](../../CHANGELOG.md). O `--refresh` reescreve só o texto entre os marcadores `ALETHE ORCHESTRATION`, então as suas notas no `CLAUDE.md` ficam.
 
 ## Levar para outro PC

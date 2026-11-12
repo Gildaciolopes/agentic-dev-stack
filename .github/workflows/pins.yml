@@ -1,0 +1,48 @@
+name: Pinned tools
+
+# Weekly: if a pinned third-party tool (config/versions.json) has a newer release that is at least 3 days old,
+# run the tests with it and open a PR. Nothing is merged automatically.
+on:
+  schedule:
+    - cron: "17 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Look for newer releases
+        id: check
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          node scripts/maintainer/check-pins.mjs --write | tee table.md
+          git diff --quiet config/versions.json && echo "changed=0" >> "$GITHUB_OUTPUT" || echo "changed=1" >> "$GITHUB_OUTPUT"
+      - name: Tests with the new pins
+        if: steps.check.outputs.changed == '1'
+        run: npm test
+      - name: Open or update the PR
+        if: steps.check.outputs.changed == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -C chore/bump-pins
+          git commit -am "chore: bump pinned third-party tools"
+          git push -f origin chore/bump-pins
+          { echo "Newer releases of pinned tools (each at least 3 days old). Tests passed with them in this run."; echo; cat table.md;
+            echo; echo "Before merging: read each tool's release notes. CI does not re-run on PRs opened by this workflow, so the test result above is the check."; } > body.md
+          gh pr view chore/bump-pins >/dev/null 2>&1 && gh pr edit chore/bump-pins --body-file body.md \
+            || gh pr create --head chore/bump-pins --title "chore: bump pinned third-party tools" --body-file body.md

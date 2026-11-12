@@ -4,6 +4,18 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-11-12
+
+### Added
+- `adopt`: finds a setup you already run by hand (scheduled curator, digest collector, 9Router autostart on launchd/crontab/systemd/Task Scheduler; Hermes digest and combo-alert jobs; an orchestration section in `~/.claude/CLAUDE.md`) that would run twice next to the stack's. For each one: **replace** (backed up, then disabled; Hermes jobs are renamed so history stays) or **keep** (the stack skips its own copy, `KEEP_EXISTING`). The wizard runs it before installing.
+- `doctor --fix`: re-runs only the phases that own a failing check, recreates the 9Router `free` combo, then checks again. doctor now follows what you enabled (disabled components show as such) and checks the CLAUDE.md block, caveman, Spec Kit, graphify, 9Router health, provider, combo and the schedules.
+- "Update available" notice (cached daily, 1.5 s budget, silent offline, `NO_UPDATE_NOTIFIER=1`).
+- Wizard test in a real pseudo-terminal (arrows, space, typing, Ctrl+U) in CI on macOS and Linux.
+- `scripts/model-curator/models.json`: one model ranking shared by the curator and the wizard.
+
+### Security
+- Third-party tools are pinned (`config/versions.json`): Spec Kit tag, RTK tag, caveman marketplace tag, graphify and 9Router versions. `PIN_<NAME>` overrides locally. A weekly workflow proposes bumps (releases at least 3 days old, tests run first); Dependabot updates GitHub Actions.
+
 ## [1.2.0] - 2026-11-12
 
 ### Added

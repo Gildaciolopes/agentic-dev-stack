@@ -28,15 +28,15 @@ MAX_PROBES = 14        # stay well under NVIDIA's 40 req/min (2 calls per model)
 TIMEOUT = 45           # seconds per call; slower than this is useless for coding
 MAX_LATENCY = 30.0     # healthy only if the slower of the two probes is under this
 
-# Quality ranking by family (lower = better). Unknown families are still probed if they match.
-FAMILIES = [
-    (r"nemotron-3-ultra", 1), (r"kimi-k2", 2), (r"glm-5(?!.*flash)", 3), (r"deepseek-v4(?!.*flash)", 3),
-    (r"qwen3\.[5-9].*(max|plus|coder|235b|480b)", 4), (r"glm-5.*flash", 5), (r"deepseek-v4.*flash", 5),
-    (r"minimax-m3", 6), (r"nemotron-3(\.5)?-super", 7), (r"gpt-oss-120b", 8), (r"llama-4", 9),
-    (r"mistral-(large|medium)", 9), (r"qwen3", 10),
-]
-EXCLUDE = re.compile(r"embed|rerank|safety|guard|reward|parse|vl-|-vl\b|vision|bolt|nano|tts|asr|whisper|"
-                     r"coder-6\.7b|8b|7b|3b|1b|instruct-51b|nemotron-4|retriever|clip", re.I)
+# Quality ranking by family (lower = better), shared with lib/ninerouter.mjs. Unknown families are still probed if they match.
+try:
+    _MODELS = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "models.json")))
+except (OSError, ValueError):
+    # no ranking file: no new candidates, but the current combo is still re-probed and kept healthy
+    print("models.json missing or invalid next to curate.py; only re-checking the current combo", file=sys.stderr)
+    _MODELS = {"families": [], "exclude": "$^"}
+FAMILIES = [(pat, score) for pat, score in _MODELS["families"]]
+EXCLUDE = re.compile(_MODELS["exclude"], re.I)
 
 
 def now():

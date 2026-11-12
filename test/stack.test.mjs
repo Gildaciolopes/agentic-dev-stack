@@ -247,6 +247,128 @@ test("9Router helpers: local CLI token and model ranking", async () => {
     ["nvidia/nvidia/nemotron-3-ultra-550b", "nvidia/moonshotai/kimi-k2.6"]);
 });
 
+test("wizard in a real terminal: arrows, space, typing (pty, macOS/Linux)", { skip: process.platform === "win32" }, () => {
+  const py = ["python3", "python"].find((c) => spawnSync(c, ["--version"]).status === 0);
+  if (!py) return;
+  const r = spawnSync(py, ["-I", path.join(REPO, "test", "tty_wizard.py"), REPO, freshHome()], { encoding: "utf8", timeout: 180_000 });
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.match(r.stdout, /tty wizard ok/);
+});
+
+test("adopt: finds a hand-made setup; replace backs it up and disables it, keep is saved", async () => {
+  const { classifyCommand, findOrchestrationSection } = await import("../lib/adopt.mjs");
+  assert.equal(classifyCommand("/usr/bin/python3 -I /Users/x/.local/share/model-curator/curate.py"), "curator");
+  assert.equal(classifyCommand("python3 -I ~/.local/share/daily-digest/collect.py"), "collector");
+  assert.equal(classifyCommand("/usr/local/bin/node /x/node_modules/9router/cli.js --tray"), "9router-autostart");
+  assert.equal(classifyCommand("python3 ~/.local/share/agentic-dev-stack/model-curator/curate.py"), null, "ours never matches");
+  assert.equal(classifyCommand("/usr/bin/hermes gateway run"), null);
+  const md = "# Mine\nkeep\n\n# Orchestration — plan big, execute small\n- old rule\n\n# graphify\n- g\n";
+  const at = findOrchestrationSection(md);
+  assert.equal(md.slice(0, at[0]) + md.slice(at[1]), "# Mine\nkeep\n\n# graphify\n- g\n");
+  assert.equal(findOrchestrationSection("<!-- BEGIN AGENTIC-DEV-STACK -->\n# Orchestration: plan big, execute small\n<!-- END AGENTIC-DEV-STACK -->\n"), null, "our block is not foreign");
+  const { cutSection } = await import("../lib/adopt.mjs");
+  const tpl = fs.readFileSync(path.join(REPO, "templates", "claude-global.md"), "utf8");
+  const mixed = "# Mine\na\n\n\n\nb\n\n# Orchestration — plan big, execute small\n- old\n```sh\n# not a heading\n```\n- old2\n\n" + tpl;
+  const cut = cutSection(mixed, findOrchestrationSection(mixed));
+  assert.equal(cut, "# Mine\na\n\n\n\nb\n\n" + tpl, "section right before the stack block: block intact, fenced '#' skipped, other blank lines untouched");
+  assert.equal(classifyCommand("python3 /x/accurate.py"), null);
+  assert.equal(classifyCommand("curl http://x/9router-backup"), null);
+  assert.equal(classifyCommand("9router --skip-update"), "9router-autostart");
+
+  const h = freshHome();
+  fs.mkdirSync(path.join(h, ".claude"), { recursive: true });
+  fs.writeFileSync(path.join(h, ".claude", "CLAUDE.md"), md);
+  fs.mkdirSync(path.join(h, ".hermes", "cron"), { recursive: true });
+  fs.writeFileSync(path.join(h, ".hermes", "cron", "jobs.json"), JSON.stringify({ jobs: [
+    { id: "aaa111", name: "resumo", prompt: `Leia ${h}/.hermes/workspace/daily/ e resuma`, schedule: { display: "0 8 * * *" } },
+    { id: "bbb222", name: "aviso", prompt: `Leia ${h}/.local/share/model-curator/status.json`, schedule: { display: "35 7 * * *" } },
+    { id: "ccc333", name: "other", prompt: "unrelated" }] }));
+  let plist;
+  if (process.platform === "darwin") {
+    plist = path.join(h, "Library", "LaunchAgents", "com.me.model-curator.plist");
+    fs.mkdirSync(path.dirname(plist), { recursive: true });
+    fs.writeFileSync(plist, `<?xml version="1.0"?><plist><dict><key>Label</key><string>com.me.model-curator</string><key>ProgramArguments</key><array><string>/usr/bin/python3</string><string>${h}/.local/share/model-curator/curate.py</string></array></dict></plist>`);
+  }
+  const dry = cliIn(h, {}, "adopt", "--dry-run");
+  assert.equal(dry.status, 0, dry.stderr + dry.stdout);
+  assert.match(dry.stdout, /resumo/);
+  assert.match(dry.stdout, /aviso/);
+  assert.doesNotMatch(dry.stdout, /other/);
+  assert.equal(fs.readFileSync(path.join(h, ".claude", "CLAUDE.md"), "utf8"), md, "dry-run changes nothing");
+
+  const r = cliIn(h, { adopt_digest: "replace", "adopt_combo-alert": "keep", "adopt_claude-md": "replace", adopt_curator: "replace" }, "adopt");
+  assert.equal(r.status, 0, r.stderr + r.stdout);
+  assert.equal(fs.readFileSync(path.join(h, ".claude", "CLAUDE.md"), "utf8"), "# Mine\nkeep\n\n# graphify\n- g\n", "only the duplicate section left");
+  if (plist) assert.equal(fs.existsSync(plist), false, "replaced launchd job removed");
+  const env = fs.readFileSync(path.join(h, ".config", "agentic-dev-stack", "stack.env"), "utf8");
+  assert.match(env, /^KEEP_EXISTING="combo-alert"$/m);
+  const backups = path.join(h, ".local", "share", "agentic-dev-stack", "backups");
+  const all = fs.readdirSync(backups, { recursive: true }).map(String);
+  assert.ok(all.some((f) => f.endsWith("CLAUDE.md")) && all.some((f) => f.endsWith("jobs.json")), "originals backed up");
+
+  // kept -> the stack skips its own copy; not asked again on the next wizard run
+  const { keeps } = await import("../lib/util.mjs");
+  assert.equal(keeps({ KEEP_EXISTING: "combo-alert,curator" }, "curator"), true);
+  assert.equal(keeps({ KEEP_EXISTING: "combo-alert" }, "digest"), false);
+});
+
+test("doctor --fix re-runs only the broken phases and checks again", () => {
+  const h = freshHome();
+  fs.mkdirSync(path.join(h, ".config", "agentic-dev-stack"), { recursive: true });
+  fs.writeFileSync(path.join(h, ".config", "agentic-dev-stack", "stack.env"),
+    "WITH_AGY=0\nWITH_OPENCODE=0\nWITH_CODEX=0\nWITH_FREE_MODELS=0\nWITH_HERMES=0\nWITH_SPECKIT=0\nWITH_GRAPHIFY=0\nWITH_CAVEMAN=0\n");
+  const before = cliIn(h, {}, "doctor");
+  assert.equal(before.status, 0, before.stderr);
+  assert.match(before.stdout, /✗ agent-model-guard hook/);
+  assert.match(before.stdout, /doctor --fix/);
+  assert.match(before.stdout, /· OpenCode {2}\(disabled\)/);
+  const fix = cliIn(h, {}, "doctor", "--fix");
+  assert.equal(fix.status, 0, fix.stderr + fix.stdout);
+  assert.match(fix.stdout, /fix: re-running core/);
+  assert.doesNotMatch(fix.stdout, /re-running (workers|free-models|hermes)/, "disabled components are not touched");
+  const after = fix.stdout.split("doctor (after fix)")[1];
+  assert.match(after, /✓ agent-model-guard hook/);
+  assert.match(after, /✓ subagents scout\/builder\/reviewer/);
+});
+
+test("update notice: semver compare, daily cache, silent when offline", async () => {
+  const { checkForUpdate, newer } = await import("../lib/update-check.mjs");
+  assert.equal(newer("1.10.0", "1.9.9"), true);
+  assert.equal(newer("1.2.0", "1.2.0"), false);
+  assert.equal(newer("1.2.0", "1.3.0"), false);
+  let calls = 0;
+  const fake = async () => { calls++; return { ok: true, json: async () => ({ version: "9.0.0" }) }; };
+  assert.equal(await checkForUpdate("1.2.0", { force: true, fetchImpl: fake }), "9.0.0");
+  assert.equal(await checkForUpdate("9.0.0", { force: true, fetchImpl: fake }), null);
+  assert.equal(await checkForUpdate("1.2.0", { force: true, fetchImpl: async () => { throw new Error("offline"); } }), "9.0.0", "offline -> cached answer");
+  assert.equal(calls, 2);
+  assert.equal(await checkForUpdate("1.2.0", { fetchImpl: fake }), null, "disabled in tests (ADS_HOME/CI/non-TTY)");
+});
+
+test("third-party tools are pinned; PIN_<NAME> overrides", async () => {
+  const { speckitArgs, graphifyArgs, cavemanSource } = await import("../lib/core.mjs");
+  const v = JSON.parse(fs.readFileSync(path.join(REPO, "config", "versions.json"), "utf8"));
+  assert.match(speckitArgs({}).join(" "), new RegExp(`spec-kit\\.git@${v.speckit.version}$`));
+  assert.deepEqual(graphifyArgs({}), [`graphifyy==${v.graphify.version}`]);
+  assert.equal(cavemanSource({}), `JuliusBrussee/caveman#${v.caveman.version}`);
+  assert.match(speckitArgs({ PIN_SPECKIT: "v9.9.9" }).join(" "), /@v9\.9\.9$/);
+  for (const f of ["lib/core.mjs", "lib/phases.mjs"]) {
+    const src = fs.readFileSync(path.join(REPO, f), "utf8");
+    assert.doesNotMatch(src, /spec-kit\.git"|"graphifyy"|marketplace", "add", "JuliusBrussee\/caveman"/, `${f}: unpinned install`);
+  }
+});
+
+test("curator and wizard rank models from the same models.json", () => {
+  const py = ["python3", "python"].find((c) => spawnSync(c, ["--version"]).status === 0);
+  if (!py) return;
+  const ids = ["moonshotai/kimi-k2.6", "meta/llama-3.1-8b-instruct", "z-ai/glm-5", "qwen/qwen3-32b", "x/embed-qa", "nvidia/nemotron-3-ultra-550b"];
+  const code = `import json,runpy,sys; m=runpy.run_path(sys.argv[1], run_name="x"); ids=json.loads(sys.argv[2]);
+r=sorted([(m["rank"](i), i) for i in ids if not m["EXCLUDE"].search(i) and m["rank"](i) is not None]); print(json.dumps(["nvidia/"+i for _, i in r]))`;
+  const r = spawnSync(py, ["-I", "-c", code, path.join(REPO, "scripts", "model-curator", "curate.py"), JSON.stringify(ids)], { encoding: "utf8" });
+  assert.equal(r.status, 0, r.stderr);
+  return import("../lib/ninerouter.mjs").then(({ rankModels }) => assert.deepEqual(rankModels(ids, 10), JSON.parse(r.stdout)));
+});
+
 test("integration: real alethe clone + profile (set ALETHE_IT=1)", { skip: process.env.ALETHE_IT !== "1" }, async () => {
   fs.rmSync(path.join(HOME, ".agents", "skills", "alethe"), { recursive: true, force: true });
   const { installAlethe, configureAlethe, aletheCfgDir } = await import("../lib/alethe.mjs");
