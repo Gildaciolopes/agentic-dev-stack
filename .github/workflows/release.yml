@@ -7,6 +7,11 @@ name: release
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:   # retry a release whose tag run failed or got stuck: gh workflow run release.yml -f tag=v1.2.3
+    inputs:
+      tag:
+        description: "Existing tag to release (e.g. v1.1.0)"
+        required: true
 
 permissions:
   contents: write   # create the GitHub release
@@ -17,15 +22,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
 
       - name: Tag must match package.json version
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
         run: |
           v="$(node -p "require('./package.json').version")"
-          [ "v$v" = "$GITHUB_REF_NAME" ] || { echo "tag $GITHUB_REF_NAME != package.json v$v"; exit 1; }
+          [ "v$v" = "$TAG" ] || { echo "tag $TAG != package.json v$v"; exit 1; }
 
       - name: Test
         run: npm test
@@ -40,8 +49,9 @@ jobs:
       - name: GitHub release (notes from CHANGELOG.md)
         env:
           GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag || github.ref_name }}
         run: |
-          v="${GITHUB_REF_NAME#v}"
+          v="${TAG#v}"
           awk -v v="$v" '$0 ~ "^## \\[?"v"\\]?" {f=1; next} f && /^## / {exit} f' CHANGELOG.md > notes.md
           [ -s notes.md ] || echo "See CHANGELOG.md" > notes.md
-          gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file notes.md
+          gh release create "$TAG" --title "$TAG" --notes-file notes.md --verify-tag
