@@ -19,7 +19,7 @@ Um setup multi-agente amplia três riscos:
 | Flags inseguras recusadas | `--yolo`, `--dangerously-skip-permissions`, `--auto`... | alethe (`trust.allowUnsafe` off) |
 | Hermes sem shell | injection não executa nada | `hermes tools disable ...` |
 | Allowlist de chat | só o seu ID fala com o bot | `*_ALLOWED_USERS` |
-| Mascaramento | o coletor mascara padrões de segredo antes do LLM ver | `scripts/daily-digest/collect.py` (`SECRET`) |
+| Mascaramento | o coletor mascara padrões de segredo e dados pessoais (e-mails, CPF/CNPJ, telefones) e descarta texto colado nos prompts antes do LLM ver qualquer coisa | `scripts/daily-digest/collect.py` (`SECRET`, `PERSONAL`, `prompt_text`) |
 
 ## Testes de vazamento (feitos de verdade, reproduza)
 

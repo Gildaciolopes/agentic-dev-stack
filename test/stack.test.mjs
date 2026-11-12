@@ -369,6 +369,36 @@ r=sorted([(m["rank"](i), i) for i in ids if not m["EXCLUDE"].search(i) and m["ra
   return import("../lib/ninerouter.mjs").then(({ rankModels }) => assert.deepEqual(rankModels(ids, 10), JSON.parse(r.stdout)));
 });
 
+test("digest diary drops pasted text and masks personal data", () => {
+  const py = ["python3", "python"].find((c) => spawnSync(c, ["--version"]).status === 0);
+  if (!py) return;
+  const cases = ["fix this <pasted_content id=\"x\"> [{\"email\": \"ana@corp.com\"}] </pasted_content> please",
+    "<pasted_content id=\"y\"> [{\"uid\": 1", "send to joao@empresa.com.br, call (11) 98765-4321, cpf 123.456.789-09",
+    "{\"rows\": []}", "token=abc123 ok", "APP10-446 release 1.3.0 on 2026-11-12", "look ```SELECT * FROM users``` now"];
+  const code = `import json,runpy,sys; m=runpy.run_path(sys.argv[1], run_name="x"); print(json.dumps([m["prompt_text"](c) for c in json.loads(sys.argv[2])]))`;
+  const r = spawnSync(py, ["-I", "-c", code, path.join(REPO, "scripts", "daily-digest", "collect.py"), JSON.stringify(cases)], { encoding: "utf8" });
+  assert.equal(r.status, 0, r.stderr);
+  assert.deepEqual(JSON.parse(r.stdout), ["fix this [colado] please", "[colado]", "send to [personal], call [personal], cpf [personal]",
+    "", "[REDACTED] ok", "APP10-446 release 1.3.0 on 2026-11-12", "look [código] now"]);
+});
+
+test("caveman counts as installed as a plugin, a skill copy or a config file", async () => {
+  const { cavemanInstalled } = await import("../lib/core.mjs");
+  const h = fs.mkdtempSync(path.join(os.tmpdir(), "ads-cave-"));
+  const prev = process.env.ADS_HOME;
+  process.env.ADS_HOME = h;
+  try {
+    assert.equal(cavemanInstalled(), false);
+    fs.mkdirSync(path.join(h, ".claude", "skills", "caveman"), { recursive: true });
+    fs.writeFileSync(path.join(h, ".claude", "skills", "caveman", "SKILL.md"), "x");
+    assert.equal(cavemanInstalled(), true, "skill copy");
+    fs.rmSync(path.join(h, ".claude", "skills"), { recursive: true });
+    fs.mkdirSync(path.join(h, ".claude", "plugins"), { recursive: true });
+    fs.writeFileSync(path.join(h, ".claude", "plugins", "installed_plugins.json"), JSON.stringify({ version: 2, plugins: { "caveman@caveman": [{}] } }));
+    assert.equal(cavemanInstalled(), true, "plugin");
+  } finally { process.env.ADS_HOME = prev; }
+});
+
 test("integration: real alethe clone + profile (set ALETHE_IT=1)", { skip: process.env.ALETHE_IT !== "1" }, async () => {
   fs.rmSync(path.join(HOME, ".agents", "skills", "alethe"), { recursive: true, force: true });
   const { installAlethe, configureAlethe, aletheCfgDir } = await import("../lib/alethe.mjs");

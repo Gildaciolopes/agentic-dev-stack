@@ -4,6 +4,14 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-11-12
+
+### Fixed
+- `doctor` reported caveman as missing when it was installed as a skill copy (`~/.claude/skills/caveman`, `~/.agents/skills/caveman`) or as a plugin without `~/.config/caveman/config.json`; the installer no longer adds the plugin next to an existing skill copy.
+
+### Security
+- Daily digest: text pasted into Claude Code prompts (`<pasted_content>` blocks, code fences, JSON dumps) no longer reaches the dev diary, and e-mails, CPF/CNPJ and phone numbers are masked in every section, so query results and customer data are not sent to the summary model or the chat.
+
 ## [1.3.0] - 2026-11-12
 
 ### Added

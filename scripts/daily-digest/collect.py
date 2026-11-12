@@ -53,8 +53,25 @@ CURATOR_DIR = f"{DATA_DIR}/model-curator"
 RADAR_REPOS = [r for r in CFG.get("RADAR_REPOS", "").split() if r] or DEFAULT_RADAR
 
 
+# personal data that must not reach the summary model or the chat: e-mails, CPF/CNPJ, phone numbers
+PERSONAL = re.compile(r"[\w.+-]+@[\w-]+(\.[\w-]+)+|\b\d{3}\.\d{3}\.\d{3}-\d{2}\b|\b\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}\b|"
+                      r"(\+\d{1,3}[\s-]?)?\(?\d{2}\)?[\s-]?9?\d{4}[\s-]\d{4}\b")
+# text pasted into a prompt (logs, query results, JSON) is data, not a description of the work: drop it
+PASTED = re.compile(r"<pasted_content[^>]*>.*?(</pasted_content>|$)", re.S)
+
+
 def mask(s):
-    return SECRET.sub("[REDACTED]", s)
+    return PERSONAL.sub("[personal]", SECRET.sub("[REDACTED]", s))
+
+
+def prompt_text(c):
+    """First words of a user prompt for the dev diary: pasted blocks and JSON/log dumps removed, then masked."""
+    c = PASTED.sub(" [colado] ", c)
+    c = re.sub(r"```.*?(```|$)", " [código] ", c, flags=re.S)
+    c = " ".join(c.split())
+    if c.startswith(("{", "[")) and not c.startswith("[colado]"):
+        return ""
+    return mask(c)
 
 
 def sh(cmd, cwd=None, timeout=60):
@@ -298,8 +315,9 @@ def sessions(projects):
                 cwd = cwd or d.get("cwd")
             if d.get("type") == "user" and isinstance(d.get("message", {}).get("content"), str):
                 c = d["message"]["content"]
-                if not c.startswith("<") and len(prompts) < 40:
-                    prompts.append((ts[-1] if ts else None, mask(c.strip().replace("\n", " "))[:160]))
+                text = prompt_text(c) if not c.startswith("<") else ""
+                if text and text != "[colado]" and len(prompts) < 40:
+                    prompts.append((ts[-1] if ts else None, text[:160]))
         if ts:
             res.append({"project": project_of(cwd, projects), "ts": sorted(ts), "prompts": prompts, "title": title})
     return res
@@ -318,7 +336,7 @@ def sec_diary_hours(ss, projects):
         if not recent:
             continue
         ps = [p for t, p in s["prompts"] if t and t >= SINCE]
-        diary.append(f"- [{s['project']}] {s['title'] or 'sessão'} ({recent[0].astimezone():%H:%M}-{recent[-1].astimezone():%H:%M}): "
+        diary.append(f"- [{s['project']}] {mask(s['title'] or 'sessão')} ({recent[0].astimezone():%H:%M}-{recent[-1].astimezone():%H:%M}): "
                      + " | ".join(ps[:8]))
     email = author_email()
     for name, p in sorted(projects.items()):
