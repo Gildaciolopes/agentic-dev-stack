@@ -47,4 +47,4 @@ npm version minor            # or patch; updates package.json and creates the ta
 git push --follow-tags       # the release workflow tests, publishes to npm with provenance and creates the GitHub release
 ```
 
-Move the `Unreleased` CHANGELOG entries under the new version before tagging.
+Move the `Unreleased` CHANGELOG entries under the new version before tagging. If the tag's run fails or gets stuck, retry without touching the tag: `gh workflow run release.yml -f tag=vX.Y.Z`.

@@ -4,6 +4,9 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 
+### Added
+- Release workflow can be re-run for an existing tag (`gh workflow run release.yml -f tag=vX.Y.Z`).
+
 ## [1.1.0] - 2026-11-11
 
 ### Added
