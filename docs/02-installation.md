@@ -15,13 +15,60 @@ The installer is a cross-platform, zero-dependency Node CLI. It is idempotent: r
 
 A Claude Pro/Max subscription or an API key is required. On Windows, **WSL2 is recommended** (see the Windows section).
 
-## 1. Choose an install method
+## 1. Run the setup wizard (recommended)
 
-All three methods run the same CLI and accept the same flags.
-
-### Method A: `npx` (any OS, nothing to clone)
 ```bash
-npx agentic-dev-stack install --all
+npx agentic-dev-stack
+```
+
+It works like `create-next-app`: a few questions with arrow keys, then it installs everything and tells you what is left. Run it again at any time: it opens pre-filled with your answers and offers **Update / repair**, **Change settings**, **Wire more projects**, **Create a new project**, **doctor** and **Uninstall**.
+
+What it asks, and what it automates for you:
+
+| Step | Question | What happens without you |
+|---|---|---|
+| Language | English or Português | All messages, the project blocks and the Hermes summaries follow it |
+| Preset | Recommended / Token savers only / Custom | Custom shows a checklist of every component, with what is already installed marked ✓ |
+| caveman | Default intensity (caveman, megacave, ultracave, off) | Installs the Claude Code plugin and writes `~/.config/caveman/config.json` |
+| Spec Kit, graphify | (part of the checklist) | Installs `uv` if needed, then `specify-cli` and `graphifyy` + the `/graphify` skill |
+| Free models | Your NVIDIA key (hidden), a new 9Router dashboard password, curator frequency | Connects the NVIDIA provider, creates the `free` combo with the best current models, creates the API key, points OpenCode at `9router/free`, runs the curator once |
+| Hermes | Discord, Telegram or none; bot token (hidden); your user ID | Verifies the token, prints the Discord invite link, auto-detects your Telegram ID when you message the bot |
+| Digest | Time, sections (free models, tokens, updates, Spec Kit, AI radar, yesterday, hours, plan), language, combo alerts | Collector runs 10 min earlier; routines are created or updated |
+| Projects | Which folder, which repos, block language | Wires each picked repo (append-only) and remembers them for future updates |
+| Git email | Pre-filled from `git config` | Used by the digest to count your commits |
+
+Nothing is written until you confirm the summary; declining leaves no trace. Answers go to `~/.config/agentic-dev-stack/stack.env` (secrets do not: tokens go to `~/.hermes/.env` with mode 600, the NVIDIA key only into 9Router).
+
+### Non-interactive (CI, dotfiles, a fleet of machines)
+
+```bash
+npx agentic-dev-stack setup --yes                       # accept the recommended answers
+ADS_ANSWERS=answers.json npx agentic-dev-stack setup    # answer from a file
+```
+
+`answers.json` uses the question ids, for example:
+
+```json
+{ "lang": "en", "preset": "custom", "components": ["caveman", "speckit", "graphify", "agy", "opencode", "free"],
+  "caveman_mode": "ultracave", "curator": "07:30 13:30 19:30", "timezone": "Europe/Berlin",
+  "projects_dir": "/home/me/code", "projects": ["/home/me/code/api"], "docs_lang": "en", "confirm": true }
+```
+
+### New project in one command
+
+```bash
+npx agentic-dev-stack new my-app
+```
+
+It asks where to create it and whether to start from a framework (Next.js, Vite, Astro, Python with `uv`; the framework's own questions run in your terminal), runs `git init`, optionally `specify init`, and wires it to the stack.
+
+## 1b. Other install methods
+
+All of them run the same CLI and accept the same flags.
+
+### Method A: `npx`, by phase (any OS, nothing to clone)
+```bash
+npx agentic-dev-stack install --all     # or pick phases, see the table below
 ```
 
 ### Method B: clone and run the wrapper
@@ -43,10 +90,10 @@ node bin/cli.mjs install --all
 
 | Flag | What it does |
 |---|---|
-| `--core` | RTK, agents, `agent-model-guard` hook, global `CLAUDE.md` block |
+| `--core` | RTK, agents, `agent-model-guard` hook, global `CLAUDE.md` block, caveman, Spec Kit, graphify |
 | `--workers` | alethe (pinned commit), agy, OpenCode, optional Codex, profile generation |
 | `--free-models` | 9Router, `opencode-safe` sandbox wrapper, model curator and its schedule |
-| `--extras` | graphify, Spec Kit, claude-squad, optional Headroom |
+| `--extras` | yt-dlp, uv, optional Headroom |
 | `--hermes` | Hermes Agent, daily digest, scheduled summaries |
 | `--all` | every phase above |
 | `--dry-run` | print what would happen, change nothing |
@@ -110,13 +157,13 @@ npx agentic-dev-stack install --all
 
 ## 3. Manual steps (only you can do these)
 
-### 3.1 caveman (inside Claude Code)
+> Used the wizard? Most of this section was done for you; it prints only what is left (usually: sign in to agy, and `/sethome` in your Discord channel). The steps below are for the phase-by-phase install, or for doing things by hand.
+
+### 3.1 caveman
+```bash
+claude plugin marketplace add JuliusBrussee/caveman && claude plugin install caveman@caveman
 ```
-/plugin marketplace add JuliusBrussee/caveman
-/plugin install caveman
-/caveman ultra
-```
-To keep it always on, ask Claude to add a rule to your `~/.claude/CLAUDE.md`: "invoke the caveman skill at ultra intensity at the start of every session".
+The plugin starts in every session on its own. Default intensity: `{"defaultMode": "ultracave"}` in `~/.config/caveman/config.json` (`caveman`, `megacave`, `ultracave` or `off`); switch per session with `/caveman`.
 
 ### 3.2 Log in to agy
 Run `agy` once and sign in with your Google account. Confirm with `agy models`.
@@ -124,6 +171,7 @@ Run `agy` once and sign in with your Google account. Confirm with `agy models`.
 > **Gemini CLI:** personal-account login was discontinued ("This client is no longer supported for Gemini Code Assist for individuals"). Use agy, or a free AI Studio key as a provider in 9Router.
 
 ### 3.3 9Router and the free NVIDIA models
+The wizard does steps 2 to 6 through 9Router's local API when you give it the key. By hand:
 1. Create a free key at **build.nvidia.com** (avatar, API Key, Generate). The limit is 40 requests/min. You do not need an NVIDIA GPU.
 2. Open `http://127.0.0.1:20128` (the installer already starts 9Router at login). The initial password is `123456`: **change it in Settings, Security**.
 3. Under **Providers, NVIDIA NIM, Add connection**, paste the key and validate it.

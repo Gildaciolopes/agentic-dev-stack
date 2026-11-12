@@ -40,7 +40,7 @@ body{width:1280px;height:760px;overflow:hidden;background:radial-gradient(1200px
 <div class="win"><div class="bar"><div class="dot" style="background:#ff5f57"></div><div class="dot" style="background:#febc2e"></div><div class="dot" style="background:#28c840"></div><div class="title" id="title"></div></div><div id="body"></div></div>
 <div class="foot"><span id="note"></span><span>github.com/Gildaciolopes/agentic-dev-stack</span></div>
 <script>
-const STEPS = ["1 install", "2 wire a project", "3 orchestrate", "4 verify"];
+const STEPS = ["1 setup", "2 wire a project", "3 orchestrate", "4 verify"];
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
 // span helper: [cls, text]
 const L = (...parts) => parts.map((x) => typeof x === "string" ? esc(x) : `<span class="${x[0]}">${esc(x[1])}</span>`).join("");
@@ -147,8 +147,7 @@ function endcard(t) {
 }
 
 const TOTAL = 34.5;
-window.TOTAL = TOTAL;
-window.render = (t) => {
+const oldRender = (t) => {
   let step, title, body, note = "";
   if (t < S1.end) { step = 0; title = S1.title; body = termScene(S1, t); }
   else if (t < S2.end) { step = 1; title = S2.title; body = termScene(S2, t); }
@@ -163,6 +162,53 @@ window.render = (t) => {
   const since = t - Math.max(...starts.filter((x) => x <= t));
   b.style.opacity = t < 0.3 ? 1 : Math.min(1, since / 0.3).toFixed(2);
   document.getElementById("note").textContent = note;
+};
+
+// ---- scene 1: the setup wizard (prompts mirror lib/prompt.mjs + lib/i18n.mjs)
+const W = 12.0; // wizard scene length; afterwards the old timeline continues from scene 2
+const Q = (m, extra = "") => L(["k", "? "], ["c", m]) + (extra ? L(["d", "  " + extra]) : "");
+const A = (m, v) => L(["g", "✔ "], ["c", m + " "], ["k", v]);
+function selectBox(msg, opts, cur, hints = []) {
+  return [Q(msg, "↑/↓ enter"), ...opts.map((o, i) => (i === cur ? L(["k", "❯ " + o]) : "  " + esc(o)) + (hints[i] ? L(["d", "  " + hints[i]]) : ""))].join("\n");
+}
+function multiBox(msg, opts, on, cur) {
+  return [Q(msg, "space toggle · enter confirm"), ...opts.map(([o, h, lock], i) => `${i === cur ? L(["k", "❯"]) : " "} ${lock ? L(["d", "◉"]) : on.has(i) ? L(["g", "◉"]) : "◯"} ${i === cur ? L(["k", o]) : esc(o)}${lock ? L(["d", "  (always)"]) : ""}${h ? L(["d", "  " + h]) : ""}`)].join("\n");
+}
+const COMPS = [["Core: Opus guard, subagents, RTK", "", 1], ["caveman", "terse replies"], ["Spec Kit", "spec-driven development"], ["graphify", "code map, fewer reads"],
+  ["Antigravity CLI (agy)", "Gemini scouts on Google quota"], ["Free-model worker (sandboxed)", "mechanical edits at zero cost"], ["Free models (9Router + NVIDIA)", "self-healing combo"], ["Hermes (Discord/Telegram)", "daily digest on your phone"]];
+function wizardScene(t) {
+  const done = [L(["d", "  agentic-dev-stack v1.2.0 · "], ["d", "smart vibe coding setup"]), ""];
+  let cur = "";
+  const steps = [
+    [0.4, 1.6, (u) => selectBox("How much do you want to install?", ["Recommended", "Token savers only", "Custom"], u < 0.5 ? 0 : 2, ["everything that fits this OS", "guard + RTK + caveman + Spec Kit + graphify", "pick each component"]), A("How much do you want to install?", "Custom")],
+    [1.6, 4.2, (u) => { const on = new Set([1, 2, 3, 4, 6, 7]); if (u > 0.55) on.add(5); return multiBox("Pick the components", COMPS, on, u < 0.4 ? Math.min(5, 1 + Math.floor(u * 12)) : 5); }, A("Pick the components", "caveman, Spec Kit, graphify, agy, free worker, free models, Hermes")],
+    [4.2, 5.2, (u) => selectBox("caveman default intensity", ["caveman: terse", "megacave: terser", "ultracave: maximum compression"], u < 0.5 ? 0 : 2), A("caveman default intensity", "ultracave")],
+    [5.2, 6.6, (u) => Q("NVIDIA API key", "free at build.nvidia.com") + "\n" + L(["k", "› "]) + "•".repeat(Math.floor(Math.min(1, u * 1.4) * 28)) + L(["k", "▏"]), A("NVIDIA API key", "•••• (saved)")],
+    [6.6, 7.5, (u) => selectBox("Where should Hermes talk to you?", ["Discord", "Telegram", "Nowhere for now"], 0), A("Where should Hermes talk to you?", "Discord")],
+    [7.5, 8.4, () => Q("Discord bot token") + "\n" + L(["k", "› "]) + "•".repeat(32), L(["g", "  ✓ Bot verified: dev-hermes · invite link generated"])],
+    [8.4, 9.3, () => multiBox("What goes into the daily digest?", [["Free-model status"], ["Tokens and quota"], ["Spec Kit progress"], ["Hours per project"], ["3 priorities for today"]], new Set([0, 1, 2, 3, 4]), 4), A("What goes into the daily digest?", "all · 08:00")],
+    [9.3, 10.0, () => Q("Install now?") + "  " + L(["k", "Yes"]) + " / no", A("Install now?", "Yes")],
+  ];
+  for (const [a, b, draw, ans] of steps) { if (t >= b) done.push(ans); else if (t >= a) { cur = draw((t - a) / (b - a)); break; } }
+  const tail = [[10.2, L(["h", "==> "], "core · workers · free-models · hermes")], [10.5, L(["g", "  ✓ "], "9Router: NVIDIA connected · combo 'free' created · OpenCode -> 9router/free")],
+    [10.8, L(["g", "  ✓ "], "Hermes: daily-digest 08:00 · 3 projects wired (append-only)")], [11.2, L(["g", "◆ All set ✔ "], ["d", "  next: open a project and run claude"])]];
+  const lines = [...done, ...(cur ? [cur] : []), ...tail.filter(([a]) => t >= a).map(([, x]) => x)];
+  return `<div class="term" style="font-size:16px;line-height:1.5">${L(["p", "❯ "], ["d", "~ "], ["c", "npx agentic-dev-stack".slice(0, Math.max(0, Math.floor((t - 0.0) * 40)))])}\n${lines.join("\n")}</div>`;
+}
+
+window.TOTAL = TOTAL - S1.end + W;
+window.render = (t) => {
+  if (t < W) {
+    oldRender(S1.end + 0.01); // sets steps/title scaffolding, then override body for the wizard
+    document.getElementById("steps").innerHTML = STEPS.map((s, i) => `<span class="step ${i === 0 ? "on" : ""}">${s}</span>`).join("");
+    document.getElementById("title").textContent = "~ — zsh";
+    const b = document.getElementById("body");
+    b.innerHTML = wizardScene(t);
+    b.style.opacity = 1;
+    document.getElementById("note").textContent = "";
+    return;
+  }
+  oldRender(t - W + S1.end);
 };
 render(0);
 </script>

@@ -177,6 +177,76 @@ test("uninstall removes only what the installer added", () => {
   assert.ok(fs.readdirSync(path.join(HOME, ".local", "share", "agentic-dev-stack", "backups")).length > 0);
 });
 
+// ---- setup wizard (non-interactive: answers file), each run in its own fresh HOME
+function freshHome() {
+  const h = fs.mkdtempSync(path.join(os.tmpdir(), "ads-wiz-"));
+  fs.mkdirSync(path.join(h, ".agents", "skills", "alethe", "scripts"), { recursive: true });
+  fs.writeFileSync(path.join(h, ".agents", "skills", "alethe", "scripts", "hook.py"), "");
+  return h;
+}
+const cliIn = (h, answers, ...args) => {
+  const af = path.join(h, "answers.json");
+  fs.writeFileSync(af, JSON.stringify(answers));
+  return spawnSync(process.execPath, [path.join(REPO, "bin", "cli.mjs"), ...args],
+    { encoding: "utf8", env: { ...process.env, ADS_HOME: h, ADS_SKIP_INSTALLS: "1", NO_COLOR: "1", ADS_ANSWERS: af } });
+};
+
+test("setup wizard saves every answer, installs and wires the picked projects", () => {
+  const h = freshHome();
+  const pd = path.join(h, "projects");
+  for (const d of ["a", "b"]) { fs.mkdirSync(path.join(pd, d), { recursive: true }); git(path.join(pd, d), "init", "-q"); }
+  const r = cliIn(h, { lang: "pt-BR", preset: "custom", components: ["caveman", "speckit", "hermes"], caveman_mode: "ultracave", platform: "none",
+    digest_time: "07:30", digest_sections: ["models", "plan"], summary_language: "Português do Brasil", timezone: "UTC",
+    projects_dir: pd, docs_lang: "pt-BR", projects: [path.join(pd, "a")], git_email: "dev@example.com", confirm: true }, "setup");
+  assert.equal(r.status, 0, r.stderr + r.stdout);
+  const env = fs.readFileSync(path.join(h, ".config", "agentic-dev-stack", "stack.env"), "utf8");
+  for (const kv of ['WITH_CAVEMAN=1', 'WITH_GRAPHIFY=0', 'WITH_HERMES=1', 'WITH_FREE_MODELS=0', 'CAVEMAN_MODE="ultracave"', 'DIGEST_SEND_TIME="07:30"',
+    'DIGEST_COLLECT_TIME="07:20"', 'DIGEST_SECTIONS="models,plan"', 'PROJECT_DOCS_LANG="pt-BR"', 'WIZARD_LANG="pt-BR"']) assert.ok(env.includes(kv), `missing ${kv}`);
+  assert.match(env, /^# Where your projects live/m, "comments from the example are kept");
+  assert.equal(JSON.parse(fs.readFileSync(path.join(h, ".config", "caveman", "config.json"), "utf8")).defaultMode, "ultracave");
+  assert.match(fs.readFileSync(path.join(pd, "a", "CLAUDE.md"), "utf8"), /Orquestração multi-agente/);
+  assert.equal(fs.existsSync(path.join(pd, "b", "CLAUDE.md")), false, "unpicked project untouched");
+  assert.ok(fs.existsSync(path.join(h, ".claude", "agents", "scout.md")));
+
+  // second run: "update" replays the saved answers without asking anything
+  const u = cliIn(h, { lang: "en", action: "update" }, "setup");
+  assert.equal(u.status, 0, u.stderr + u.stdout);
+  assert.match(u.stdout, /CLAUDE\.md: unchanged/);
+});
+
+test("setup wizard: declining the summary leaves no trace", () => {
+  const h = freshHome();
+  const r = cliIn(h, { lang: "en", preset: "savers", projects_dir_text: h, docs_lang: "en", confirm: false }, "setup");
+  assert.equal(r.status, 0, r.stderr + r.stdout);
+  assert.equal(fs.existsSync(path.join(h, ".config", "agentic-dev-stack", "stack.env")), false);
+  assert.equal(fs.existsSync(path.join(h, ".claude")), false);
+});
+
+test("new: creates a git repo already wired to the stack", () => {
+  const h = freshHome();
+  const r = cliIn(h, { new_parent: path.join(h, "code"), new_scaffold: "none", new_speckit: false }, "new", "shop");
+  assert.equal(r.status, 0, r.stderr + r.stdout);
+  const dir = path.join(h, "code", "shop");
+  assert.ok(fs.existsSync(path.join(dir, ".git")));
+  assert.match(fs.readFileSync(path.join(dir, "CLAUDE.md"), "utf8"), /BEGIN ALETHE ORCHESTRATION/);
+  assert.match(fs.readFileSync(path.join(h, ".config", "agentic-dev-stack", "projects.list"), "utf8"), /shop/);
+});
+
+test("9Router helpers: local CLI token and model ranking", async () => {
+  const { cliToken, rankModels } = await import("../lib/ninerouter.mjs");
+  const d = fs.mkdtempSync(path.join(os.tmpdir(), "ads-9r-"));
+  process.env.NINEROUTER_DATA_DIR = d;
+  assert.equal(cliToken(), null, "no files -> no token");
+  fs.mkdirSync(path.join(d, "auth"));
+  fs.writeFileSync(path.join(d, "machine-id"), "m1\n");
+  fs.writeFileSync(path.join(d, "auth", "cli-secret"), "s1\n");
+  const { createHash } = await import("node:crypto");
+  assert.equal(cliToken(), createHash("sha256").update("m1" + "9r-cli-auth" + "s1").digest("hex").slice(0, 16));
+  delete process.env.NINEROUTER_DATA_DIR;
+  assert.deepEqual(rankModels(["meta/llama-3.1-8b-instruct", "qwen/qwen3-32b", "moonshotai/kimi-k2.6", "nvidia/nemotron-3-ultra-550b", "x/embed-qa"], 2),
+    ["nvidia/nvidia/nemotron-3-ultra-550b", "nvidia/moonshotai/kimi-k2.6"]);
+});
+
 test("integration: real alethe clone + profile (set ALETHE_IT=1)", { skip: process.env.ALETHE_IT !== "1" }, async () => {
   fs.rmSync(path.join(HOME, ".agents", "skills", "alethe"), { recursive: true, force: true });
   const { installAlethe, configureAlethe, aletheCfgDir } = await import("../lib/alethe.mjs");

@@ -4,8 +4,19 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-12
+
 ### Added
+- **Setup wizard**: `npx agentic-dev-stack` asks a few questions (arrow keys, like `create-next-app`) and installs and configures everything. English and Portuguese. Re-running it opens pre-filled with Update / repair, Change settings, Wire more projects, New project, doctor and Uninstall. Nothing is written until you confirm.
+- 9Router configured through its local API: NVIDIA provider, `free` combo seeded with the best current models, API key, OpenCode wiring, new dashboard password; then the curator runs once.
+- caveman (plugin + default intensity), Spec Kit and graphify are installed automatically (uv is installed when missing).
+- Hermes: bot tokens are verified, the Discord invite link is generated, the Telegram user ID is auto-detected; digest time, sections and language are configurable, and routines are updated (not duplicated) on re-runs.
+- `npx agentic-dev-stack new <name>`: new project with an optional framework (Next.js, Vite, Astro, Python/uv), `git init`, optional Spec Kit, already wired.
+- Non-interactive setup: `setup --yes` or `ADS_ANSWERS=answers.json`.
 - Release workflow can be re-run for an existing tag (`gh workflow run release.yml -f tag=vX.Y.Z`).
+
+### Fixed
+- Test mode (fake `ADS_HOME`) no longer touches real system services (launchd/crontab/Task Scheduler, Hermes, 9Router autostart).
 
 ## [1.1.0] - 2026-11-11
 
@@ -32,6 +43,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 - Smart vibe coding guide and 10 docs in English and Portuguese, dark Excalidraw diagrams, CLAUDE.md/AGENTS.md starter templates.
 - CI on Ubuntu, macOS and Windows (Node 20 and 22).
 
-[Unreleased]: https://github.com/Gildaciolopes/agentic-dev-stack/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/Gildaciolopes/agentic-dev-stack/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/Gildaciolopes/agentic-dev-stack/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/Gildaciolopes/agentic-dev-stack/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/Gildaciolopes/agentic-dev-stack/releases/tag/v1.0.0

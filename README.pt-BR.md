@@ -17,8 +17,10 @@
 **🇺🇸 [Read in English](README.md)** · 📘 **[Guia do vibe coding inteligente](docs/pt-BR/00-vibe-coding-inteligente.md)** · 🧩 **[Templates de CLAUDE.md / AGENTS.md](templates/pt-BR/)**
 
 ```bash
-npx agentic-dev-stack install --all
+npx agentic-dev-stack
 ```
+
+<sub>Um wizard curto (como o `create-next-app`) pergunta o que você quer e instala e configura tudo, inclusive os modelos grátis e o bot do Discord/Telegram. Rode de novo quando quiser para atualizar ou mudar algo.</sub>
 
 ![Demo: instalar o stack, ligar um projeto, orquestrar workers em paralelo com review, verificar com doctor](docs/assets/demo.gif)
 
@@ -96,35 +98,31 @@ Detalhes: [docs/pt-BR/01-arquitetura.md](docs/pt-BR/01-arquitetura.md).
 
 ## Instalação
 
-| Método | Comando |
-|---|---|
-| **npx (qualquer SO)** | `npx agentic-dev-stack install --all` |
-| **macOS / Linux** | `git clone https://github.com/Gildaciolopes/agentic-dev-stack && cd agentic-dev-stack && ./install.sh --all` |
-| **Windows (PowerShell)** | `git clone https://github.com/Gildaciolopes/agentic-dev-stack; cd agentic-dev-stack; .\install.ps1 --all` |
-
-Em vez de `--all`, dá para escolher as fases: `--core`, `--workers`, `--free-models`, `--extras`, `--hermes`. Use `--dry-run` para ver antes o que seria feito. O instalador:
-- pode rodar de novo sem duplicar nada;
-- faz backup de toda config que altera;
-- nunca apaga conteúdo seu.
-
-Depois, ligue cada projeto e confira se está tudo certo:
-
 ```bash
-npx agentic-dev-stack add-project ~/projetos/meu-app --lang pt-BR
-npx agentic-dev-stack doctor
+npx agentic-dev-stack             # setup interativo: escolha os componentes, ele faz o resto
+npx agentic-dev-stack new meu-app # projeto novo (Next.js/Vite/Astro/Python opcional + Spec Kit), já ligado
 ```
 
-O `add-project` nunca apaga nada: ele anexa um bloco marcado ao `CLAUDE.md`/`AGENTS.md`. Projeto novo, pasta vazia? Ligue agora e rode `add-project . --refresh` depois de montar a base, para detectar de novo os comandos de test/lint e o Spec Kit. Para desfazer: `add-project <pasta> --remove` num projeto, `uninstall` no stack inteiro (os dois fazem backup do que tocam e aceitam `--dry-run`).
+O wizard só pergunta o que não consegue detectar, valida o que você digita (chave da NVIDIA, tokens dos bots) e automatiza o que antes era manual: provider do 9Router, combo `free`, API key e ligação com o OpenCode; instalação do caveman, Spec Kit e graphify; link de convite do Discord; detecção do ID do Telegram; rotinas do Hermes; e liga os repos que você escolher. Nada é gravado antes de você confirmar, e rodar de novo abre já preenchido com **Atualizar / reparar · Mudar configurações · Ligar mais projetos · Projeto novo · doctor · Desinstalar**.
 
-Pré-requisitos: Node ≥ 18, git e Claude Code. O Python ≥ 3.9 também é necessário para o alethe, o curador e o coletor. Detalhes por SO e os passos manuais (logins, chaves) estão em [docs/pt-BR/02-instalacao.md](docs/pt-BR/02-instalacao.md).
+| Outros jeitos | Comando |
+|---|---|
+| Aceitar as respostas recomendadas | `npx agentic-dev-stack setup --yes` |
+| Respostas de um arquivo (CI, dotfiles) | `ADS_ANSWERS=respostas.json npx agentic-dev-stack setup` |
+| Por fases, sem perguntas | `npx agentic-dev-stack install --core --workers --free-models --extras --hermes` (ou `--all`, `--dry-run`) |
+| A partir do clone | `./install.sh --all` (macOS/Linux) · `.\install.ps1 --all` (Windows) |
+| Um projeto | `npx agentic-dev-stack add-project <pasta>` (`--refresh`, `--remove`, `--lang pt-BR`) |
+| Conferir / desfazer | `npx agentic-dev-stack doctor` · `npx agentic-dev-stack uninstall` |
+
+Tudo pode ser rodado de novo, faz backup do que edita e nunca apaga conteúdo seu. Pré-requisitos: Node ≥ 18, git e Claude Code; Python ≥ 3.9 para o alethe, o curador e o coletor. Detalhes por SO: [docs/pt-BR/02-instalacao.md](docs/pt-BR/02-instalacao.md).
 
 | Plataforma | Suporte |
 |---|---|
 | macOS | Completo (launchd, `sandbox-exec` no worker grátis) |
 | Linux | Completo (crontab/systemd, sandbox bubblewrap) |
-| Windows | Core, workers, alethe, 9Router e Agendador de Tarefas. O worker grátis vem desligado (não há sandbox de kernel; use WSL2). Hermes via WSL2 |
+| Windows | Core, workers, alethe, 9Router, Agendador de Tarefas. O worker grátis vem desligado (sem sandbox de kernel; use WSL2). Hermes via WSL2 |
 
-O CI roda os testes e uma instalação `--core` de verdade no **Ubuntu, macOS e Windows (PowerShell)**, em Node 20 e 22.
+O CI roda os testes (incluindo o wizard) e uma instalação `--core` real no **Ubuntu, macOS e Windows (PowerShell)**, em Node 20 e 22.
 
 ## Templates para os seus projetos
 

@@ -11,7 +11,48 @@ Tempo estimado: 20–30 min, a maior parte criando contas e chaves.
 | Python ≥ 3.9 (alethe, curador, resumo) | macOS: `brew install python` · Linux: `sudo apt install python3` · Windows: `winget install Python.Python.3.12` |
 | Claude Code logado | macOS: `brew install --cask claude-code`; depois `claude` (assinatura Pro/Max ou API) |
 
-## 1. Escolher o método e configurar
+## 1. Rodar o wizard de setup (recomendado)
+
+```bash
+npx agentic-dev-stack
+```
+
+Funciona como o `create-next-app`: algumas perguntas com as setas, depois ele instala tudo e diz o que falta. Rode de novo quando quiser: ele abre já preenchido com as suas respostas e oferece **Atualizar / reparar**, **Mudar configurações**, **Ligar mais projetos**, **Criar um projeto novo**, **doctor** e **Desinstalar**.
+
+O que ele pergunta, e o que ele faz sozinho:
+
+| Etapa | Pergunta | O que acontece sem você |
+|---|---|---|
+| Idioma | English ou Português | Mensagens, blocos dos projetos e resumos do Hermes seguem a escolha |
+| Preset | Recomendado / Só economia de tokens / Personalizado | O personalizado mostra uma lista com todos os componentes, marcando com ✓ o que já está instalado |
+| caveman | Intensidade padrão (caveman, megacave, ultracave, off) | Instala o plugin do Claude Code e grava `~/.config/caveman/config.json` |
+| Spec Kit, graphify | (fazem parte da lista) | Instala o `uv` se preciso, depois `specify-cli` e `graphifyy` + a skill `/graphify` |
+| Modelos grátis | Sua chave da NVIDIA (oculta), nova senha do painel do 9Router, frequência do curador | Conecta o provider NVIDIA, cria o combo `free` com os melhores modelos do momento, cria a API key, aponta o OpenCode para `9router/free`, roda o curador uma vez |
+| Hermes | Discord, Telegram ou nenhum; token do bot (oculto); seu ID | Valida o token, mostra o link de convite do Discord, detecta seu ID do Telegram quando você manda mensagem para o bot |
+| Resumo | Horário, seções (modelos grátis, tokens, atualizações, Spec Kit, radar de IA, ontem, horas, plano), idioma, avisos do combo | O coletor roda 10 min antes; as rotinas são criadas ou atualizadas |
+| Projetos | Qual pasta, quais repos, idioma dos blocos | Liga cada repo escolhido (só acrescenta) e guarda a lista para as próximas atualizações |
+| E-mail do git | Já vem do `git config` | Usado pelo resumo para contar seus commits |
+
+Nada é gravado antes de você confirmar o resumo; recusar não deixa rastro. As respostas vão para `~/.config/agentic-dev-stack/stack.env` (segredos não: tokens vão para `~/.hermes/.env` com permissão 600, a chave da NVIDIA só para o 9Router).
+
+### Sem interação (CI, dotfiles, várias máquinas)
+
+```bash
+npx agentic-dev-stack setup --yes                       # aceita as respostas recomendadas
+ADS_ANSWERS=respostas.json npx agentic-dev-stack setup  # responde a partir de um arquivo
+```
+
+O arquivo usa os ids das perguntas, por exemplo `{"lang": "pt-BR", "preset": "savers", "caveman_mode": "ultracave", "projects_dir": "/home/eu/projetos", "docs_lang": "pt-BR", "confirm": true}`.
+
+### Projeto novo num comando
+
+```bash
+npx agentic-dev-stack new meu-app
+```
+
+Pergunta onde criar e se quer começar de um framework (Next.js, Vite, Astro, Python com `uv`; as perguntas do próprio framework rodam no seu terminal), faz `git init`, opcionalmente `specify init`, e já liga ao stack.
+
+## 1b. Configurar à mão
 
 O instalador é um CLI Node multiplataforma, sem dependências. Na primeira execução ele copia `config/stack.env.example` para `~/.config/agentic-dev-stack/stack.env`; edite essa cópia:
 
@@ -29,7 +70,7 @@ Campos importantes:
 - `ALLOW_UNSANDBOXED_FREE_WORKER`: só Windows (ver notas no fim).
 - `ALETHE_COMMIT`: o commit auditado do alethe. Só troque depois de auditar outro.
 
-## 2. Rodar o instalador
+## 2. Rodar o instalador por fases
 
 Três métodos equivalentes:
 
@@ -51,13 +92,13 @@ No fim, ele imprime a lista de passos manuais. Eles estão detalhados abaixo.
 
 ## 3. Passos manuais (só você pode fazer)
 
-### 3.1 caveman (dentro do Claude Code)
+> Usou o wizard? Quase tudo desta seção já foi feito; ele mostra só o que falta (normalmente: entrar no agy e mandar `/sethome` no canal do Discord). Os passos abaixo são para a instalação por fases ou para fazer à mão.
+
+### 3.1 caveman
+```bash
+claude plugin marketplace add JuliusBrussee/caveman && claude plugin install caveman@caveman
 ```
-/plugin marketplace add JuliusBrussee/caveman
-/plugin install caveman
-/caveman ultra
-```
-Para ficar sempre ligado, peça ao Claude para colocar no seu `~/.claude/CLAUDE.md` uma regra "invoque a skill caveman ultra no início de toda sessão".
+O plugin já liga sozinho em toda sessão. Intensidade padrão: `{"defaultMode": "ultracave"}` em `~/.config/caveman/config.json` (`caveman`, `megacave`, `ultracave` ou `off`); para trocar numa sessão, `/caveman`.
 
 ### 3.2 Login no agy
 Rode `agy` uma vez e faça login com a conta Google. Confira com `agy models`.
@@ -65,6 +106,7 @@ Rode `agy` uma vez e faça login com a conta Google. Confira com `agy models`.
 > **Gemini CLI:** o login com conta pessoal foi descontinuado ("This client is no longer supported for Gemini Code Assist for individuals"). Use o agy, ou uma chave grátis do AI Studio como provider no 9Router.
 
 ### 3.3 9Router + modelos grátis da NVIDIA
+O wizard faz os passos 2 a 6 pela API local do 9Router quando você informa a chave. À mão:
 1. Crie uma chave grátis em **build.nvidia.com** (avatar → API Key → Generate). O limite é 40 requisições/min. Não precisa ter placa NVIDIA.
 2. Abra `http://127.0.0.1:20128` (o instalador já deixa o 9Router subindo no login). A senha inicial é `123456`: **troque em Settings → Security**.
 3. Em **Providers → NVIDIA NIM → Add connection**, cole a chave e valide.

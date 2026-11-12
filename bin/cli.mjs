@@ -7,12 +7,17 @@ import { aletheDir, configureAlethe } from "../lib/alethe.mjs";
 import { phaseCore } from "../lib/core.mjs";
 import { phaseExtras, phaseFreeModels, phaseHermes, phaseWorkers } from "../lib/phases.mjs";
 import { uninstall } from "../lib/uninstall.mjs";
+import { newProject, wizard } from "../lib/wizard.mjs";
+import { interactive } from "../lib/prompt.mjs";
 import { IS_LINUX, IS_MAC, IS_WIN, REPO, TODOS, backupLocation, has, home, loadConfig, log, p, python, readJSON } from "../lib/util.mjs";
 
 const VERSION = readJSON(p(REPO, "package.json")).version;
 const HELP = `agentic-dev-stack ${VERSION}: smart vibe coding stack for Claude Code
 
 Usage:
+  agentic-dev-stack                      interactive setup (questions, like create-next-app); re-run any time
+  agentic-dev-stack setup [--yes]        same; --yes accepts the recommended answers without asking
+  agentic-dev-stack new [name]           create a project (optional framework + Spec Kit) already wired to the stack
   agentic-dev-stack install [phases] [--dry-run] [--config <file>]
   agentic-dev-stack add-project <dir> [--refresh | --remove] [--dry-run] [--no-docs] [--lang en|pt-BR]
   agentic-dev-stack configure-alethe [--force]
@@ -50,6 +55,7 @@ function parse(argv) {
     else if (x === "--refresh") a.refresh = true;
     else if (x === "--remove") a.remove = true;
     else if (x === "--purge") a.purge = true;
+    else if (x === "--yes" || x === "-y") a.yes = true;
     else if (x === "--config") a.config = argv[++i];
     else if (x === "--lang") a.lang = argv[++i];
     else if (x === "-h" || x === "--help") a.help = true;
@@ -92,7 +98,13 @@ async function main() {
   const a = parse(process.argv.slice(2));
   const cmd = a._[0];
   if (a.version) return console.log(VERSION);
-  if (a.help || !cmd) return console.log(HELP);
+  if (a.yes) process.env.ADS_YES = "1";
+  if (a.help) return console.log(HELP);
+  if (!cmd || cmd === "setup") {
+    if (!cmd && !interactive() && !a.yes && !process.env.ADS_ANSWERS) return console.log(HELP);
+    return wizard({ version: VERSION, doctor });
+  }
+  if (cmd === "new") return newProject({ name: a._[1], lang: a.lang });
   const cfg = loadConfig(a.config);
 
   if (cmd === "install") {
@@ -107,7 +119,7 @@ async function main() {
       log.ok(`config created: ${userCfg} (edit it and re-run to change defaults)`);
     }
     for (const ph of a.phases) {
-      if (ph === "core") phaseCore({ dryRun: a.dryRun });
+      if (ph === "core") phaseCore({ dryRun: a.dryRun, cfg });
       if (ph === "workers") phaseWorkers(cfg, { dryRun: a.dryRun });
       if (ph === "free-models") phaseFreeModels(cfg, { dryRun: a.dryRun });
       if (ph === "extras") phaseExtras(cfg, { dryRun: a.dryRun });

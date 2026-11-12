@@ -17,8 +17,10 @@
 **🇧🇷 [Leia em português](README.pt-BR.md)** · 📘 **[The smart vibe coding guide](docs/00-smart-vibe-coding.md)** · 🧩 **[CLAUDE.md / AGENTS.md templates](templates/)**
 
 ```bash
-npx agentic-dev-stack install --all
+npx agentic-dev-stack
 ```
+
+<sub>A short setup wizard (like `create-next-app`) asks what you want, then installs and configures everything, including the free models and the Discord/Telegram bot. Re-run it any time to update or change settings.</sub>
 
 ![Demo: install the stack, wire a project, orchestrate parallel workers with a review gate, verify with doctor](docs/assets/demo.gif)
 
@@ -96,27 +98,23 @@ Details: [docs/01-architecture.md](docs/01-architecture.md).
 
 ## Install
 
-| Method | Command |
-|---|---|
-| **npx (any OS)** | `npx agentic-dev-stack install --all` |
-| **macOS / Linux** | `git clone https://github.com/Gildaciolopes/agentic-dev-stack && cd agentic-dev-stack && ./install.sh --all` |
-| **Windows (PowerShell)** | `git clone https://github.com/Gildaciolopes/agentic-dev-stack; cd agentic-dev-stack; .\install.ps1 --all` |
-
-Instead of `--all`, you can pick phases: `--core`, `--workers`, `--free-models`, `--extras`, `--hermes`. Add `--dry-run` to preview. The installer:
-- can be re-run safely (nothing is duplicated);
-- backs up any config it edits;
-- never deletes your content.
-
-Then wire each project and check the result:
-
 ```bash
-npx agentic-dev-stack add-project ~/code/my-app   # --lang pt-BR for Portuguese blocks
-npx agentic-dev-stack doctor
+npx agentic-dev-stack            # interactive setup: pick components, it does the rest
+npx agentic-dev-stack new my-app # new project (optional Next.js/Vite/Astro/Python + Spec Kit), already wired
 ```
 
-`add-project` never deletes anything: it appends a marked block to `CLAUDE.md`/`AGENTS.md`. Brand-new, empty project? Wire it now and run `add-project . --refresh` after scaffolding to re-detect test/lint commands and Spec Kit. To undo: `add-project <dir> --remove` for a project, `uninstall` for the whole stack (both back up what they touch, and both accept `--dry-run`).
+The wizard asks only what it cannot detect, verifies what you type (NVIDIA key, bot tokens), and automates what used to be manual: 9Router provider, `free` combo, API key and OpenCode wiring; caveman, Spec Kit and graphify installs; Discord invite link; Telegram ID detection; Hermes routines; wiring the repos you pick. Nothing is written until you confirm, and running it again opens pre-filled with **Update / repair · Change settings · Wire more projects · New project · doctor · Uninstall**.
 
-Prerequisites: Node ≥ 18, git and Claude Code. Python ≥ 3.9 is also needed for alethe, the curator and the digest. Per-OS details and the manual steps (logins, keys) are in [docs/02-installation.md](docs/02-installation.md).
+| Other ways | Command |
+|---|---|
+| Accept the recommended answers | `npx agentic-dev-stack setup --yes` |
+| Answers from a file (CI, dotfiles) | `ADS_ANSWERS=answers.json npx agentic-dev-stack setup` |
+| By phase, no questions | `npx agentic-dev-stack install --core --workers --free-models --extras --hermes` (or `--all`, `--dry-run`) |
+| From a clone | `./install.sh --all` (macOS/Linux) · `.\install.ps1 --all` (Windows) |
+| One project | `npx agentic-dev-stack add-project <dir>` (`--refresh`, `--remove`, `--lang pt-BR`) |
+| Check / undo | `npx agentic-dev-stack doctor` · `npx agentic-dev-stack uninstall` |
+
+Everything is re-runnable, backs up what it edits and never deletes your content. Prerequisites: Node ≥ 18, git and Claude Code; Python ≥ 3.9 for alethe, the curator and the digest. Per-OS details: [docs/02-installation.md](docs/02-installation.md).
 
 | Platform | Support |
 |---|---|
@@ -124,7 +122,7 @@ Prerequisites: Node ≥ 18, git and Claude Code. Python ≥ 3.9 is also needed f
 | Linux | Full (crontab/systemd, bubblewrap sandbox) |
 | Windows | Core, workers, alethe, 9Router, Task Scheduler. The free worker is off by default (no kernel sandbox; use WSL2). Hermes via WSL2 |
 
-CI runs the test suite and a real `--core` install on **Ubuntu, macOS and Windows (PowerShell)**, on Node 20 and 22.
+CI runs the test suite (including the wizard) and a real `--core` install on **Ubuntu, macOS and Windows (PowerShell)**, on Node 20 and 22.
 
 ## Templates for your projects
 
