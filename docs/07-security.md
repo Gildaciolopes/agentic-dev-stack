@@ -86,7 +86,7 @@ Windows has no practical equivalent of `sandbox-exec` or `bwrap` that a normal u
 A local proxy that all API traffic flows through. Telemetry and beacon are disabled with `HEADROOM_TELEMETRY=off` and `HEADROOM_BEACON=off`.
 
 ### 9Router
-The `postinstall` only pre-warms dependencies (SQLite, wreq-js); it is safe to skip. The web UI ships with a default password (change it). Remote/tunnel mode exposes the API, so do not enable it without changing the key.
+The `postinstall` only pre-warms dependencies (SQLite, wreq-js); it is safe to skip. The web UI ships with a default password (change it). Remote/tunnel mode exposes the API, so do not enable it without changing the key. 9Router binds `0.0.0.0` by default, which puts the API and the web UI on your local network; the autostart the installer writes passes `--host 127.0.0.1`. An older install keeps listening on the network until you re-run `install --free-models`.
 
 ## Pinned versions (supply chain)
 

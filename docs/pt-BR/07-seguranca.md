@@ -81,7 +81,7 @@ O Windows não tem um equivalente de `sandbox-exec`/`bwrap` acessível a um usu�
 Proxy local por onde passa todo o tráfego da API. Telemetria e beacon desligados via `HEADROOM_TELEMETRY=off` e `HEADROOM_BEACON=off`.
 
 ### 9Router
-O `postinstall` só pré-aquece dependências (SQLite, wreq-js); é seguro pular. A WebUI tem senha padrão (troque). O modo remoto/túnel expõe a API, então não ligue sem trocar a chave.
+O `postinstall` só pré-aquece dependências (SQLite, wreq-js); é seguro pular. A WebUI tem senha padrão (troque). O modo remoto/túnel expõe a API, então não ligue sem trocar a chave. Por padrão o 9Router escuta em `0.0.0.0`, o que põe a API e a WebUI na sua rede local; o autostart que o instalador escreve passa `--host 127.0.0.1`. Uma instalação antiga continua escutando na rede até você rodar `install --free-models` de novo.
 
 ## Versões fixas (cadeia de suprimentos)
 

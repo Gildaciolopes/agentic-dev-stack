@@ -64,6 +64,19 @@ Vem das skills Apple que vêm junto e de buscas amplas. → Clique **Não permit
 **O plano do dia sugere projeto parado, ou interpreta errado.**
 → Crie `~/.hermes/workspace/projects.md` com o status de cada projeto; o prompt lê esse arquivo.
 
+**Uma rotina falha com `HTTP 422: input rejected by content safety screening`.**
+A NVIDIA não está barrando o prompt. Alguns modelos NIM (por exemplo `minimax-m3.1-flash`) respondem com esse erro a qualquer campo `reasoning_effort`, e o Hermes manda `medium` por padrão para endpoints custom. → Rode `install --hermes` de novo, ou configure à mão:
+```bash
+hermes config set agent.reasoning_effort "" --force
+hermes config set model_overrides.custom.free.supports_reasoning false
+```
+
+**Uma rotina falha com `Operation interrupted: waiting for model response (2816s elapsed)`.**
+Para endpoint local, o Hermes usa timeout de 1800 s e desliga o detector de chamada parada, então um modelo grátis travado segura a rotina o tempo todo. → `install --hermes` configura `providers.custom.request_timeout_seconds 180`, `providers.custom.stale_timeout_seconds 240` e `agent.api_max_retries 1`. Se o curator deixar o combo com um modelo só, dá para adicionar também uma lista `fallback_providers` em `~/.hermes/config.yaml` (outros modelos pelo mesmo 9Router, com `provider: custom`, `base_url` e `api_key`). Rotina sem modelo próprio herda essa lista.
+
+**O aviso do combo fica `[SILENT]` mesmo depois de o combo mudar.**
+Ele só avisa se o `status.json` tiver menos de 40 minutos. Em instalações antigas, `ranAt` guardava o início do curator, uma rodada lenta já gravava o status parecendo velho, e o aviso rodava só 5 minutos depois do curator. → Atualize e rode `install --hermes` de novo para o aviso passar a rodar 15 minutos depois do curator.
+
 ## Coleta de dados
 
 **Transcrição do YouTube: `HTTP Error 429: Too Many Requests`.**

@@ -72,6 +72,13 @@ hermes config set model.provider custom
 hermes config set model.base_url http://127.0.0.1:20128/v1
 hermes config set model.default free
 hermes config set model.api_key <chave-local-do-9router>
+# a NVIDIA NIM rejeita reasoning_effort em alguns modelos com um HTTP 422 enganoso "content safety screening"
+hermes config set agent.reasoning_effort "" --force
+hermes config set model_overrides.custom.free.supports_reasoning false
+# derruba um modelo grátis travado em 3 minutos, não 30, e vai para o fallback depois de 1 retry
+hermes config set providers.custom.request_timeout_seconds 180
+hermes config set providers.custom.stale_timeout_seconds 240
+hermes config set agent.api_max_retries 1
 hermes -z "Responda só: OK"      # teste
 ```
 O Hermes precisa de pelo menos 64K de contexto, e os modelos que o curador escolhe passam disso.

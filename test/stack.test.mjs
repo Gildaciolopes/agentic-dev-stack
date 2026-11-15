@@ -410,3 +410,39 @@ test("integration: real alethe clone + profile (set ALETHE_IT=1)", { skip: proce
   assert.match(pb, /providers: \[claude, agy, codex\]/);
   assert.match(pb, /provider: agy/);
 });
+
+test("combo alert runs 15 min after the curator, carrying into the next hour", async () => {
+  const { comboAlertCron } = await import("../lib/phases.mjs");
+  assert.deepEqual(comboAlertCron(["07:30", "13:30", "19:30"]), { cron: "45 7,13,19 * * *", spread: 0 });
+  assert.deepEqual(comboAlertCron(["07:50", "19:50"]), { cron: "5 8,20 * * *", spread: 0 });
+  assert.deepEqual(comboAlertCron(["23:55"]), { cron: "10 0 * * *", spread: 0 });
+  assert.deepEqual(comboAlertCron([]), { cron: "45 7 * * *", spread: 0 });
+  // different minutes: the latest one sets the minute, so every alert is >= 15 min after its run
+  assert.deepEqual(comboAlertCron(["07:30", "13:45"]), { cron: "0 8,14 * * *", spread: 15 });
+  assert.deepEqual(comboAlertCron(["07:50", "13:30"]), { cron: "5 8,14 * * *", spread: 20 });
+});
+
+test("curator http calls stop at a hard deadline even when the server trickles bytes", () => {
+  const py = ["python3", "python"].find((c) => spawnSync(c, ["--version"]).status === 0);
+  if (!py || process.platform === "win32") return;
+  // server sends one header byte per second forever: urllib's per-read timeout never fires
+  const code = `import runpy,socket,sys,threading,time
+m=runpy.run_path(sys.argv[1], run_name="x")
+s=socket.socket(); s.bind(("127.0.0.1",0)); s.listen(1); port=s.getsockname()[1]
+def serve():
+    c,_=s.accept(); c.recv(65536); c.sendall(b"HTTP/1.1 200 OK\\r\\n")
+    while True:
+        try: c.sendall(b"X-Pad: 1\\r\\n"); time.sleep(1)
+        except OSError: return
+threading.Thread(target=serve, daemon=True).start()
+t=time.time()
+try:
+    m["http_json"](f"http://127.0.0.1:{port}/", timeout=2); print("no-timeout")
+except Exception as e:
+    print(type(e).__name__, round(time.time()-t))`;
+  const r = spawnSync(py, ["-I", "-c", code, path.join(REPO, "scripts", "model-curator", "curate.py")], { encoding: "utf8", timeout: 30_000 });
+  assert.equal(r.status, 0, r.stderr);
+  const [kind, secs] = r.stdout.trim().split(" ");
+  assert.equal(kind, "Deadline");
+  assert.ok(+secs <= 9, `took ${secs}s`);
+});
