@@ -2,6 +2,7 @@
 
 import { Canvas } from "@react-three/fiber";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { deviceCapable } from "./capability";
 
 type Props = {
   /** width / height of the fixed box (zero CLS) */
@@ -16,24 +17,6 @@ type Props = {
   cameraPosition?: [number, number, number];
   className?: string;
 };
-
-function hasWebGL() {
-  try {
-    const c = document.createElement("canvas");
-    return !!(c.getContext("webgl2") || c.getContext("webgl"));
-  } catch {
-    return false;
-  }
-}
-
-function deviceCapable() {
-  if (typeof window === "undefined") return false;
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
-  const nav = navigator as Navigator & { connection?: { saveData?: boolean }; deviceMemory?: number };
-  if (nav.connection?.saveData) return false;
-  if (typeof nav.hardwareConcurrency === "number" && nav.hardwareConcurrency < 4) return false;
-  return hasWebGL();
-}
 
 /** Poster first; the Canvas mounts only when visible and the device is capable, then fades in. */
 export function SceneFrame({ aspect, poster, overlay, children, cameraPosition = [14, 14, 14], className }: Props) {

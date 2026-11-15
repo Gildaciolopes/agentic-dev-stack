@@ -1,4 +1,11 @@
 {
+  "_sources": {
+    "funnel.rtkMeasured": "README.md:51 (Total row: 24,431 commands, 1.3M tokens, 14.6%)",
+    "funnel.rtkClaim": "docs/01-architecture.md:126 (15-30% fewer input tokens)",
+    "funnel.sourceMeasured": "README.md:42-53 (\"Measured, not promised\": 24,431 commands, 1.3M, 14.6%, rows 2026-09 to 2026-11 at :48-50, partial-month caveat :50 and :53)",
+    "funnel.sourceClaim": "docs/01-architecture.md:126 and :57 (RTK row)",
+    "funnel.illustrative": "README.md:53 (\"Savings from delegation ... and caveman are not measured here yet\"); particle counts are illustrative"
+  },
   "funnel": {
     "figureLabel": "Token funnel: raw shell output falls through RTK, caveman and graphify and leaves as fewer, brighter particles",
     "modeLabel": "RTK figure to show",

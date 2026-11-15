@@ -54,8 +54,8 @@
   --kind-optional: #6b7177;
   --kind-lead: var(--spectrum-cyan);
   --kind-neutral: var(--muted-foreground);
-  --kind-hermes: #9c36b5; /* 6.0:1 on white */
-  --kind-economy: #1971c2; /* 5.2:1 on white */
+  --kind-hermes: #9c36b5; /* 5.82:1 on white, 5.51:1 on card */
+  --kind-economy: #1971c2; /* 5.02:1 on white, 4.75:1 on card */
 
   /* shape */
   --radius: 0px;
@@ -130,8 +130,8 @@
   --destructive: #ff5a5f;
   --success: #3ddc84;
   --kind-optional: #8a8a8a;
-  --kind-hermes: #da77f2; /* 8.6:1 on black */
-  --kind-economy: #4dabf7; /* 9.0:1 on black */
+  --kind-hermes: #da77f2; /* 7.90:1 on black, 7.31:1 on card */
+  --kind-economy: #4dabf7; /* 8.48:1 on black, 7.85:1 on card */
   --border: #1f1f1f;
   --input: #1f1f1f;
   --ring: #6ee6ff;

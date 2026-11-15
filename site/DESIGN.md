@@ -35,6 +35,19 @@ Dark is the native look. Light is derived (section 12). All names are shadcn var
 | `--link` | `#6ee6ff` | `#0a6f91` |
 | `--code-bg` / `--code-fg` | `#0d0d0d` / `#e8e8e8` | `#0b0b0b` / `#e8e8e8` |
 | `--kind-optional` | `#8a8a8a` | `#6b7177` |
+| `--kind-neutral` | `#8a8a8a` (= `--muted-foreground`) | `#4f5459` (= `--muted-foreground`) |
+| `--kind-hermes` | `#da77f2` | `#9c36b5` |
+| `--kind-economy` | `#4dabf7` | `#1971c2` |
+
+Contrast of the new kind tokens (WCAG relative luminance, computed; card is `#0d0d0d` dark / `#f7f9fa` light):
+
+| Token | Dark on background | Dark on card | Light on background | Light on card |
+|---|---|---|---|---|
+| `--kind-neutral` | 6.08:1 | 5.63:1 | 7.65:1 | 7.24:1 |
+| `--kind-hermes` | 7.90:1 | 7.31:1 | 5.82:1 | 5.51:1 |
+| `--kind-economy` | 8.48:1 | 7.85:1 | 5.02:1 | 4.75:1 |
+
+All three clear 4.5:1 in both themes. The kind tokens are used only for non-text graphics (node and edge strokes, arrowheads, packets, legend dots), where 3:1 (WCAG 1.4.11) applies; node labels and edge labels use `--foreground` / `--muted-foreground`. `--kind-neutral` is `--muted-foreground`, which is also a text token and passes 4.5:1 as text. No value needed adjusting.
 
 Theme-independent spectrum (`--spectrum-*`): sky `#03c3fb`, cyan `#05d7fd`, ice `#6ee6ff`, blue `#3d74ef`, cobalt `#065bbc`, indigo `#3a2a8f`, coral `#f64a35`, pink `#ec3079`, red `#fe0506`, mint `#2ad8c4`, teal `#257772`, mintlight `#befcfc`, peach `#facd86`.
 

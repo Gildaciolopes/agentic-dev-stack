@@ -70,6 +70,8 @@ export function CuratorPanel({ onActive }: { onActive?: (active: boolean) => voi
   const seen = useInView(root, 0.45);
   const [playing, setPlaying] = useState(false);
   const started = useRef(false);
+  const replayTimer = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(replayTimer.current), []);
   const stepRaw = useSequence(TIMES, playing);
   const step = reduced && !playing ? LAST : stepRaw;
   const finished = step >= LAST;
@@ -90,7 +92,8 @@ export function CuratorPanel({ onActive }: { onActive?: (active: boolean) => voi
   const replay = () => {
     started.current = true;
     setPlaying(false);
-    window.setTimeout(() => setPlaying(true), 60);
+    window.clearTimeout(replayTimer.current);
+    replayTimer.current = window.setTimeout(() => setPlaying(true), 60);
   };
 
   const dropped = step >= N + 1;

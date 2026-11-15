@@ -10,6 +10,7 @@ import { SegmentedPicker } from "@/components/fluid/segmented-picker/SegmentedPi
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/site/toast";
 import { LegendChip, type LegendKind } from "@/components/ui/legend-chip";
+import { deviceCapableCached } from "@/components/three/capability";
 import { Link } from "@/i18n/navigation";
 import { architecture, assemblySteps, workflow, type GraphNode, type Kind } from "@/content/architecture";
 import { cn } from "@/lib/utils";
@@ -93,6 +94,7 @@ export function ArchitectureExplorer() {
   const svgRef = useRef<SVGSVGElement>(null);
 
   const mounted = useSyncExternalStore(noopSubscribe, () => true, () => false);
+  const capable3d = useSyncExternalStore(noopSubscribe, deviceCapableCached, () => false);
   const isDesktop = useSyncExternalStore(subscribeDesktop, () => window.matchMedia(DESKTOP_Q).matches, () => true);
   const mode: Mode = isDesktop ? "desktop" : "mobile";
   const [view, setView] = useState<ViewId>("architecture");
@@ -119,10 +121,11 @@ export function ArchitectureExplorer() {
   const graph = GRAPHS[view];
 
   /* ------------------------------------------------------------ layouts + routes */
-  const layouts = useMemo<Record<ViewId, Layout>>(
-    () => (mode === "desktop" ? DESK : { architecture: mobileLayout(architecture, bw), workflow: mobileLayout(workflow, bw) }),
-    [mode, bw],
+  const mobLayouts = useMemo<Record<ViewId, Layout>>(
+    () => ({ architecture: mobileLayout(architecture, bw), workflow: mobileLayout(workflow, bw) }),
+    [bw],
   );
+  const layouts = mode === "desktop" ? DESK : mobLayouts;
   const routes = useMemo(
     () => ({ architecture: routesFor(architecture, layouts.architecture), workflow: routesFor(workflow, layouts.workflow) }),
     [layouts],
@@ -130,11 +133,11 @@ export function ArchitectureExplorer() {
   const rv = useMemo(() => revealed(STEPS, effStep), [effStep]);
   /** mobile: the viewBox only reaches as far down as what has been revealed */
   const mobileH = useMemo(() => {
-    const full = layouts[view].vb[1];
-    if (mode !== "mobile" || view !== "architecture" || reduced) return full;
-    const b = boundsOf(layouts[view], [...rv.nodes], [...rv.groups]);
+    const full = mobLayouts[view].vb[1];
+    if (view !== "architecture" || reduced) return full;
+    const b = boundsOf(mobLayouts[view], [...rv.nodes], [...rv.groups]);
     return b ? Math.min(full, b.y + b.h + 20) : full;
-  }, [layouts, view, mode, reduced, rv]);
+  }, [mobLayouts, view, reduced, rv]);
 
   /* ------------------------------------------------------------ bind + mode + size */
   const applied = useRef({ layouts: null as Record<ViewId, Layout> | null, view: null as ViewId | null, first: true, cam: true });
@@ -193,8 +196,10 @@ export function ArchitectureExplorer() {
       top = r.top + window.scrollY - navH;
       span = Math.max(1, r.height - (window.innerHeight - navH));
     };
+    let raf = 0;
     const update = () => {
       ticking = false;
+      raf = 0;
       const p = clamp((window.scrollY - top) / span, 0, 0.9999);
       const s = Math.min(STEPS.length, Math.floor(p * STEPS.length) + 1);
       setStep((prev) => (prev === s ? prev : s));
@@ -202,7 +207,7 @@ export function ArchitectureExplorer() {
     const onScroll = () => {
       if (ticking) return;
       ticking = true;
-      requestAnimationFrame(update);
+      raf = requestAnimationFrame(update);
     };
     const io = new IntersectionObserver(
       ([e]) => {
@@ -232,6 +237,7 @@ export function ArchitectureExplorer() {
       io.disconnect();
       ro.disconnect();
       window.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
     };
   }, [mounted, mode, reduced]);
 
@@ -410,13 +416,16 @@ export function ArchitectureExplorer() {
   const leadShape = view === "workflow" || formed ? rectPath(lead.w, lead.h) : logoPath(lead.w, lead.h);
   const caption = view === "architecture" ? STEPS[effStep - 1].caption : workflow.subtitle;
   const visibleIds = view === "architecture" ? [...rv.nodes] : undefined;
-  const mobileVb = mode === "mobile" ? `${L.vb[0]} / ${mobileH}` : undefined;
   const frameRect = layouts.architecture.vb;
-  const areaStyle = mobileVb
-    ? { aspectRatio: mobileVb }
-    : !scroll
-      ? { aspectRatio: `${L.vb[0]} / ${L.vb[1]}` }
-      : undefined;
+  /* Both boxes are reserved in CSS (media queries on --ar-d / --ar-m / --ar-mf) so the server HTML already has the right
+     aspect ratio at each breakpoint and nothing swaps after mount. */
+  const dv = DESK[view].vb;
+  const mv = mobLayouts[view].vb;
+  const areaStyle = {
+    "--ar-d": `${dv[0]} / ${dv[1]}`,
+    "--ar-m": `${mv[0]} / ${mobileH}`,
+    "--ar-mf": `${mv[0]} / ${mv[1]}`,
+  } as CSSProperties;
 
   return (
     <div
@@ -450,7 +459,16 @@ export function ArchitectureExplorer() {
                 />
               ))}
             </div>
-            <Button variant="secondary" size="sm" aria-pressed={use3d} onClick={() => setUse3d((v) => !v)} className={styles.toggle3d}>
+            <Button
+              variant="secondary"
+              size="sm"
+              aria-pressed={use3d}
+              onClick={() => setUse3d((v) => !v)}
+              className={styles.toggle3d}
+              data-capable={capable3d ? "1" : "0"}
+              tabIndex={capable3d ? undefined : -1}
+              aria-hidden={capable3d ? undefined : true}
+            >
               {use3d ? t("toolbar.to2d") : t("toolbar.to3d")}
             </Button>
           </div>
@@ -590,6 +608,26 @@ export function ArchitectureExplorer() {
               })}
             </svg>
 
+            {use3d ? (
+              /* 3D mode: the SVG is display:none, so this visually-hidden list keeps every node keyboard/SR reachable.
+                 Focus highlights the node in the scene (via activeId -> highlightId); activation opens the same MorphDialog. */
+              <ul className={styles.srList} aria-label={t("explorer.label")}>
+                {graph.nodes
+                  .filter((n) => !visibleIds || visibleIds.includes(n.id))
+                  .map((n) => (
+                    <li key={n.id}>
+                      <button
+                        type="button"
+                        onClick={(ev) => openNode(n, ev.currentTarget)}
+                        onFocus={() => setFocusId(n.id)}
+                        onBlur={() => setFocusId(null)}
+                      >
+                        {`${n.label}, ${t(`kinds.${n.kind}`)}`}
+                      </button>
+                    </li>
+                  ))}
+              </ul>
+            ) : null}
             {use3d ? (
               <div className={styles.scene3d}>
                 <Scene3D

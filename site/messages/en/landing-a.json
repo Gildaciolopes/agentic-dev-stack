@@ -36,7 +36,7 @@
     "label": "In the wild",
     "stars": "GitHub stars",
     "downloads": "npm downloads, last month",
-    "asOf": "as of build"
+    "asOf": "updated daily, as of"
   },
   "why": {
     "index": "00",
@@ -172,7 +172,7 @@
     "hero.command": "README.md:19-21",
     "hero.words": "audience words are tone, not claims; free models README.md:15,174",
     "tools.items": "Claude Code README.md:1,82; GitHub Spec Kit README.md:89; RTK/caveman/graphify README.md:90-92; alethe README.md:88; 9Router README.md:35; NVIDIA NIM README.md:174; Hermes Agent README.md:93; OpenCode README.md:87; Codex README.md:86; agy (Antigravity) README.md:85,131 + docs/01-architecture.md:95",
-    "stats": "fetched at build from api.github.com and api.npmjs.org; nothing hard-coded",
+    "stats": "fetched at render from api.github.com and api.npmjs.org, revalidated daily (ISR); nothing hard-coded",
     "why.rows": "README.md:31-40 (bold markers removed)",
     "orchestration.intro": "README.md:94; docs/01-architecture.md:7-16",
     "orchestration.agents.scout": "README.md:84; docs/01-architecture.md:71",

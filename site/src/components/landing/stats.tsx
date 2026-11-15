@@ -1,26 +1,10 @@
 import { getFormatter, getTranslations } from "next-intl/server";
 
-const GITHUB = "https://api.github.com/repos/Gildaciolopes/agentic-dev-stack";
-const NPM = "https://api.npmjs.org/downloads/point/last-month/agentic-dev-stack";
+import { loadStats } from "@/lib/stats";
 
-async function load(url: string): Promise<unknown> {
-  try {
-    const res = await fetch(url, { next: { revalidate: 86400 }, signal: AbortSignal.timeout(5000) });
-    return res.ok ? await res.json() : null;
-  } catch {
-    return null;
-  }
-}
-
-function count(value: unknown): number | null {
-  return typeof value === "number" && Number.isFinite(value) ? value : null;
-}
-
-/** Live numbers fetched at build time. A stat that fails to load is simply not rendered. */
+/** Live numbers fetched at render and revalidated daily (ISR). A stat that fails to load is simply not rendered. */
 export async function Stats() {
-  const [repo, downloads] = await Promise.all([load(GITHUB), load(NPM)]);
-  const stars = count((repo as { stargazers_count?: unknown } | null)?.stargazers_count);
-  const npm = count((downloads as { downloads?: unknown } | null)?.downloads);
+  const { stars, downloads: npm } = await loadStats();
   if (stars === null && npm === null) return null;
 
   const [t, format] = await Promise.all([getTranslations("landing-a.stats"), getFormatter()]);

@@ -81,6 +81,21 @@
 .toggle3d {
   margin-left: auto;
 }
+/* Space stays reserved (no CLS) until the capability check passes; invisible and not focusable meanwhile. */
+.toggle3d[data-capable="0"] {
+  visibility: hidden;
+}
+.srList {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  list-style: none;
+}
 
 /* ---------------------------------------------------------------- stage area */
 .area {
@@ -91,6 +106,18 @@
 }
 .stage:not(.pinned) .area {
   flex: none;
+  aspect-ratio: var(--ar-m);
+}
+@media (min-width: 1024px) {
+  .stage:not(.pinned) .area {
+    aspect-ratio: var(--ar-d);
+  }
+}
+/* Reduced motion on mobile shows the whole stacked layout (no story steps). */
+@media (max-width: 1023.98px) and (prefers-reduced-motion: reduce) {
+  .stage:not(.pinned) .area {
+    aspect-ratio: var(--ar-mf);
+  }
 }
 .svg {
   position: absolute;

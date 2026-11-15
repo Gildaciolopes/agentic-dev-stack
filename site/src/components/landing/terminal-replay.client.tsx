@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useInView, useReducedMotion } from "@usefluid/motion/react";
+import { useReducedMotion } from "@usefluid/motion/react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
+import { useVisible } from "./use-visible";
 import { ACTS, type Cls, type Line } from "./terminal-replay.data";
 
 const TYPE_MS = 45;
@@ -98,7 +99,7 @@ export function TerminalReplayPlayer() {
   const reduced = useReducedMotion();
   const wrap = useRef<HTMLDivElement>(null);
   const screen = useRef<HTMLDivElement>(null);
-  const inView = useInView(wrap, 0.4);
+  const inView = useVisible(wrap, 0.4); // non-latching: pauses off-screen and in a hidden tab
   const [time, setTime] = useState(0);
   // auto: starts once the terminal is first in view. play/pause: the visitor took over.
   const [mode, setMode] = useState<"auto" | "play" | "pause">("auto");
@@ -115,7 +116,7 @@ export function TerminalReplayPlayer() {
     let raf = 0;
     let last = performance.now();
     const tick = (now: number) => {
-      clock.current = Math.min(total, clock.current + (now - last));
+      clock.current = Math.min(total, clock.current + Math.min(Math.max(0, now - last), 100));
       last = now;
       if (clock.current - shown.current >= FRAME_MS || clock.current >= total) {
         shown.current = clock.current;
