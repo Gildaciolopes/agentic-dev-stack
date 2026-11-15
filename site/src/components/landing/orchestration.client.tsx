@@ -15,7 +15,7 @@ export function AgentTabs({ agents, labels, code }: { agents: Agent[]; labels: L
       <div className="overflow-x-auto pb-1">
         <PillTabs label={labels.tabs} value={value} onChange={setValue} tabs={agents.map((a) => ({ value: a.id, label: a.id }))} />
       </div>
-      <div role="tabpanel" aria-label={agent.id} className="grid gap-6 border border-border bg-card p-6 md:grid-cols-[1.4fr_1fr]">
+      <div role="tabpanel" aria-label={agent.id} className="grid grid-cols-1 gap-6 border border-border bg-card p-6 md:grid-cols-[1.4fr_1fr]">
         <p className="text-card-foreground">{agent.role}</p>
         <dl className="grid gap-3 text-small">
           <div>

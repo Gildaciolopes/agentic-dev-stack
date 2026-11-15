@@ -32,7 +32,7 @@ export async function PillarFreeModels() {
       <div className="container-site flex flex-col gap-16">
         <SectionHeader index={t("index")} label={t("label")} title={t("title")} intro={t("intro")} />
 
-        <dl className="grid gap-4 sm:grid-cols-3">
+        <dl className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {facts.map((f) => (
             <div key={f.label} className="border border-border bg-card p-6">
               <dt className="section-label">{f.label}</dt>
@@ -41,7 +41,7 @@ export async function PillarFreeModels() {
           ))}
         </dl>
 
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
           <div className="flex flex-col gap-4">
             <h3 className="text-h3 font-bold">{t("dial.title")}</h3>
             <CuratorDial />
@@ -67,7 +67,7 @@ export async function PillarFreeModels() {
           </div>
         </div>
 
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
           <div className="flex flex-col gap-4">
             <h3 className="text-h3 font-bold">{t("incidents.title")}</h3>
             <ul className="flex flex-col gap-2">

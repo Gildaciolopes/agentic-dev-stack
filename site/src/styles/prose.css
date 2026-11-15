@@ -140,6 +140,7 @@
   .prose th,
   .prose td {
     padding: 0.5rem 0.875rem;
+    overflow-wrap: break-word;
     text-align: left;
     vertical-align: top;
     border-bottom: 1px solid var(--border);

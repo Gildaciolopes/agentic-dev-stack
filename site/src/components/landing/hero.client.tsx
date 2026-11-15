@@ -54,8 +54,8 @@ export function HeroInstall({ command, copyLabel, copiedLabel, petLabel }: Insta
   };
 
   return (
-    <div className="flex w-full max-w-xl items-center gap-4">
-      <div onClick={onClick} className="min-w-0 flex-1">
+    <div className="flex w-full max-w-xl flex-col items-center gap-4 sm:flex-row">
+      <div onClick={onClick} className="w-full min-w-0 sm:flex-1">
         <InstallCommand command={command} copyLabel={copyLabel} copiedLabel={copiedLabel} />
       </div>
       <div className="size-16 flex-none text-foreground">

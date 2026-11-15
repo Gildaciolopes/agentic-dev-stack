@@ -50,7 +50,7 @@ export function IsoBlock({ cx, cy, a, d, tone = "cool", opacity = 1 }: { cx: num
     <g opacity={opacity}>
       <path d={`M${cx - a} ${cy}L${cx} ${cy + h}V${cy + h + d}L${cx - a} ${cy + d}Z`} fill={`url(#iso3-${tone})`} />
       <path d={`M${cx} ${cy + h}L${cx + a} ${cy}V${cy + d}L${cx} ${cy + h + d}Z`} fill={`url(#iso3-${tone}-r)`} />
-      <path d={`M${cx} ${cy - h}L${cx + a} ${cy}L${cx} ${cy + h}L${cx - a} ${cy}Z`} fill="#fff" />
+      <path d={`M${cx} ${cy - h}L${cx + a} ${cy}L${cx} ${cy + h}L${cx - a} ${cy}Z`} fill="#fff" stroke="var(--iso-edge)" strokeWidth="1" strokeLinejoin="round" />
     </g>
   );
 }
@@ -65,7 +65,7 @@ export function IsoRing({ cx, cy, a, d, r = 0.62, tone = "cool" }: { cx: number;
     <g>
       <path d={`M${cx - a} ${cy}L${cx} ${cy + h}V${cy + h + d}L${cx - a} ${cy + d}Z`} fill={`url(#iso3-${tone})`} />
       <path d={`M${cx} ${cy + h}L${cx + a} ${cy}V${cy + d}L${cx} ${cy + h + d}Z`} fill={`url(#iso3-${tone}-r)`} />
-      <path d={top} fill="#fff" fillRule="evenodd" />
+      <path d={top} fill="#fff" fillRule="evenodd" stroke="var(--iso-edge)" strokeWidth="1" strokeLinejoin="round" />
     </g>
   );
 }

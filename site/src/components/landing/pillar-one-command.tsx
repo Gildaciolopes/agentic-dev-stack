@@ -21,7 +21,7 @@ export async function PillarOneCommand() {
 
         <InstallCommand command={site.install} copyLabel={t("copy")} copiedLabel={t("copied")} />
 
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
           <div className="flex min-w-0 flex-col gap-4">
             <h3 className="text-h3 font-bold">{t("otherTitle")}</h3>
             <div className="overflow-x-auto" tabIndex={0} role="region" aria-label={t("otherTitle")}>

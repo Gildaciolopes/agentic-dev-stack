@@ -36,7 +36,7 @@ export async function PillarOrchestration() {
   return (
     <section id="orchestration" className="section container-site flex flex-col gap-12">
       <SectionHeader index={t("index")} label={t("label")} title={t("title")} intro={t("intro")} />
-      <div className="grid items-start gap-10 lg:grid-cols-[1.2fr_1fr]">
+      <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[1.2fr_1fr]">
         <AgentTabs
           agents={agents}
           labels={{ tabs: t("tabsLabel"), role: t("role"), model: t("model"), quota: t("quota"), guard: t("guard") }}

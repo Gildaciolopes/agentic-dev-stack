@@ -28,7 +28,7 @@ export async function Cta() {
 
       {/* The page's one light moment: black on cyan is 12.14:1 (DESIGN.md section 3). */}
       <div className="w-full bg-[linear-gradient(135deg,#05d7fd_0%,#03c3fb_100%)] text-black">
-        <div className="container-site grid items-center gap-10 py-[clamp(48px,8vw,112px)] md:grid-cols-[auto_1fr] md:gap-16">
+        <div className="container-site grid grid-cols-1 items-center gap-10 py-[clamp(48px,8vw,112px)] md:grid-cols-[auto_1fr] md:gap-16">
           <svg viewBox="0 0 120 120" role="img" aria-label={t("panelLabel")} className="mx-auto w-[clamp(160px,32vw,360px)]">
             <path d={logo} fill="#000" />
           </svg>

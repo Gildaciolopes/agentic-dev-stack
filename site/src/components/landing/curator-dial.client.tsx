@@ -94,7 +94,7 @@ export function CuratorDial() {
 
       <div>
         <h4 className="section-label mb-3">{t("runs")}</h4>
-        <ol className="grid gap-2 sm:grid-cols-3">
+        <ol className="grid grid-cols-1 gap-2 sm:grid-cols-3">
           {RUNS.map((r, i) => (
             <li
               key={r.label}

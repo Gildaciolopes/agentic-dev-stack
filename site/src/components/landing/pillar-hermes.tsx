@@ -12,7 +12,7 @@ export async function PillarHermes() {
       <div className="container-site flex flex-col gap-16">
         <SectionHeader index={t("index")} label={t("label")} title={t("title")} intro={t("intro")} />
 
-        <div className="grid items-start gap-12 lg:grid-cols-2 lg:gap-16">
+        <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-2 lg:gap-16">
           <div className="flex flex-col gap-10">
             <div className="flex flex-col gap-4">
               <h3 className="text-h3 font-bold">{t("digestTitle")}</h3>

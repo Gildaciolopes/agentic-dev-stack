@@ -17,7 +17,7 @@ export async function PillarSecurity() {
       <div className="container-site flex flex-col gap-16">
         <SectionHeader index={t("index")} label={t("label")} title={t("title")} intro={t("intro")} />
 
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {CARDS.map(({ key, tone }) => {
             const points = t.raw(`cards.${key}.points`) as string[];
             return (
@@ -40,7 +40,7 @@ export async function PillarSecurity() {
           <p className="mt-2 text-muted-foreground">{t("guard.body")}</p>
         </aside>
 
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-16">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-16">
           <div className="flex flex-col gap-4">
             <h3 className="text-h3 font-bold">{t("terminal.title")}</h3>
             <p className="text-muted-foreground">{t("terminal.intro")}</p>

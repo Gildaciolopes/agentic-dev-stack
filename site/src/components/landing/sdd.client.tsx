@@ -57,7 +57,7 @@ export function SddStepper({ steps, label, codes }: { steps: Step[]; label: stri
           ))}
         </div>
       </div>
-      <div className="grid gap-6 lg:grid-cols-2" aria-live="polite">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2" aria-live="polite">
         <div className="flex flex-col gap-2 border border-border bg-card p-6">
           <p className="text-h3 font-bold">{steps[index].what}</p>
           <p className="text-muted-foreground">{steps[index].why}</p>

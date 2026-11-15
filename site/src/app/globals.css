@@ -107,6 +107,7 @@
   --elev-1: 0 1px 0 rgb(0 0 0 / 0.04), 0 8px 24px rgb(0 0 0 / 0.06);
   --elev-2: 0 30px 80px rgb(0 0 0 / 0.12), inset 0 1px 0 rgb(255 255 255 / 0.6);
   --glow-under: rgb(42 216 196 / 0.35);
+  --iso-edge: rgb(0 0 0 / 0.28);
   color-scheme: light;
 }
 
@@ -142,6 +143,7 @@
   --elev-1: 0 1px 0 rgb(255 255 255 / 0.04);
   --elev-2: 0 30px 80px rgb(0 0 0 / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.06);
   --glow-under: rgb(42 216 196 / 0.45);
+  --iso-edge: transparent;
   color-scheme: dark;
 }
 

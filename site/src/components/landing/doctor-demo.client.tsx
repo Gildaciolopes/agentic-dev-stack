@@ -105,7 +105,7 @@ export function DoctorDemo({ onDone }: { onDone?: () => void }) {
           </span>
           <span className="flex-1 truncate text-[length:var(--text-label)] tracking-wide text-[#8a8a8a]">{t("windowTitle")}</span>
         </figcaption>
-        <ul className="grid gap-x-8 gap-y-1 p-5 text-[length:var(--text-small)] sm:grid-cols-2" aria-live="off">
+        <ul className="grid grid-cols-1 gap-x-8 gap-y-1 p-5 text-[length:var(--text-small)] sm:grid-cols-2" aria-live="off">
           {CHECKS.map((c, i) => {
             const checked = i < count;
             return (

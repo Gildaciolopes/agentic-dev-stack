@@ -10,7 +10,7 @@ function Cube({ x, y, s, left = "url(#ls-left)", right = "url(#ls-right)" }: { x
     <g>
       <path d={`M${x - s} ${y + h}L${x} ${y + s}V${y + 2 * s}L${x - s} ${y + 1.5 * s}Z`} fill={left} />
       <path d={`M${x} ${y + s}L${x + s} ${y + h}V${y + 1.5 * s}L${x} ${y + 2 * s}Z`} fill={right} />
-      <path d={`M${x} ${y}L${x + s} ${y + h}L${x} ${y + s}L${x - s} ${y + h}Z`} fill="#fff" />
+      <path d={`M${x} ${y}L${x + s} ${y + h}L${x} ${y + s}L${x - s} ${y + h}Z`} fill="#fff" stroke="var(--iso-edge)" strokeWidth="1" strokeLinejoin="round" />
     </g>
   );
 }
@@ -23,7 +23,7 @@ function Arch({ x, y }: { x: number; y: number }) {
   return (
     <g transform={`translate(${x} ${y})`}>
       <path d="M0 64V28a28 14 0 0 1 56 0V64H38V34a10 5 0 0 0-20 0V64Z" fill="url(#ls-left)" />
-      <path d="M0 28a28 14 0 0 1 56 0 28 14 0 0 0-56 0Z" fill="#fff" />
+      <path d="M0 28a28 14 0 0 1 56 0 28 14 0 0 0-56 0Z" fill="#fff" stroke="var(--iso-edge)" strokeWidth="1" strokeLinejoin="round" />
     </g>
   );
 }
@@ -33,7 +33,7 @@ function Toggle({ x, y }: { x: number; y: number }) {
     <g transform={`translate(${x} ${y})`}>
       <path d="M0 22L36 40V50L0 32Z" fill="url(#ls-left)" />
       <path d="M36 40L72 22V32L36 50Z" fill="url(#ls-right)" />
-      <path d="M36 4L72 22L36 40L0 22Z" fill="#fff" />
+      <path d="M36 4L72 22L36 40L0 22Z" fill="#fff" stroke="var(--iso-edge)" strokeWidth="1" strokeLinejoin="round" />
       <ellipse cx="50" cy="22" rx="13" ry="7" fill="url(#ls-mint)" />
     </g>
   );

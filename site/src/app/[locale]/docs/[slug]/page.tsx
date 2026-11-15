@@ -37,7 +37,7 @@ export default async function DocPage({ params }: Props) {
     <>
       <JsonLd data={breadcrumbList(crumbs.map((c) => ({ name: c.name, url: absoluteUrl(locale as Locale, c.href) })))} />
       <Breadcrumb items={crumbs} label={t("breadcrumbLabel")} />
-      <div className="grid gap-8 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-12 xl:grid-cols-[15rem_minmax(0,1fr)_13rem]">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-12 xl:grid-cols-[15rem_minmax(0,1fr)_13rem]">
         <DocsSidebar docs={docs} current={slug} label={t("sidebar.label")} menuLabel={t("sidebar.menu")} />
         <article className="min-w-0">
           <div className="prose" dangerouslySetInnerHTML={{ __html: doc.html }} />

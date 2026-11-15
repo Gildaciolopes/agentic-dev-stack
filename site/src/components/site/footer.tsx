@@ -41,7 +41,7 @@ export async function Footer() {
 
   return (
     <footer className="border-t border-border bg-band">
-      <div className="container-site grid gap-12 py-16 md:grid-cols-[1.4fr_repeat(3,1fr)]">
+      <div className="container-site grid grid-cols-1 gap-12 py-16 md:grid-cols-[1.4fr_repeat(3,1fr)]">
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2.5 font-bold">
             <LogoMark size={28} />

@@ -21,7 +21,7 @@ export async function PillarTokens({ visual }: { visual?: ReactNode }) {
     <section id="tokens" className="section container-site flex flex-col gap-12">
       <SectionHeader index={t("index")} label={t("label")} title={t("title")} intro={t("intro")} />
       {visual ? <div>{visual}</div> : null}
-      <div className="grid items-start gap-10 lg:grid-cols-2">
+      <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-2">
         <div className="flex flex-col gap-8">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left text-small">
@@ -59,7 +59,7 @@ export async function PillarTokens({ visual }: { visual?: ReactNode }) {
           <CodeWindow filename={t("codeFile")} code={CODE} copyLabel={t("copy")} copiedLabel={t("copied")} />
         </div>
       </div>
-      <ul aria-label={t("cardsLabel")} className="grid gap-4 md:grid-cols-3">
+      <ul aria-label={t("cardsLabel")} className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {cards.map((c) => (
           <li key={c.name}>
             <Card className="h-full">
