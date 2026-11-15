@@ -38,7 +38,7 @@
   --kind-native: #3ddc84;
   --kind-google: var(--spectrum-mint);
   --kind-free: #ff8a3d;
-  --kind-optional: #8a8a8a;
+  --kind-optional: #6b7177;
   --kind-lead: var(--spectrum-cyan);
 
   /* shape */
@@ -48,12 +48,12 @@
   --frame-width: 6px;
 
   /* motion: one spring scale for the whole site (w = rad/s, z = damping ratio) */
-  --spring-snappy-w: 30;
-  --spring-snappy-z: 0.9;
-  --spring-soft-w: 14;
-  --spring-soft-z: 1;
-  --spring-bouncy-w: 18;
-  --spring-bouncy-z: 0.55;
+  --spring-snappy-w: 22;
+  --spring-snappy-z: 0.8;
+  --spring-soft-w: 13;
+  --spring-soft-z: 0.86;
+  --spring-bouncy-w: 17;
+  --spring-bouncy-z: 0.58;
 
   /* layout */
   --container: 1200px;
@@ -112,6 +112,7 @@
   --accent-foreground: #ffffff;
   --destructive: #ff5a5f;
   --success: #3ddc84;
+  --kind-optional: #8a8a8a;
   --border: #1f1f1f;
   --input: #1f1f1f;
   --ring: #6ee6ff;
@@ -300,6 +301,29 @@
     color: #000000;
   }
 
+  /* marquee: see components/ui/marquee.tsx */
+  .marquee {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee var(--marquee-duration, 40s) linear infinite var(--marquee-dir, normal);
+    will-change: transform;
+  }
+  .marquee-group {
+    display: flex;
+    flex: none;
+    gap: 16px;
+    padding-right: 16px;
+  }
+  .marquee:hover .marquee-track,
+  .marquee:focus-within .marquee-track {
+    animation-play-state: paused;
+  }
+
   .sr-only-focusable:not(:focus):not(:focus-within) {
     position: absolute;
     width: 1px;
@@ -320,7 +344,28 @@
   z-index: 1;
 }
 
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .marquee {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .marquee-track {
+    animation: none !important;
+    width: auto;
+  }
+  .marquee-group {
+    flex-wrap: wrap;
+    padding-right: 0;
+  }
+  .marquee-dup {
+    display: none;
+  }
   *,
   *::before,
   *::after {
