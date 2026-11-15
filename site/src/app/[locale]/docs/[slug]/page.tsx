@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Link, getPathname } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 import { routing, type Locale } from "@/i18n/routing";
 import { docsBreadcrumbs, editUrl, getAdjacentDocs, getDoc, getDocSlugs, listDocs } from "@/lib/docs";
-import { site } from "@/lib/site";
+import { JsonLd, breadcrumbList } from "@/lib/jsonld";
+import { absoluteUrl, buildMetadata } from "@/lib/seo";
 import { Breadcrumb } from "@/components/docs/Breadcrumb";
 import { DocsSidebar } from "@/components/docs/DocsSidebar";
 
@@ -21,11 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
   const doc = await getDoc(slug, locale as Locale);
   if (!doc) return {};
-  return {
-    title: `${doc.title} | ${site.name}`,
-    description: doc.description,
-    alternates: { canonical: getPathname({ locale: locale as Locale, href: `/docs/${slug}` }) },
-  };
+  return buildMetadata({ locale: locale as Locale, path: `/docs/${slug}`, title: doc.title, description: doc.description, og: "docs" });
 }
 
 export default async function DocPage({ params }: Props) {
@@ -35,9 +32,11 @@ export default async function DocPage({ params }: Props) {
   if (!doc) notFound();
   const t = await getTranslations("docs");
   const [docs, { prev, next }] = await Promise.all([listDocs(), getAdjacentDocs(slug)]);
+  const crumbs = docsBreadcrumbs({ home: t("home"), docs: t("docs") }, doc);
   return (
     <>
-      <Breadcrumb items={docsBreadcrumbs({ home: t("home"), docs: t("docs") }, doc)} label={t("breadcrumbLabel")} />
+      <JsonLd data={breadcrumbList(crumbs.map((c) => ({ name: c.name, url: absoluteUrl(locale as Locale, c.href) })))} />
+      <Breadcrumb items={crumbs} label={t("breadcrumbLabel")} />
       <div className="grid gap-8 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-12 xl:grid-cols-[15rem_minmax(0,1fr)_13rem]">
         <DocsSidebar docs={docs} current={slug} label={t("sidebar.label")} menuLabel={t("sidebar.menu")} />
         <article className="min-w-0">

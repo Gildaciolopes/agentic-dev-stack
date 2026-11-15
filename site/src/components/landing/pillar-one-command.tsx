@@ -2,12 +2,11 @@ import { getTranslations } from "next-intl/server";
 import { InstallCommand } from "@/components/ui/install-command";
 import { SectionHeader } from "@/components/ui/section-header";
 import { site } from "@/lib/site";
-import { DoctorDemo } from "./doctor-demo.client";
+import { DoctorDemoWithToast } from "./doctor-demo-with-toast.client";
 
 type Way = { what: string; cmd: string };
 type Platform = { os: string; support: string };
 
-/** Functions cannot cross the server/client boundary: to rewire `onDone`, wrap `DoctorDemo` in a client component. */
 export async function PillarOneCommand() {
   const t = await getTranslations("landing-b.one");
   const other = t.raw("other") as Way[];
@@ -82,7 +81,7 @@ export async function PillarOneCommand() {
         <div className="flex flex-col gap-4">
           <h3 className="text-h3 font-bold">{t("doctor.title")}</h3>
           <p className="max-w-3xl text-muted-foreground">{t("doctor.intro")}</p>
-          <DoctorDemo />
+          <DoctorDemoWithToast />
         </div>
       </div>
     </section>

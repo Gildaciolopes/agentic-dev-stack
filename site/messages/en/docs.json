@@ -22,5 +22,9 @@
     "description": "Every release of agentic-dev-stack: what was added, changed, fixed and secured.",
     "unreleased": "Unreleased",
     "viewMarkdown": "View as Markdown"
+  },
+  "descriptions": {
+    "03-alethe": "alethe orchestration: concepts (lead, workers, playbooks, strategies, tiers, profiles), passive mode, the exact command recipe and how to update it safely.",
+    "09-maintenance": "What maintains itself (model curator, daily digest, services), what stays manual, how to update the stack, move it to another PC and measure the savings."
   }
 }

@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
-import { getPathname } from "@/i18n/navigation";
-import type { Locale } from "@/i18n/routing";
+import { hasLocale } from "next-intl";
+import { routing, type Locale } from "@/i18n/routing";
+import { JsonLd, breadcrumbList } from "@/lib/jsonld";
+import { absoluteUrl, buildMetadata } from "@/lib/seo";
 import { getChangelog } from "@/lib/docs";
 import { Breadcrumb } from "@/components/docs/Breadcrumb";
 import "@/styles/prose.css";
@@ -10,12 +12,9 @@ type Props = { params: Promise<{ locale: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) return {};
   const t = await getTranslations({ locale, namespace: "docs" });
-  return {
-    title: t("changelogPage.title"),
-    description: t("changelogPage.description"),
-    alternates: { canonical: getPathname({ locale: locale as Locale, href: "/changelog" }) },
-  };
+  return buildMetadata({ locale, path: "/changelog", title: t("changelogPage.title"), description: t("changelogPage.description"), og: "docs" });
 }
 
 export default async function ChangelogPage({ params }: Props) {
@@ -23,16 +22,15 @@ export default async function ChangelogPage({ params }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations("docs");
   const format = await getFormatter();
+  const crumbs = [
+    { name: t("home"), href: "/" },
+    { name: t("changelog"), href: "/changelog" },
+  ];
   const { intro, entries } = await getChangelog(locale as Locale);
   return (
     <main id="main" className="container-site pb-24 pt-10">
-      <Breadcrumb
-        items={[
-          { name: t("home"), href: "/" },
-          { name: t("changelog"), href: "/changelog" },
-        ]}
-        label={t("breadcrumbLabel")}
-      />
+      <JsonLd data={breadcrumbList(crumbs.map((c) => ({ name: c.name, url: absoluteUrl(locale as Locale, c.href) })))} />
+      <Breadcrumb items={crumbs} label={t("breadcrumbLabel")} />
       <h1 className="text-display">{t("changelogPage.title")}</h1>
       <div className="prose mt-6" dangerouslySetInnerHTML={{ __html: intro }} />
       <p className="mt-4 text-small">

@@ -50,7 +50,7 @@ export function useGradientMaterial(opacity = 1) {
   return mat;
 }
 
-export type KindColors = Record<"native" | "google" | "free" | "optional" | "lead" | "neutral", THREE.Color>;
+export type KindColors = Record<"native" | "google" | "free" | "optional" | "lead" | "neutral" | "hermes" | "economy", THREE.Color>;
 
 const FALLBACK: Record<keyof KindColors, string> = {
   native: "#3ddc84",
@@ -59,6 +59,8 @@ const FALLBACK: Record<keyof KindColors, string> = {
   optional: "#6b7177",
   lead: "#05d7fd",
   neutral: "#9aa0a6",
+  hermes: "#da77f2",
+  economy: "#4dabf7",
 };
 
 function read(): KindColors {
