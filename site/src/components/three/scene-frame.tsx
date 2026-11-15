@@ -51,7 +51,7 @@ export function SceneFrame({ aspect, poster, overlay, children, cameraPosition =
 
   return (
     <div ref={box} className={`relative w-full overflow-hidden ${className ?? ""}`} style={{ aspectRatio: String(aspect) }}>
-      <div className="absolute inset-0" aria-hidden>
+      <div className="absolute inset-0" aria-hidden style={{ opacity: ready ? 0 : 1, transition: "opacity 600ms ease-out" }}>
         {poster}
       </div>
       {mount && (
