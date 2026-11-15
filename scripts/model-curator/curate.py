@@ -11,6 +11,7 @@ import json
 import os
 import re
 import shutil
+import signal
 import sqlite3
 import sys
 import time
@@ -27,6 +28,7 @@ KEEP = 4               # models in the combo
 MAX_PROBES = 14        # stay well under NVIDIA's 40 req/min (2 calls per model)
 TIMEOUT = 45           # seconds per call; slower than this is useless for coding
 MAX_LATENCY = 30.0     # healthy only if the slower of the two probes is under this
+BUDGET = 12 * 60       # whole run must finish well before the combo alert reads status.json
 
 # Quality ranking by family (lower = better), shared with lib/ninerouter.mjs. Unknown families are still probed if they match.
 try:
@@ -50,13 +52,32 @@ def router_key():
     return json.load(open(OPENCODE_CFG))["provider"]["9router"]["options"]["apiKey"]
 
 
+class Deadline(Exception):
+    pass
+
+
+def _on_alarm(*_):
+    raise Deadline("timed out (total deadline)")
+
+
 def http_json(url, payload=None, key=None, timeout=TIMEOUT):
     req = urllib.request.Request(url, data=json.dumps(payload).encode() if payload else None)
     req.add_header("Content-Type", "application/json")
     if key:
         req.add_header("Authorization", f"Bearer {key}")
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        return json.loads(r.read().decode())
+    # urllib's timeout is per socket read, so a server that trickles bytes never trips it
+    # (one run took 6 hours). SIGALRM caps the whole call; Windows has no SIGALRM and keeps
+    # only the per-read timeout.
+    alarm = hasattr(signal, "SIGALRM")
+    if alarm:
+        signal.signal(signal.SIGALRM, _on_alarm)
+        signal.alarm(int(timeout) + 5)
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return json.loads(r.read().decode())
+    finally:
+        if alarm:
+            signal.alarm(0)
 
 
 def rank(model_id):
@@ -147,6 +168,9 @@ def main():
     try:
         ids, _ = candidates(current)
         for mid in ids:
+            if (now() - started).total_seconds() > BUDGET:
+                alert = f"time budget ({BUDGET // 60} min) spent; {len(ids) - len(probes)} models not probed"
+                break
             probes.append(probe(mid, key))
             time.sleep(1.5)
     except Exception as e:  # noqa: BLE001
@@ -164,8 +188,11 @@ def main():
         write_combo(new)
         changed = True
 
+    # ranAt = when the result was written: the combo alert checks its age, so a slow run
+    # must not look stale the moment it lands.
     status = {
-        "ranAt": started.isoformat(timespec="seconds"),
+        "ranAt": now().isoformat(timespec="seconds"),
+        "startedAt": started.isoformat(timespec="seconds"),
         "durationSec": round((now() - started).total_seconds()),
         "changed": changed, "before": current, "after": new,
         "removed": [m for m in current if m not in new], "added": [m for m in new if m not in current],

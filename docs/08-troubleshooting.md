@@ -67,6 +67,19 @@ It comes from the bundled Apple skills and broad searches. → Click **Don't All
 **The plan of the day suggests a paused project, or reads priorities wrong.**
 → Create `~/.hermes/workspace/projects.md` with each project's status; the digest prompt reads it.
 
+**A routine fails with `HTTP 422: input rejected by content safety screening`.**
+The prompt is not what NVIDIA rejects. Some NIM models (for example `minimax-m3.1-flash`) answer any `reasoning_effort` field with this error, and Hermes sends `medium` to custom endpoints by default. → Re-run `install --hermes`, or set it by hand:
+```bash
+hermes config set agent.reasoning_effort "" --force
+hermes config set model_overrides.custom.free.supports_reasoning false
+```
+
+**A routine fails with `Operation interrupted: waiting for model response (2816s elapsed)`.**
+Hermes gives a local endpoint a 1800 s timeout and turns off its stale-call detector, so a hung free model holds the run for the whole time. → `install --hermes` sets `providers.custom.request_timeout_seconds 180`, `providers.custom.stale_timeout_seconds 240` and `agent.api_max_retries 1`. If the curator leaves the combo with a single model, you can also add a `fallback_providers` list in `~/.hermes/config.yaml` (other models through the same 9Router, with `provider: custom`, `base_url` and `api_key`). A routine that does not set its own model inherits that list.
+
+**The combo alert stays `[SILENT]` after the combo changed.**
+It only reports a `status.json` younger than 40 minutes. On older installs, `ranAt` recorded when the curator started, a slow run made the status look old as soon as it was written, and the alert ran only 5 minutes after the curator. → Update, and re-run `install --hermes` so the alert moves to 15 minutes after the curator.
+
 **The summaries come in the wrong language.**
 → Set `SUMMARY_LANGUAGE` in `~/.config/agentic-dev-stack/stack.env`, then recreate the routine: `hermes cron edit <id> --prompt "..."` (or delete the `daily-digest` and `combo-alert` routines and re-run `install --hermes`).
 

@@ -4,6 +4,16 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 
+### Fixed
+- Hermes routines failed with `HTTP 422: input rejected by content safety screening` on some NVIDIA NIM models (for example `minimax-m3.1-flash`). NVIDIA returns that error for any `reasoning_effort` field, and Hermes sends `medium` to custom endpoints by default. `install --hermes` now keeps the field off the wire (`agent.reasoning_effort` unset, `model_overrides.custom.free.supports_reasoning false`).
+- A hung free model held a Hermes routine for 47 minutes: a local endpoint gets a 1800 s timeout and no stale-call detector. `install --hermes` sets `providers.custom.request_timeout_seconds 180`, `stale_timeout_seconds 240` and `agent.api_max_retries 1`.
+- Curator: urllib's timeout applies to each socket read, so a server that sends bytes slowly kept a run going for 6 hours. Each call now has a hard deadline (SIGALRM, not on Windows), and the whole run has a 12-minute budget.
+- Combo alert missed combo changes: `ranAt` recorded when the curator started, so a slow run looked stale as soon as it was written, and the alert ran only 5 minutes after the curator (with no carry into the next hour, so a 07:58 curator got a 07:03 alert). `ranAt` is now when the result is written (`startedAt` keeps the start), and the alert runs 15 minutes after the curator.
+- Combo alert prompt: the final combo lists only the models in `after`; the model used to list every probe that answered, including ones over the latency limit.
+
+### Security
+- 9Router binds `0.0.0.0` by default, which exposes its API and web UI to the local network. The autostart (launchd, systemd, Task Scheduler) now passes `--host 127.0.0.1`.
+
 ## [1.3.1] - 2026-11-12
 
 ### Fixed
