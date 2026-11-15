@@ -107,9 +107,9 @@ export function CuratorPanel({ onActive }: { onActive?: (active: boolean) => voi
           <p className="section-label">
             <span aria-hidden className={styles.dot} style={{ background: "var(--k-free)" }} /> {t("eyebrow")}
           </p>
-          <h3 id="curator-title" className="text-h3 mt-2">
+          <h2 id="curator-title" className="text-h3 mt-2">
             {t("title")}
-          </h3>
+          </h2>
           <p className="mt-2 max-w-prose text-[length:var(--text-small)] text-muted-foreground">{t("intro", { times: curatorDemo.config.runsPerDay })}</p>
         </div>
         <Button variant="secondary" size="sm" onClick={replay} disabled={active} className="shrink-0">

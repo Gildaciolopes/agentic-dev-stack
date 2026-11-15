@@ -19,6 +19,7 @@ import {
   ToolsBand,
   Why,
 } from "@/components/landing";
+import { HydrateOnView } from "@/components/site/hydrate-on-view";
 import { LazyTokenFunnel } from "@/components/three/lazy";
 import { routing } from "@/i18n/routing";
 import { JsonLd, faqPage } from "@/lib/jsonld";
@@ -39,17 +40,17 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       <Hero teaser={<ArchitectureTeaser />} />
       <ToolsBand />
       <Stats />
-      <Why />
+      <HydrateOnView><Why /></HydrateOnView>
       <SectionArchitecture />
-      <PillarOrchestration />
-      <PillarSdd />
-      <PillarTokens visual={<LazyTokenFunnel />} />
-      <PillarFreeModels />
-      <PillarSecurity />
-      <PillarHermes />
-      <PillarOneCommand />
-      <TerminalReplay />
-      <Faq />
+      <HydrateOnView><PillarOrchestration /></HydrateOnView>
+      <HydrateOnView><PillarSdd /></HydrateOnView>
+      <HydrateOnView><PillarTokens visual={<LazyTokenFunnel />} /></HydrateOnView>
+      <HydrateOnView><PillarFreeModels /></HydrateOnView>
+      <HydrateOnView><PillarSecurity /></HydrateOnView>
+      <HydrateOnView><PillarHermes /></HydrateOnView>
+      <HydrateOnView><PillarOneCommand /></HydrateOnView>
+      <HydrateOnView><TerminalReplay /></HydrateOnView>
+      <HydrateOnView><Faq /></HydrateOnView>
       <Cta />
       <JsonLd data={faqPage(faqItems)} />
     </main>

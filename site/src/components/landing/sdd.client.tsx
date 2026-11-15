@@ -51,7 +51,7 @@ export function SddStepper({ steps, label, codes }: { steps: Step[]; label: stri
                 i === index ? "bg-foreground text-background" : i < index ? "bg-secondary text-foreground" : "bg-card text-muted-foreground hover:bg-secondary",
               )}
             >
-              <span className="text-label uppercase opacity-70">{String(i + 1).padStart(2, "0")}</span>
+              <span className="text-label uppercase">{String(i + 1).padStart(2, "0")}</span>
               <span className="font-bold">{s.id}</span>
             </button>
           ))}

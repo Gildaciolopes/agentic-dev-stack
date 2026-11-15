@@ -61,6 +61,7 @@ await page.waitForTimeout(1000);
 await shot(page, "hero-t1.png", { clip: { x: 0, y: 0, width: 1440, height: 700 } });
 check("a) hero differs after 1s", !a1.equals(a2));
 
+console.log("DBG-b", await page.evaluate(() => [...document.querySelectorAll("main > div")].map((e) => Math.round(e.getBoundingClientRect().height)).join(",")));
 // (b) architecture scroll steps
 const wrapInfo = await page.evaluate(() => {
   const w = document.querySelector("[data-mode]")?.firstElementChild;
@@ -90,6 +91,7 @@ const progressive = counts.length === 7 && counts[6] > counts[0] && counts.every
 check("b) nodes appear progressively", progressive, `visible nodes per step: ${counts.join(",")}`);
 check("b) captions change", captions.size >= 4, `${captions.size} distinct captions`);
 
+console.log("DBG-c", await page.evaluate(() => [...document.querySelectorAll("main > div")].map((e) => Math.round(e.getBoundingClientRect().height)).join(",")));
 // (c) run a feature
 const archTop = await page.evaluate(() => scrollY);
 await page.getByRole("button", { name: /run a feature/i }).first().click();
@@ -103,6 +105,7 @@ const toastSeen = await page.waitForFunction(() => [...document.querySelectorAll
 await shot(page, "run-toast.png");
 check("c) toast 'committed on your ok'", toastSeen);
 
+console.log("DBG-d", await page.evaluate(() => [...document.querySelectorAll("main > div")].map((e) => Math.round(e.getBoundingClientRect().height)).join(",")));
 // (d) node -> dialog
 await page.evaluate((y) => scrollTo({ top: y, behavior: "instant" }), archTop);
 await page.waitForTimeout(800);
@@ -121,6 +124,7 @@ try {
   check("d) node opens MorphDialog", false, String(e).slice(0, 150));
 }
 
+console.log("DBG-e", await page.evaluate(() => [...document.querySelectorAll("main > div")].map((e) => Math.round(e.getBoundingClientRect().height)).join(",")));
 // (e) Architecture <-> Workflow
 await page.getByRole("radio", { name: "Workflow" }).first().click();
 await page.waitForTimeout(1800);
@@ -157,11 +161,15 @@ if (toggleVisible) {
   check("f) 3D toggle shown", false, "toggle not visible (device capability gate?)");
 }
 // token funnel
-await page.evaluate(() => {
-  const el = document.querySelector("#tokens") ?? document.querySelector("#token-economy");
-  el?.scrollIntoView({ block: "center" });
-});
-await page.waitForTimeout(3500);
+console.log("DBG", page.url(), await page.evaluate(() => [document.querySelectorAll("section").length, document.querySelectorAll("[id]").length, [...document.querySelectorAll("main > div, main > section")].map((e) => (e.querySelector("section")?.id || e.id) + ":" + Math.round(e.getBoundingClientRect().height)).join(" ")].join(",")));
+await page.evaluate(() => scrollTo({ top: document.querySelector("#tokens")?.getBoundingClientRect().top + scrollY, behavior: "instant" }));
+await page.waitForTimeout(1200);
+for (let i = 0; i < 6; i++) {
+  await page.mouse.wheel(0, 250);
+  await page.waitForTimeout(500);
+}
+await page.waitForSelector("canvas", { timeout: 15000 }).catch(() => {});
+await page.waitForTimeout(2500);
 const canvases = await page.locator("canvas").count();
 await shot(page, "funnel-3d.png");
 check("f) token funnel canvas", canvases > 0, `${canvases} canvas in DOM`);
