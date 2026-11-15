@@ -1,28 +1,22 @@
 import type { Metadata } from "next";
-import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { notFound } from "next/navigation";
-import { routing } from "@/i18n/routing";
-import { buildMetadata } from "@/lib/seo";
+import { ArchitectureFigure } from "@/components/architecture/ArchitectureFigure";
+import { SectionHeader } from "@/components/ui/section-header";
 
-type Props = { params: Promise<{ locale: string }> };
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) return {};
-  const t = await getTranslations({ locale, namespace: "seo" });
-  return buildMetadata({ locale, path: "/architecture", title: t("architecture.title"), description: t("architecture.description") });
+  const t = await getTranslations({ locale, namespace: "architecture.page" });
+  return { title: t("label"), description: t("description") };
 }
 
-/** Placeholder so the route exists; the architecture section replaces this. */
-export default async function ArchitecturePage({ params }: Props) {
+export default async function ArchitecturePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  const t = await getTranslations("seo");
+  const t = await getTranslations("architecture.page");
   return (
-    <main id="main" className="container-site section">
-      <h1 className="text-display">{t("architecture.heading")}</h1>
+    <main id="main" className="container-site section flex flex-col gap-12">
+      <SectionHeader index={t("index")} label={t("label")} title={t("title")} titleAs="h1" />
+      <ArchitectureFigure />
     </main>
   );
 }
