@@ -28,7 +28,7 @@ KEEP = 4               # models in the combo
 MAX_PROBES = 14        # stay well under NVIDIA's 40 req/min (2 calls per model)
 TIMEOUT = 45           # seconds per call; slower than this is useless for coding
 MAX_LATENCY = 30.0     # healthy only if the slower of the two probes is under this
-BUDGET = 12 * 60       # whole run must finish well before the combo alert reads status.json
+BUDGET = 11 * 60       # whole run (plus one last probe, ~1.7 min) ends before the combo alert, 15 min later
 
 # Quality ranking by family (lower = better), shared with lib/ninerouter.mjs. Unknown families are still probed if they match.
 try:

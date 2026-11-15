@@ -413,10 +413,13 @@ test("integration: real alethe clone + profile (set ALETHE_IT=1)", { skip: proce
 
 test("combo alert runs 15 min after the curator, carrying into the next hour", async () => {
   const { comboAlertCron } = await import("../lib/phases.mjs");
-  assert.equal(comboAlertCron(["07:30", "13:30", "19:30"]), "45 7,13,19 * * *");
-  assert.equal(comboAlertCron(["07:50", "19:50"]), "5 8,20 * * *");
-  assert.equal(comboAlertCron(["23:55"]), "10 0 * * *");
-  assert.equal(comboAlertCron([]), "45 7 * * *");
+  assert.deepEqual(comboAlertCron(["07:30", "13:30", "19:30"]), { cron: "45 7,13,19 * * *", spread: 0 });
+  assert.deepEqual(comboAlertCron(["07:50", "19:50"]), { cron: "5 8,20 * * *", spread: 0 });
+  assert.deepEqual(comboAlertCron(["23:55"]), { cron: "10 0 * * *", spread: 0 });
+  assert.deepEqual(comboAlertCron([]), { cron: "45 7 * * *", spread: 0 });
+  // different minutes: the latest one sets the minute, so every alert is >= 15 min after its run
+  assert.deepEqual(comboAlertCron(["07:30", "13:45"]), { cron: "0 8,14 * * *", spread: 15 });
+  assert.deepEqual(comboAlertCron(["07:50", "13:30"]), { cron: "5 8,14 * * *", spread: 20 });
 });
 
 test("curator http calls stop at a hard deadline even when the server trickles bytes", () => {
