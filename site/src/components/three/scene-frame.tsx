@@ -1,0 +1,92 @@
+"use client";
+
+import { Canvas } from "@react-three/fiber";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+
+type Props = {
+  /** width / height of the fixed box (zero CLS) */
+  aspect: number;
+  /** static fallback shown immediately, under and until the canvas fades in */
+  poster: ReactNode;
+  /** DOM drawn above the canvas (labels) */
+  overlay?: ReactNode;
+  /** R3F content */
+  children: ReactNode;
+  /** orthographic camera position (true isometric default) */
+  cameraPosition?: [number, number, number];
+  className?: string;
+};
+
+function hasWebGL() {
+  try {
+    const c = document.createElement("canvas");
+    return !!(c.getContext("webgl2") || c.getContext("webgl"));
+  } catch {
+    return false;
+  }
+}
+
+function deviceCapable() {
+  if (typeof window === "undefined") return false;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
+  const nav = navigator as Navigator & { connection?: { saveData?: boolean }; deviceMemory?: number };
+  if (nav.connection?.saveData) return false;
+  if (typeof nav.hardwareConcurrency === "number" && nav.hardwareConcurrency < 4) return false;
+  return hasWebGL();
+}
+
+/** Poster first; the Canvas mounts only when visible and the device is capable, then fades in. */
+export function SceneFrame({ aspect, poster, overlay, children, cameraPosition = [14, 14, 14], className }: Props) {
+  const box = useRef<HTMLDivElement>(null);
+  const [mount, setMount] = useState(false);
+  const [inView, setInView] = useState(false);
+  const [tabVisible, setTabVisible] = useState(true);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const el = box.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        const vis = entry.isIntersecting;
+        setInView(vis);
+        if (vis) setMount((m) => m || deviceCapable());
+      },
+      { rootMargin: "200px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const on = () => setTabVisible(document.visibilityState === "visible");
+    document.addEventListener("visibilitychange", on);
+    return () => document.removeEventListener("visibilitychange", on);
+  }, []);
+
+  const active = inView && tabVisible;
+
+  return (
+    <div ref={box} className={`relative w-full overflow-hidden ${className ?? ""}`} style={{ aspectRatio: String(aspect) }}>
+      <div className="absolute inset-0" aria-hidden>
+        {poster}
+      </div>
+      {mount && (
+        <div className="absolute inset-0" aria-hidden style={{ opacity: ready ? 1 : 0, transition: "opacity 600ms ease-out" }}>
+          <Canvas
+            orthographic
+            frameloop={active ? "always" : "never"}
+            dpr={[1, 1.75]}
+            gl={{ antialias: true, powerPreference: "low-power", alpha: true }}
+            camera={{ position: cameraPosition, zoom: 40, near: -100, far: 200 }}
+            onCreated={() => setReady(true)}
+            style={{ background: "transparent" }}
+          >
+            {children}
+          </Canvas>
+        </div>
+      )}
+      {overlay}
+    </div>
+  );
+}
