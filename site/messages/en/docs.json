@@ -1,0 +1,26 @@
+{
+  "breadcrumbLabel": "Breadcrumb",
+  "home": "Home",
+  "docs": "Docs",
+  "changelog": "Changelog",
+  "index": {
+    "title": "Documentation",
+    "description": "Guides for the agentic-dev-stack setup: architecture, installation, models, security and maintenance.",
+    "eyebrow": "Docs"
+  },
+  "sidebar": {
+    "label": "Documentation",
+    "menu": "Docs menu"
+  },
+  "toc": "On this page",
+  "previous": "Previous",
+  "next": "Next",
+  "editOnGithub": "Edit on GitHub",
+  "viewMarkdown": "View as Markdown",
+  "changelogPage": {
+    "title": "Changelog",
+    "description": "Every release of agentic-dev-stack: what was added, changed, fixed and secured.",
+    "unreleased": "Unreleased",
+    "viewMarkdown": "View as Markdown"
+  }
+}
