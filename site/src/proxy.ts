@@ -5,5 +5,5 @@ export default createMiddleware(routing);
 
 export const config = {
   // Skip API, Next internals, static files and the agent-readable .md/.txt routes.
-  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
+  matcher: ["/((?!api|_next|_vercel|apple-icon|.*\\..*).*)"],
 };

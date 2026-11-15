@@ -1,0 +1,29 @@
+{
+  "description": "Stop running one AI agent at a time. Opus plans, cheap and free models execute, and a reviewer from another provider checks the diff.",
+  "og": {
+    "eyebrow": "agentic-dev-stack",
+    "home": {
+      "headline": "Stop running one AI agent at a time.",
+      "alt": "agentic-dev-stack: stop running one AI agent at a time."
+    },
+    "architecture": {
+      "headline": "The architecture, live.",
+      "alt": "agentic-dev-stack architecture: Opus lead, scout, builder, reviewer, 9Router and Hermes.",
+      "chips": ["Opus lead", "scout", "builder", "reviewer", "9Router", "Hermes"]
+    },
+    "docs": {
+      "headline": "Documentation",
+      "sub": "Guides for installing and running the stack.",
+      "alt": "agentic-dev-stack documentation."
+    }
+  },
+  "architecture": {
+    "title": "Architecture",
+    "heading": "The architecture, live.",
+    "description": "How the Opus lead, scout, builder and reviewer agents, 9Router and Hermes fit together."
+  },
+  "docs": {
+    "title": "Docs",
+    "description": "Guides for installing and running agentic-dev-stack."
+  }
+}
