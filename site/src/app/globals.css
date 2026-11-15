@@ -346,8 +346,7 @@
     padding-right: 16px;
   }
   .marquee:hover .marquee-track,
-  .marquee:focus-within .marquee-track,
-  .marquee[data-paused] .marquee-track {
+  .marquee:focus-within .marquee-track {
     animation-play-state: paused;
   }
 
@@ -390,8 +389,7 @@
     flex-wrap: wrap;
     padding-right: 0;
   }
-  .marquee-dup,
-  .marquee-toggle {
+  .marquee-dup {
     display: none;
   }
   *,

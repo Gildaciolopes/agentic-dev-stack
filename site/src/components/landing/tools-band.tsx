@@ -9,7 +9,7 @@ export async function ToolsBand() {
   const rows = [items.slice(0, half), items.slice(half)];
   return (
     <section id="tools" aria-labelledby="tools-title" className="bg-band py-12 md:py-16">
-      <div className="container-site mb-8">
+      <div className="container-site mb-8 text-center">
         <p className="section-label">{t("label")}</p>
         <h2 id="tools-title" className="sr-only">
           {t("heading")}
