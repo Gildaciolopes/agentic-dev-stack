@@ -1,0 +1,196 @@
+{
+  "hero": {
+    "logoLabel": "agentic-dev-stack",
+    "title": "Stop running one AI agent at a time.",
+    "madeFor": "Made for",
+    "words": ["solo devs.", "teams.", "free models."],
+    "sub": "Opus plans. Cheap and free models execute. A reviewer from another provider checks the diff. Every turn spends the minimum number of tokens.",
+    "ctaPrimary": "Get started",
+    "ctaSecondary": "Documentation",
+    "command": "npx agentic-dev-stack",
+    "copy": "Copy",
+    "copied": "Copied",
+    "installNote": "One command on macOS, Linux and Windows.",
+    "petLabel": "The lead agent, our mascot. It cheers when you copy the install command.",
+    "scenesLabel": "Decorative isometric illustration"
+  },
+  "tools": {
+    "label": "The real stack",
+    "heading": "Tools the stack wires together",
+    "items": [
+      "Claude Code",
+      "GitHub Spec Kit",
+      "RTK",
+      "caveman",
+      "graphify",
+      "alethe",
+      "9Router",
+      "NVIDIA NIM",
+      "Hermes Agent",
+      "OpenCode",
+      "Codex",
+      "agy (Antigravity)"
+    ]
+  },
+  "stats": {
+    "label": "In the wild",
+    "stars": "GitHub stars",
+    "downloads": "npm downloads, last month",
+    "asOf": "as of build"
+  },
+  "why": {
+    "index": "01",
+    "label": "Why",
+    "title": "One agent at a time\nis the bottleneck.",
+    "caption": "Without the stack compared with the stack, row by row",
+    "without": "Without the stack",
+    "with": "With the stack",
+    "rows": [
+      ["One agent at a time; you are the bottleneck", "The lead plans and fans out parallel workers, each in an isolated git worktree"],
+      ["Subagents silently inherit Opus", "A hook blocks Opus subagents; the default becomes Sonnet; reading goes to Haiku/Gemini"],
+      ["Claude quota runs out mid-day", "Heavy reading uses Google quota (agy); mechanical edits use free models (NVIDIA via 9Router)"],
+      ["\"Free models\" break every week (410, 404, timeouts)", "A curator probes models 3×/day and rewrites the combo on its own"],
+      ["Terminal output and context bloat every turn", "RTK compresses shell output, caveman trims replies, graphify replaces broad reads"],
+      ["Rules live in CLAUDE.md and get ignored", "Rules become enforcement: hooks, kernel sandbox, orchestrator policy"],
+      ["No spec, giant prompts, blind diffs", "Spec Kit SDD: specify → clarify → plan → tasks → analyze → implement → review → verify"],
+      ["You only know what happened by opening the laptop", "Hermes sends a daily digest + plan of the day to Discord/Telegram"]
+    ]
+  },
+  "orchestration": {
+    "index": "02",
+    "label": "Orchestration",
+    "title": "Plan big.\nExecute small.",
+    "intro": "Text rules do not work; enforcement does. The lead splits work by type and sends each type to the cheapest executor that still delivers the quality required.",
+    "tabsLabel": "Who does what",
+    "role": "Role",
+    "model": "Model",
+    "quota": "Quota",
+    "guard": "agent-model-guard",
+    "codeFile": "hooks/agent-model-guard.mjs",
+    "copy": "Copy",
+    "copied": "Copied",
+    "agents": {
+      "scout": {
+        "role": "Reading and search that needs a shell. Returns a conclusion with file:line, never the whole file.",
+        "model": "Haiku",
+        "quota": "Claude, cheap",
+        "guard": "Allowed: model pinned in the agent definition."
+      },
+      "builder": {
+        "role": "Implements planned units, runs the checks, does not commit. Opus only for deep or risky units.",
+        "model": "Sonnet",
+        "quota": "Claude, mid cost",
+        "guard": "Allowed: model pinned in the agent definition."
+      },
+      "reviewer": {
+        "role": "Reads the diff against the acceptance criteria and hunts for bugs without editing.",
+        "model": "Sonnet",
+        "quota": "Claude",
+        "guard": "Allowed: model pinned in the agent definition."
+      },
+      "agy": {
+        "role": "Heavy read-only scouting with Gemini Flash. With Claude Opus via agy, an independent reviewer.",
+        "model": "Gemini Flash · Claude Opus (review)",
+        "quota": "Google, separate from your Claude subscription",
+        "guard": "Not a Claude subagent: runs as an alethe worker."
+      },
+      "opencode-safe": {
+        "role": "Mechanical edits gated by tests, in an isolated worktree inside a kernel sandbox that denies .env and keys.",
+        "model": "OpenCode + 9Router free combo",
+        "quota": "Zero cost",
+        "guard": "Not a Claude subagent: runs as an alethe worker."
+      },
+      "codex": {
+        "role": "Independent bug-hunting review. A different provider is a real second opinion.",
+        "model": "Codex",
+        "quota": "Its own provider, not Claude's",
+        "guard": "Not a Claude subagent: runs as an alethe worker."
+      }
+    },
+    "lanes": {
+      "label": "Three parallel worktree lanes, and an Opus subagent blocked at the gate",
+      "lead": "lead",
+      "worktree": "worktree",
+      "blocked": "blocked",
+      "opus": "Opus subagent",
+      "gate": "agent-model-guard"
+    }
+  },
+  "sdd": {
+    "index": "03",
+    "label": "Spec-driven development",
+    "title": "Spec first.\nCode second.",
+    "intro": "The spec is the contract. Decisions stay with the lead; implement is where delegation pays.",
+    "stepsLabel": "Spec Kit pipeline",
+    "steps": [
+      { "id": "specify", "what": "what and why", "why": "user stories and acceptance criteria, in spec.md" },
+      { "id": "clarify", "what": "kill ambiguity", "why": "always run it: it kills ambiguity before it becomes code" },
+      { "id": "plan", "what": "how", "why": "research, data model, contracts" },
+      { "id": "tasks", "what": "ordered units", "why": "[P] marks the parallelizable ones" },
+      { "id": "analyze", "what": "consistency check", "why": "spec, plan and tasks cross-checked before any code" },
+      { "id": "implement", "what": "the code", "why": "delegated to builders, one worktree each" },
+      { "id": "review", "what": "independent diff review", "why": "a reviewer on another provider gets the task and the full diff" },
+      { "id": "verify", "what": "evidence, not claims", "why": "tests, typecheck, and a manual run of the real feature" }
+    ],
+    "fanTitle": "[P] tasks fan out",
+    "fanLabel": "tasks.md fans out parallel tasks to builders, each in its own worktree",
+    "fanTasks": "tasks.md",
+    "fanBuilder": "builder",
+    "codeFile": "Claude Code",
+    "copy": "Copy",
+    "copied": "Copied"
+  },
+  "tokens": {
+    "index": "04",
+    "label": "Token economy",
+    "title": "Measured,\nnot promised.",
+    "intro": "Real numbers from the author's machine, straight from rtk gain --monthly (24,431 shell commands run by agents).",
+    "tableCaption": "Shell output savings by month",
+    "cols": ["Month", "Commands", "Tokens kept out of context", "Saved"],
+    "barsLabel": "Share of shell output tokens saved, by month, on a 0 to 30 percent scale",
+    "rows": [
+      { "month": "2026-09", "commands": "10,215", "tokens": "330K", "saved": "11.9%", "pct": 11.9, "short": "2026-09" },
+      { "month": "2026-10", "commands": "10,898", "tokens": "686K", "saved": "14.1%", "pct": 14.1, "short": "2026-10" },
+      { "month": "2026-11 (stack set up early in the month, partial)", "commands": "3,318", "tokens": "261K", "saved": "24.2%", "pct": 24.2, "short": "2026-11" },
+      { "month": "Total", "commands": "24,431", "tokens": "1.3M", "saved": "14.6%", "pct": 14.6, "short": "Total" }
+    ],
+    "footnote": "That is one developer and one workload, and November is a partial month, so read it as a trend, not a benchmark. Savings from delegation (subagents, alethe) and caveman are not measured here yet. Measure your own after a week or two.",
+    "codeFile": "terminal",
+    "copy": "Copy",
+    "copied": "Copied",
+    "cardsLabel": "Three tools that cut tokens",
+    "cards": [
+      { "name": "RTK", "what": "Shell output tokens", "body": "A transparent hook rewrites git status into rtk git status and compresses output (git, ls, tests, docker) before the model sees it. Realistic savings are 15-30% of input tokens, not magic." },
+      { "name": "caveman", "what": "Output tokens and context re-read", "body": "Makes replies short. That cuts output tokens and, because every turn re-reads the history, the context too. Only replies to you: code, commit messages and PR text stay normal." },
+      { "name": "graphify", "what": "Reading tokens", "body": "A knowledge graph of the codebase lives in graphify-out/. Ask it first, so there is no blind grep or file dump." }
+    ]
+  },
+  "_sources": {
+    "hero.title": "README.md:9",
+    "hero.sub": "README.md:9-13",
+    "hero.installNote": "README.md:15",
+    "hero.command": "README.md:19-21",
+    "hero.words": "audience words are tone, not claims; free models README.md:15,174",
+    "tools.items": "Claude Code README.md:1,82; GitHub Spec Kit README.md:89; RTK/caveman/graphify README.md:90-92; alethe README.md:88; 9Router README.md:35; NVIDIA NIM README.md:174; Hermes Agent README.md:93; OpenCode README.md:87; Codex README.md:86; agy (Antigravity) README.md:85,131 + docs/01-architecture.md:95",
+    "stats": "fetched at build from api.github.com and api.npmjs.org; nothing hard-coded",
+    "why.rows": "README.md:31-40 (bold markers removed)",
+    "orchestration.intro": "README.md:94; docs/01-architecture.md:7-16",
+    "orchestration.agents.scout": "README.md:84; docs/01-architecture.md:71",
+    "orchestration.agents.builder": "README.md:83; docs/01-architecture.md:72",
+    "orchestration.agents.reviewer": "docs/01-architecture.md:73",
+    "orchestration.agents.agy": "README.md:85-86; docs/01-architecture.md:95-98",
+    "orchestration.agents.opencode-safe": "README.md:87,95; docs/01-architecture.md:102-107",
+    "orchestration.agents.codex": "README.md:86; docs/01-architecture.md:14",
+    "orchestration.agents.*.guard": "hooks/agent-model-guard.mjs:13-25 (PINNED set); docs/01-architecture.md:38",
+    "orchestration code": "hooks/agent-model-guard.mjs:17-26 verbatim. NOTE: the hook is .mjs in the repo, not .py",
+    "orchestration.lanes": "README.md:33-34; docs/01-architecture.md:78-81",
+    "sdd.steps": "README.md:39; docs/00-smart-vibe-coding.md:35-42 (specify..implement), 105-109 (review, verify)",
+    "sdd code": "docs/00-smart-vibe-coding.md:90-94,102-103,107,120; templates/project/CLAUDE.md:44 (/speckit.implement)",
+    "sdd.intro": "docs/00-smart-vibe-coding.md:44",
+    "tokens.rows, cols, footnote": "README.md:44-53",
+    "tokens code": "README.md:55-58",
+    "tokens.cards.RTK": "docs/00-smart-vibe-coding.md:60; README.md:91",
+    "tokens.cards.caveman": "docs/00-smart-vibe-coding.md:69",
+    "tokens.cards.graphify": "docs/00-smart-vibe-coding.md:46-48; docs/01-architecture.md:59"
+  }
+}
