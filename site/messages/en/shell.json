@@ -1,0 +1,48 @@
+{
+  "skip": "Skip to content",
+  "nav": {
+    "label": "Main",
+    "home": "agentic-dev-stack home",
+    "docs": "Docs",
+    "architecture": "Architecture",
+    "changelog": "Changelog",
+    "github": "GitHub",
+    "githubAria": "agentic-dev-stack on GitHub (opens in a new tab)",
+    "getStarted": "Get started",
+    "menuOpen": "Open menu",
+    "menuClose": "Close menu"
+  },
+  "theme": {
+    "label": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "auto": "Auto (follow system)"
+  },
+  "locale": {
+    "label": "Language"
+  },
+  "footer": {
+    "pitch": "Smart vibe coding stack for Claude Code.",
+    "docs": "Docs",
+    "guide": "00 Smart vibe coding guide",
+    "architecture": "01 Architecture",
+    "installation": "02 Installation",
+    "project": "Project",
+    "github": "GitHub",
+    "npm": "npm",
+    "changelog": "Changelog",
+    "license": "License MIT",
+    "community": "Community",
+    "issues": "Issues",
+    "contributing": "CONTRIBUTING",
+    "security": "SECURITY",
+    "copyright": "MIT License · © {year} Gildacio Lopes",
+    "githubAria": "agentic-dev-stack on GitHub (opens in a new tab)"
+  },
+  "notFound": {
+    "title": "404: page not found",
+    "body": "The lead agent looked everywhere and found nothing at this address.",
+    "pet": "the lead agent",
+    "home": "Back to home"
+  }
+}
