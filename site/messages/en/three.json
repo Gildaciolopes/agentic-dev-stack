@@ -1,0 +1,17 @@
+{
+  "funnel": {
+    "figureLabel": "Token funnel: raw shell output falls through RTK, caveman and graphify and leaves as fewer, brighter particles",
+    "modeLabel": "RTK figure to show",
+    "modeMeasured": "Measured",
+    "modeClaim": "RTK claim",
+    "stageRtk": "RTK",
+    "stageCaveman": "caveman",
+    "stageGraphify": "graphify",
+    "rtkMeasured": "14.6% kept out of context",
+    "rtkClaim": "15–30% fewer input tokens",
+    "notMeasured": "not measured yet",
+    "sourceMeasured": "Measured: 1.3M tokens kept out of context over 24,431 shell commands, 14.6% total. One developer, one workload, author's machine, Sep–Nov 2026; November is a partial month, so read it as a trend, not a benchmark. Source: README, Measured, not promised.",
+    "sourceClaim": "Claim: RTK compresses shell output for 15–30% fewer input tokens, transparently. Source: docs/01-architecture.md. Not a measurement.",
+    "illustrative": "Particle counts are illustrative. Only the RTK figure comes from the repo; caveman and graphify savings are not measured here yet."
+  }
+}

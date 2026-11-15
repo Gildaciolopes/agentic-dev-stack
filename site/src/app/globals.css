@@ -1,6 +1,19 @@
 @import "tailwindcss";
 @import "../styles/fluid-theme.css";
 
+/* three/hero-fragments: CSS-only float for decorative SVG fragments */
+@keyframes hf-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hf-float {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: hf-float 7s ease-in-out infinite;
+  }
+}
+
 /*
  * agentic-dev-stack design tokens. See site/DESIGN.md.
  * One source of colour: shadcn variables, Fluid's --fluid-* and the 3D
