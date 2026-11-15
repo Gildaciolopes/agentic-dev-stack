@@ -148,6 +148,14 @@
 .loading3d {
   padding: 24px;
   color: var(--muted-foreground);
+  /* only surfaces on slow loads; a fast load goes straight to the canvas fade-in */
+  opacity: 0;
+  animation: loading3d-in 0.3s ease-out 0.6s forwards;
+}
+@keyframes loading3d-in {
+  to {
+    opacity: 1;
+  }
 }
 
 /* ---------------------------------------------------------------- svg parts */

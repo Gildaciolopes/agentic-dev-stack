@@ -6,7 +6,6 @@ import { createSpring, springs, type Spring } from "@usefluid/motion";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import type { Graph, GraphEdge, GraphGroup, GraphNode, Kind } from "@/content/architecture";
-import { ArchitecturePoster } from "./architecture-poster";
 import { useKindColors, type KindColors } from "./iso-3d";
 import { SceneFrame } from "./scene-frame";
 
@@ -479,7 +478,7 @@ function World({ graph, visibleIds, highlightId, onSelect }: Props) {
 /** 3D lift of the architecture graph. The canvas is aria-hidden: the 2D figure keeps the accessible content. */
 export default function ArchitectureScene(props: Props) {
   return (
-    <SceneFrame aspect={16 / 10} poster={<ArchitecturePoster />} className="lg:h-full max-lg:absolute max-lg:inset-x-0 max-lg:top-1/2 max-lg:-translate-y-1/2">
+    <SceneFrame aspect={16 / 10} className="lg:h-full max-lg:absolute max-lg:inset-x-0 max-lg:top-1/2 max-lg:-translate-y-1/2">
       <World {...props} />
     </SceneFrame>
   );

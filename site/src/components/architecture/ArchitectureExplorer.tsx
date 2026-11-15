@@ -58,7 +58,10 @@ function Loading3D() {
     </p>
   );
 }
-const Scene3D = dynamic(() => import("@/components/three/architecture-scene"), { ssr: false, loading: () => <Loading3D /> });
+const load3D = () => import("@/components/three/architecture-scene");
+const Scene3D = dynamic(load3D, { ssr: false, loading: () => <Loading3D /> });
+/** Warm the three.js chunk on intent (hover / focus / touch) so the click shows the scene without a wait. */
+const preload3D = () => void load3D().catch(() => {});
 
 type Mode = "desktop" | "mobile";
 const DESKTOP_Q = "(min-width: 1024px)";
@@ -466,6 +469,9 @@ export function ArchitectureExplorer() {
               size="sm"
               aria-pressed={use3d}
               onClick={() => setUse3d((v) => !v)}
+              onPointerEnter={preload3D}
+              onFocus={preload3D}
+              onTouchStart={preload3D}
               className={styles.toggle3d}
               data-capable={capable3d ? "1" : "0"}
               tabIndex={capable3d ? undefined : -1}

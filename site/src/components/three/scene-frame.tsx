@@ -7,8 +7,8 @@ import { deviceCapable } from "./capability";
 type Props = {
   /** width / height of the fixed box (zero CLS) */
   aspect: number;
-  /** static fallback shown immediately, under and until the canvas fades in */
-  poster: ReactNode;
+  /** optional static fallback shown under the canvas until it fades in */
+  poster?: ReactNode;
   /** DOM drawn above the canvas (labels) */
   overlay?: ReactNode;
   /** R3F content */
@@ -51,18 +51,20 @@ export function SceneFrame({ aspect, poster, overlay, children, cameraPosition =
 
   return (
     <div ref={box} className={`relative w-full overflow-hidden ${className ?? ""}`} style={{ aspectRatio: String(aspect) }}>
-      <div className="absolute inset-0" aria-hidden style={{ opacity: ready ? 0 : 1, transition: "opacity 600ms ease-out" }}>
-        {poster}
-      </div>
+      {poster ? (
+        <div className="absolute inset-0" aria-hidden style={{ opacity: ready ? 0 : 1, transition: "opacity 400ms ease-out" }}>
+          {poster}
+        </div>
+      ) : null}
       {mount && (
-        <div className="absolute inset-0" aria-hidden style={{ opacity: ready ? 1 : 0, transition: "opacity 600ms ease-out" }}>
+        <div className="absolute inset-0" aria-hidden style={{ opacity: ready ? 1 : 0, transition: "opacity 400ms ease-out" }}>
           <Canvas
             orthographic
             frameloop={active ? "always" : "never"}
             dpr={[1, 1.75]}
             gl={{ antialias: true, powerPreference: "low-power", alpha: true }}
             camera={{ position: cameraPosition, zoom: 40, near: -100, far: 200 }}
-            onCreated={() => setReady(true)}
+            onCreated={() => requestAnimationFrame(() => requestAnimationFrame(() => setReady(true)))}
             style={{ background: "transparent" }}
           >
             {children}
