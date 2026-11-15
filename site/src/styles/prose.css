@@ -1,0 +1,173 @@
+/*
+ * Long-form content styles for docs and changelog. No typography plugin:
+ * everything reads the design tokens from globals.css.
+ */
+@layer components {
+  .prose {
+    color: var(--foreground);
+    font-size: var(--text-small);
+    line-height: 1.85;
+    max-width: 78ch;
+    overflow-wrap: anywhere;
+  }
+  .prose > :first-child {
+    margin-top: 0;
+  }
+  .prose h1 {
+    font-size: var(--text-h2);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    margin: 0 0 1.25rem;
+  }
+  .prose h2 {
+    font-size: var(--text-h3);
+    margin: 3rem 0 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .prose h3 {
+    font-size: 1rem;
+    margin: 2rem 0 0.75rem;
+  }
+  .prose h4 {
+    font-size: var(--text-small);
+    font-weight: 700;
+    margin: 1.5rem 0 0.5rem;
+  }
+  .prose p,
+  .prose ul,
+  .prose ol,
+  .prose blockquote,
+  .prose pre,
+  .prose .table-wrap,
+  .prose details,
+  .prose figure {
+    margin: 0 0 1.25rem;
+  }
+  .prose ul,
+  .prose ol {
+    padding-left: 1.5rem;
+  }
+  .prose ul {
+    list-style: square;
+  }
+  .prose ol {
+    list-style: decimal;
+  }
+  .prose li {
+    margin-block: 0.35rem;
+  }
+  .prose li > :is(ul, ol) {
+    margin: 0.35rem 0;
+  }
+  .prose li::marker {
+    color: var(--muted-foreground);
+  }
+  .prose a {
+    color: var(--link);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .prose a:hover {
+    text-decoration-thickness: 2px;
+  }
+  .prose strong {
+    font-weight: 700;
+  }
+  .prose blockquote {
+    border-left: 3px solid var(--spectrum-cyan);
+    background: var(--band);
+    padding: 0.75rem 1.25rem;
+  }
+  .prose blockquote > :last-child {
+    margin-bottom: 0;
+  }
+  .prose hr {
+    border: 0;
+    border-top: 1px solid var(--border);
+    margin: 2.5rem 0;
+  }
+  .prose img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--border);
+    background: #ffffff;
+  }
+  .prose :not(pre) > code {
+    background: var(--muted);
+    border: 1px solid var(--border);
+    padding: 0.1em 0.4em;
+    font-size: 0.9em;
+    overflow-wrap: anywhere;
+  }
+  .prose pre {
+    overflow-x: auto;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--border);
+    font-size: 0.8125rem;
+    line-height: 1.7;
+    background: #f6f8fa;
+    color: #1f2328;
+    tab-size: 2;
+  }
+  .dark .prose pre {
+    background: var(--code-bg);
+    color: var(--code-fg);
+  }
+  .prose pre code {
+    background: none;
+    border: 0;
+    padding: 0;
+    font-size: inherit;
+    overflow-wrap: normal;
+  }
+  /* shiki dual theme: both palettes as CSS variables, the .dark class picks one */
+  .prose .shiki span {
+    color: var(--shiki-light);
+  }
+  .dark .prose .shiki span {
+    color: var(--shiki-dark);
+  }
+  .prose .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+  }
+  .prose table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.8125rem;
+  }
+  .prose th,
+  .prose td {
+    padding: 0.5rem 0.875rem;
+    overflow-wrap: break-word;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--border);
+  }
+  .prose th {
+    background: var(--band);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .prose tr:last-child td {
+    border-bottom: 0;
+  }
+  .prose details {
+    border: 1px solid var(--border);
+    padding: 0.75rem 1rem;
+  }
+  .prose details > summary {
+    cursor: pointer;
+    font-weight: 700;
+  }
+  .prose details[open] > summary {
+    margin-bottom: 0.75rem;
+  }
+  .prose details > pre:last-child {
+    margin-bottom: 0;
+  }
+  .prose input[type="checkbox"] {
+    margin-right: 0.5rem;
+  }
+}

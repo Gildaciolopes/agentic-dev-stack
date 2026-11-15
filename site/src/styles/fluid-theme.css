@@ -1,0 +1,12 @@
+:root {
+  --fluid-accent: #11100f;
+  --fluid-on-accent: #6fc4fd;
+  --fluid-surface: #ffffff;
+  --fluid-surface-2: #6fc4fd;
+  --fluid-text: #11100f;
+  --fluid-text-2: rgba(17, 16, 15, 0.74);
+  --fluid-border: rgba(17, 16, 15, 0.18);
+  --fluid-focus: #11100f;
+  --fluid-radius: 14px;
+  --fluid-font: ui-sans-serif, system-ui, sans-serif;
+}

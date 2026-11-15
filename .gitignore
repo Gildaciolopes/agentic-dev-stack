@@ -3,3 +3,6 @@ __pycache__/
 *.pyc
 config/stack.env
 node_modules/
+
+# website reference screenshots (third-party, never commit)
+site/references/

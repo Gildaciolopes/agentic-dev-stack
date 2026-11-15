@@ -1,0 +1,38 @@
+.root {
+  display: inline-block;
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.word {
+  display: inline-block;
+  white-space: pre;
+}
+.char {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.5em) scale(0.8);
+  transition-property: opacity, transform;
+  transition-duration: 180ms, var(--duration);
+  transition-timing-function: ease, cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@supports (transition-timing-function: linear(0, 1)) {
+  .char {
+    transition-timing-function: ease, var(--easing);
+  }
+}
+.root[data-play="true"] .char {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .char {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

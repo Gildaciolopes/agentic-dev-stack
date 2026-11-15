@@ -1,0 +1,135 @@
+{
+  "_sources": {
+    "page.description": "docs/01-architecture.md:7-16 (lead decides, cheap/free workers, independent reviewer), :55-60 (token-economy layer)",
+    "section.intro": "docs/01-architecture.md:7-16 (routing table: lead / Haiku, Gemini / Sonnet / another provider / free model)",
+    "figure.caption": "docs/01-architecture.md:7-16 (routing), :122-129 (graphify, RTK, caveman); docs/05-free-models.md:14 (curator), docs/06-hermes.md (Hermes)",
+    "figure.alt": "same as figure.caption",
+    "kinds": "docs/01-architecture.md:7-16 (lead, native, agy, free), :55-60 (token economy)",
+    "run.stages": "illustrative flow, not measured: spec -> tasks -> parallel builders -> independent review -> commit on your ok; routing from docs/01-architecture.md:7-16",
+    "meter.hint": "docs/01-architecture.md:126 (RTK 15-30%, the only figure taken from the repo); bar lengths are illustrative",
+    "meter.rtk.note": "docs/01-architecture.md:126 (\"Measured in real use: 15-30% fewer input tokens\"); table row :57",
+    "meter.caveman.note": "docs/01-architecture.md:58 (table row, output tokens) and :128-129 (caveman); not quantified",
+    "meter.graphify.note": "docs/01-architecture.md:59 (table row, reading cost) and :122-123 (graphify section); not quantified",
+    "curator.intro": "docs/05-free-models.md:14 (3 times a day), :51 (CURATOR_TIMES default 07:30 13:30 19:30); config/stack.env.example:14; times come from curatorDemo.config.runsPerDay in src/content/architecture.ts",
+    "curator.illustrative": "docs/05-free-models.md:19-20 (410 Gone for GLM 5.2 and DeepSeek V4 Pro, real); latencies are invented for the demo",
+    "curator.statusDrop": "docs/05-free-models.md:19-20 (410 Gone), :26 (9Router does not skip on 410/404)",
+    "curator.statusDone": "docs/05-free-models.md:14 (curator rewrites the combo), :26"
+  },
+  "page": {
+    "index": "01",
+    "label": "Architecture",
+    "title": "How the stack\nfits together.",
+    "description": "An interactive map of agentic-dev-stack: the lead plans, cheap and free models execute, an independent reviewer checks, and a token-economy layer wraps it all."
+  },
+  "section": {
+    "index": "01",
+    "label": "Architecture",
+    "title": "The lead plans.\nThe rest build.",
+    "intro": "An expensive model decides, cheap and free models do the volume, and an independent reviewer checks the diff. Scroll to watch it assemble, then click any part."
+  },
+  "figure": {
+    "caption": "The agentic-dev-stack architecture: you talk to a lead model, which delegates to native subagents and to alethe, which runs workers in isolated worktrees. A curator keeps the free models healthy, Hermes reports to your phone, and a token-economy layer wraps everything.",
+    "alt": "Diagram of agentic-dev-stack: you, the lead (Opus), a delegation layer of native subagents and alethe, workers in isolated worktrees, the self-healing free models, Hermes, and the token-economy layer.",
+    "readAsText": "Read as text",
+    "hideText": "Hide text version",
+    "stepsTitle": "How it assembles",
+    "layers": "Layers",
+    "flows": "Flows",
+    "optional": "optional"
+  },
+  "explorer": {
+    "label": "Interactive architecture diagram. Each part is a button that opens its details."
+  },
+  "toolbar": {
+    "view": "View",
+    "architecture": "Architecture",
+    "workflow": "Workflow",
+    "filter": "Filter by kind",
+    "to3d": "3D view",
+    "to2d": "2D view",
+    "loading3d": "Loading the 3D view…"
+  },
+  "kinds": {
+    "lead": "lead model",
+    "native": "native Claude",
+    "google": "Google (agy)",
+    "free": "free",
+    "optional": "optional",
+    "neutral": "orchestration and data",
+    "hermes": "always-on agent",
+    "economy": "token economy"
+  },
+  "story": {
+    "prev": "Previous step",
+    "next": "Next step",
+    "count": "Step {n} of {total}"
+  },
+  "run": {
+    "idle": "Run a feature",
+    "loading": "Running",
+    "done": "Committed",
+    "toast": "committed on your ok",
+    "stages": {
+      "spec": "Spec: you and the lead write down what and why.",
+      "tasks": "Tasks: the lead splits the work into units and hands them to delegation.",
+      "builders": "Three builders work in parallel, each in its own worktree.",
+      "review": "The diffs go to the independent reviewer.",
+      "fail": "Review fails once. The diff goes back to the builder.",
+      "retry": "The builder fixes the diff and sends it again.",
+      "pass": "Review passes.",
+      "commit": "Committed on your ok."
+    }
+  },
+  "meter": {
+    "label": "Tokens, relative",
+    "hint": "Bars are relative and illustrative, not measured. Only the RTK range comes from the docs.",
+    "rtk": {
+      "name": "RTK",
+      "note": "15–30% fewer input tokens"
+    },
+    "caveman": {
+      "name": "caveman",
+      "note": "fewer output tokens"
+    },
+    "graphify": {
+      "name": "graphify",
+      "note": "fewer files read"
+    }
+  },
+  "dialog": {
+    "model": "Model",
+    "quota": "Quota",
+    "status": "Status",
+    "optional": "Optional, pluggable",
+    "docs": "Read the docs",
+    "close": "Close"
+  },
+  "curator": {
+    "eyebrow": "Free models, self-healing",
+    "title": "The curator drops dead models",
+    "intro": "Runs {times} times a day. It probes each candidate with a chat and a tool call, then rewrites the combo that 9Router serves.",
+    "run": "Run the curator",
+    "replay": "Replay",
+    "cols": {
+      "model": "Model",
+      "answers": "Answers?",
+      "tool": "Tool call?",
+      "latency": "Latency"
+    },
+    "probing": "probing…",
+    "ok": "OK",
+    "toolOk": "tool call OK",
+    "failed": "failed",
+    "illustrative": "Illustrative results: the 410 case is real, the latencies are made up for the demo.",
+    "combo": "\"{name}\" combo in 9Router",
+    "serving": "9Router keeps serving",
+    "statusIdle": "Ready to run the curator.",
+    "statusProbe": "Probing the candidate models one by one.",
+    "statusDrop": "A model answered 410 Gone and is dropped. The combo is rewritten.",
+    "statusDone": "Done. The combo now lists only healthy models and 9Router never stopped serving."
+  },
+  "teaser": {
+    "label": "The lead plans and fans work out to scout, builder and reviewer.",
+    "lead": "LEAD"
+  }
+}

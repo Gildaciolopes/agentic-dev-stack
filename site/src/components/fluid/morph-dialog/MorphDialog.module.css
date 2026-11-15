@@ -1,0 +1,70 @@
+.dialog {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 16px;
+  border: 0;
+  background: transparent;
+  overflow: hidden;
+  color: var(--fluid-text);
+  font-family: var(--fluid-font);
+}
+.dialog[open] {
+  display: grid;
+  place-items: center;
+}
+.dialog[data-contained] {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+.dialog::backdrop {
+  background: transparent;
+}
+.dialog:focus,
+.dialog:focus-visible {
+  outline: none;
+}
+:global(html):has(.dialog:modal) {
+  overflow: hidden;
+}
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--fluid-scrim, rgba(8, 8, 10, 0.5));
+  opacity: 0;
+}
+.surface {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  clip-path: inset(50%);
+}
+.panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  overflow: hidden;
+  transition: box-shadow 280ms ease;
+}
+:where(.panel) {
+  width: min(560px, 100%);
+  border-radius: calc(var(--fluid-radius) * 2);
+  background: var(--fluid-surface);
+}
+.panel[data-rest] {
+  box-shadow: 0 0 0 1px var(--fluid-border), 0 30px 90px rgba(0, 0, 0, 0.3);
+}
+.content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  margin: -4px;
+  padding: 4px;
+  overflow: auto;
+  opacity: 0;
+}

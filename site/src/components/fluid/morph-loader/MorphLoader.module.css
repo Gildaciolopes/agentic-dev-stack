@@ -1,0 +1,28 @@
+.root {
+  display: inline-grid;
+  place-items: center;
+}
+.shape {
+  width: 72px;
+  height: 72px;
+  color: var(--fluid-accent);
+  animation: turn 2.4s linear infinite;
+}
+.shape[data-done="true"] {
+  animation: none;
+}
+@keyframes turn {
+  to { transform: rotate(360deg); }
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .shape {
+    animation: none;
+  }
+}
