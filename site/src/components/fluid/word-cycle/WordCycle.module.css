@@ -1,0 +1,41 @@
+.root {
+  display: inline-block;
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.stack {
+  display: inline-grid;
+}
+.stack > * {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+}
+.sizer {
+  visibility: hidden;
+}
+.still {
+  display: block;
+}
+.in {
+  display: block;
+  animation: in 340ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.out {
+  display: block;
+  pointer-events: none;
+  animation: out 200ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes in {
+  from { opacity: 0; filter: blur(7px); transform: translateY(0.3em); }
+  to { opacity: 1; filter: blur(0); transform: none; }
+}
+@keyframes out {
+  from { opacity: 1; filter: blur(0); transform: none; }
+  to { opacity: 0; filter: blur(7px); transform: translateY(-0.3em); }
+}

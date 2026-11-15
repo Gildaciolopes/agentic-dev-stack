@@ -1,0 +1,47 @@
+.root {
+  position: relative;
+  overflow: hidden;
+  border-radius: inherit;
+}
+.curtain {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  background: var(--fluid-accent);
+  color: var(--fluid-on-accent);
+}
+.curtain[data-fixed] {
+  position: fixed;
+  z-index: 1000;
+}
+.curtain[data-phase="cover"] {
+  animation: cover 420ms cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+.curtain[data-phase="leave"] {
+  animation: leave 460ms cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+.logo {
+  width: min(34%, 72px);
+  aspect-ratio: 1;
+  animation: pop 560ms cubic-bezier(0.34, 1.56, 0.64, 1) 120ms both;
+}
+@keyframes cover {
+  from { clip-path: circle(0 at 50% 50%); }
+  to { clip-path: circle(75% at 50% 50%); }
+}
+@keyframes leave {
+  from { clip-path: inset(0 0 0 0); }
+  to { clip-path: inset(0 0 100% 0); }
+}
+@keyframes pop {
+  from { transform: scale(0.4); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .curtain,
+  .logo {
+    animation: none;
+  }
+}
