@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "@usefluid/motion/react";
 import { useTranslations } from "next-intl";
-import { IslandToast } from "@/components/fluid/island-toast/IslandToast";
 import { MorphLoader } from "@/components/fluid/morph-loader/MorphLoader";
 
 /**
@@ -35,15 +34,13 @@ const CHECKS: { name: string; off?: boolean }[] = [
 ];
 
 const STEP_MS = 230;
-const TOAST_MS = 3600;
 
-/** Self-contained: pass `onDone` to also react (for example with a global toast) when the run completes. */
+/** Self-contained: pass `onDone` to also react (for example with the global toast) when the run completes. */
 export function DoctorDemo({ onDone }: { onDone?: () => void }) {
   const t = useTranslations("landing-b.one.doctor");
   const reduced = useReducedMotion();
   const [started, setStarted] = useState(false);
   const [count, setCount] = useState(0);
-  const [toast, setToast] = useState<string | null>(null);
   const [announce, setAnnounce] = useState("");
   const onDoneRef = useRef(onDone);
   useEffect(() => {
@@ -57,7 +54,6 @@ export function DoctorDemo({ onDone }: { onDone?: () => void }) {
 
   const finish = () => {
     setAnnounce(t("announceDone", { ok, off }));
-    setToast(t("toast"));
     onDoneRef.current?.();
   };
 
@@ -72,15 +68,8 @@ export function DoctorDemo({ onDone }: { onDone?: () => void }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [started, count]);
 
-  useEffect(() => {
-    if (!toast) return;
-    const id = window.setTimeout(() => setToast(null), TOAST_MS);
-    return () => window.clearTimeout(id);
-  }, [toast]);
-
   const start = () => {
     if (running) return;
-    setToast(null);
     setStarted(true);
     if (reduced) {
       setCount(CHECKS.length);
@@ -104,9 +93,6 @@ export function DoctorDemo({ onDone }: { onDone?: () => void }) {
         </button>
         <div className="size-[72px]">
           {!started ? null : <MorphLoader done={done} label={t("running")} doneLabel={t("doneLabel")} />}
-        </div>
-        <div className="min-w-0 flex-1 basis-64">
-          <IslandToast message={toast} />
         </div>
       </div>
 

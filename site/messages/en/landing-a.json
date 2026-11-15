@@ -39,7 +39,7 @@
     "asOf": "as of build"
   },
   "why": {
-    "index": "01",
+    "index": "00",
     "label": "Why",
     "title": "One agent at a time\nis the bottleneck.",
     "caption": "Without the stack compared with the stack, row by row",

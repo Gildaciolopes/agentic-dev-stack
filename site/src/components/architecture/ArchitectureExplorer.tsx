@@ -1,14 +1,14 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { type CSSProperties, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useReducedMotion, MorphPath } from "@usefluid/motion/react";
 import { useTranslations } from "next-intl";
 import { MorphButton, type MorphButtonState } from "@/components/fluid/morph-button/MorphButton";
 import { MorphDialog } from "@/components/fluid/morph-dialog/MorphDialog";
-import { IslandToast } from "@/components/fluid/island-toast/IslandToast";
 import { SegmentedPicker } from "@/components/fluid/segmented-picker/SegmentedPicker";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/site/toast";
 import { LegendChip, type LegendKind } from "@/components/ui/legend-chip";
 import { Link } from "@/i18n/navigation";
 import { architecture, assemblySteps, workflow, type GraphNode, type Kind } from "@/content/architecture";
@@ -112,7 +112,7 @@ export function ArchitectureExplorer() {
   const [runState, setRunState] = useState<MorphButtonState>("idle");
   const [announce, setAnnounce] = useState("");
   const [meter, setMeter] = useState(0);
-  const [toast, setToast] = useState<string | null>(null);
+  const toast = useToast();
   const [freeActive, setFreeActive] = useState(false);
 
   const effStep = reduced ? STEPS.length : step;
@@ -339,7 +339,7 @@ export function ArchitectureExplorer() {
         if (!alive) return;
         setAnnounce(t(`run.stages.${key}`));
         setMeter(progress);
-        if (key === "commit") setToast(t("run.toast"));
+        if (key === "commit") toast.show(t("run.toast"));
       },
     }).then((ok) => {
       if (alive && ok) setRunState("done");
@@ -349,12 +349,11 @@ export function ArchitectureExplorer() {
       ctrl.reset();
       ctrl.clearRun();
     };
-  }, [runState, view, ctrl, reduced, t]);
+  }, [runState, view, ctrl, reduced, t, toast]);
 
   useEffect(() => {
     if (runState !== "done") return;
     const id = window.setTimeout(() => {
-      setToast(null);
       ctrl.clearRun();
     }, 3600);
     const id2 = window.setTimeout(() => {
@@ -428,7 +427,7 @@ export function ArchitectureExplorer() {
       data-view={view}
       data-reduced={reduced ? "1" : "0"}
     >
-      <div ref={wrapRef} className={styles.wrap} style={scroll ? { height: `${STEPS.length * 70}vh` } : undefined}>
+      <div ref={wrapRef} className={styles.wrap} style={{ "--arch-steps": STEPS.length, ...(scroll ? { height: `${STEPS.length * 70}vh` } : {}) } as CSSProperties}>
         <div className={cn(styles.stage, scroll && styles.pinned)}>
           <div className={styles.toolbar}>
             <SegmentedPicker
@@ -704,9 +703,6 @@ export function ArchitectureExplorer() {
         ) : null}
       </MorphDialog>
 
-      <div className={styles.toastLayer}>
-        <IslandToast message={toast} />
-      </div>
     </div>
   );
 }

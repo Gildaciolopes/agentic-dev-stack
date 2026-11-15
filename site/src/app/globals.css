@@ -53,6 +53,9 @@
   --kind-free: #ff8a3d;
   --kind-optional: #6b7177;
   --kind-lead: var(--spectrum-cyan);
+  --kind-neutral: var(--muted-foreground);
+  --kind-hermes: #9c36b5; /* 6.0:1 on white */
+  --kind-economy: #1971c2; /* 5.2:1 on white */
 
   /* shape */
   --radius: 0px;
@@ -127,6 +130,8 @@
   --destructive: #ff5a5f;
   --success: #3ddc84;
   --kind-optional: #8a8a8a;
+  --kind-hermes: #da77f2; /* 8.6:1 on black */
+  --kind-economy: #4dabf7; /* 9.0:1 on black */
   --border: #1f1f1f;
   --input: #1f1f1f;
   --ring: #6ee6ff;
@@ -203,6 +208,9 @@
   --color-kind-free: var(--kind-free);
   --color-kind-optional: var(--kind-optional);
   --color-kind-lead: var(--kind-lead);
+  --color-kind-neutral: var(--kind-neutral);
+  --color-kind-hermes: var(--kind-hermes);
+  --color-kind-economy: var(--kind-economy);
 
   --radius-sm: 0px;
   --radius-md: 0px;

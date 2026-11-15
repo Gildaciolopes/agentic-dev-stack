@@ -1,7 +1,6 @@
 /*
  * Architecture explorer. Colours only through tokens: the legend kinds come from
- * --kind-* (globals.css); the three kinds without a legend entry are mapped here to
- * existing spectrum / foreground tokens. Square corners except packets.
+ * --kind-* (globals.css), including neutral / hermes / economy. Square corners except packets.
  */
 
 .root,
@@ -11,9 +10,9 @@
   --k-google: var(--kind-google);
   --k-free: var(--kind-free);
   --k-optional: var(--kind-optional);
-  --k-neutral: var(--muted-foreground);
-  --k-hermes: var(--spectrum-pink);
-  --k-economy: var(--spectrum-peach);
+  --k-neutral: var(--kind-neutral);
+  --k-hermes: var(--kind-hermes);
+  --k-economy: var(--kind-economy);
 }
 
 .figure {
@@ -47,6 +46,12 @@
 
 .wrap {
   position: relative;
+}
+/* Reserve the scroll-assembly height (7 steps x 70vh) before hydration so the page does not jump when the pinned stage mounts. */
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  .wrap {
+    min-height: calc(var(--arch-steps, 7) * 70vh);
+  }
 }
 .stage {
   display: flex;
@@ -612,12 +617,6 @@
   color: var(--link);
   text-decoration: underline;
   text-underline-offset: 4px;
-}
-.toastLayer {
-  position: fixed;
-  inset: calc(var(--nav-h) + 8px) 0 auto;
-  z-index: 70;
-  pointer-events: none;
 }
 
 /* ---------------------------------------------------------------- hero teaser */

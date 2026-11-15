@@ -5,8 +5,6 @@ import { RevealHeading } from "@/components/ui/reveal-heading";
 import { logo } from "@/lib/logo";
 import { site } from "@/lib/site";
 
-const START = `${site.repo}/blob/main/docs/02-installation.md`;
-
 export async function Cta() {
   const t = await getTranslations("landing-b.cta");
 
@@ -18,7 +16,7 @@ export async function Cta() {
           <p className="max-w-[60ch] text-muted-foreground">{t("line")}</p>
           <InstallCommand command={site.install} copyLabel={t("copy")} copiedLabel={t("copied")} className="max-w-xl" />
           <div className="flex flex-wrap gap-3">
-            <Button size="lg" href={START}>
+            <Button size="lg" href="/docs/02-installation">
               {t("start")}
             </Button>
             <Button size="lg" variant="secondary" href={site.repo}>

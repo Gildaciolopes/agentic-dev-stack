@@ -184,7 +184,7 @@
       "summary": "{ok} passed · {off} disabled · 0 failed",
       "announceStart": "doctor started.",
       "announceDone": "doctor finished. {ok} checks passed, {off} disabled, none failed.",
-      "toast": "Install complete",
+      "toast": "doctor: all checks passed",
       "platform": "platform:"
     }
   },

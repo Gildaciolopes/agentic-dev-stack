@@ -31,7 +31,7 @@ export async function Stats() {
   ].filter((i): i is { value: number; label: string } => i !== null);
 
   return (
-    <section aria-label={t("label")} className="container-site py-10">
+    <section id="stats" aria-label={t("label")} className="container-site py-10">
       <dl className="flex flex-wrap items-end justify-center gap-x-16 gap-y-6 text-center">
         {items.map((item) => (
           <div key={item.label} className="flex flex-col-reverse gap-1">

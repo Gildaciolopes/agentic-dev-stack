@@ -16,6 +16,15 @@ export function absoluteUrl(locale: Locale, path: string): string {
   return new URL(localePath(locale, path), site.url).toString();
 }
 
+export type OgKind = "home" | "architecture" | "docs";
+
+/** Route of each generated OG card (the `opengraph-image.tsx` files). `generateImageMetadata` gives them the id "default". */
+const OG_PATH: Record<OgKind, string> = {
+  home: "/opengraph-image/default",
+  architecture: "/architecture/opengraph-image/default",
+  docs: "/docs/opengraph-image/default",
+};
+
 type Input = {
   locale: Locale;
   /** Unprefixed path of the page, e.g. "/docs". Omit to skip canonical/hreflang. */
@@ -23,11 +32,14 @@ type Input = {
   /** Page title. Omit on the root layout to emit the default title + template. */
   title?: string;
   description: string;
-  /** Overrides the file-convention opengraph-image. */
+  /** Which generated OG card to use. The URL is prefix-free for the default locale, so it never hops through a redirect. */
+  og?: OgKind;
+  /** Explicit image URL; wins over `og`. */
   ogImage?: string;
 };
 
-export function buildMetadata({ locale, path, title, description, ogImage }: Input): Metadata {
+export function buildMetadata({ locale, path, title, description, og, ogImage: explicitImage }: Input): Metadata {
+  const ogImage = explicitImage ?? (og ? localePath(locale, OG_PATH[og]) : undefined);
   const languages: Record<string, string> | undefined = path
     ? {
         ...Object.fromEntries(locales.map((l) => [localeTags[l], localePath(l, path)])),

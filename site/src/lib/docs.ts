@@ -11,7 +11,11 @@ import type { Element, Root as HastRoot, ElementContent, RootContent } from "has
 import type { Root as MdastRoot, RootContent as MdastNode } from "mdast";
 import { getPathname } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
+import messages from "../../messages/en/docs.json";
 import { site } from "@/lib/site";
+
+/** Hand-written descriptions for docs whose first paragraph is not a usable summary. */
+const descriptionOverrides: Record<string, string> = messages.descriptions;
 
 const repoRoot = path.join(process.cwd(), "..");
 const docsDir = path.join(repoRoot, "docs");
@@ -162,7 +166,7 @@ function parseMeta(file: string, markdown: string): DocMeta {
     file,
     number: slug.slice(0, 2),
     title: h1 ? nodeText(h1).trim() : slug,
-    description: truncate(firstParagraph(tree).replace(/:$/, ".")),
+    description: descriptionOverrides[slug] ?? truncate(firstParagraph(tree).replace(/:$/, ".")),
   };
 }
 

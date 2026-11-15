@@ -7,7 +7,7 @@ import { memo, type RefObject, useCallback, useEffect, useMemo, useRef } from "r
 import * as THREE from "three";
 import type { Graph, GraphEdge, GraphNode, Kind } from "@/content/architecture";
 import { ArchitecturePoster } from "./architecture-poster";
-import { FitZoom, Glow, gradientBox, useGradientMaterial, useKindColors, type KindColors, type PaletteName } from "./iso-3d";
+import { FitZoom, Glow, gradientBox, useGradientMaterial, useKindColors, type PaletteName } from "./iso-3d";
 import { SceneFrame } from "./scene-frame";
 
 type Props = {
@@ -33,7 +33,6 @@ const PALETTE: Record<Kind, PaletteName> = {
   optional: "grey",
 };
 const HEIGHT: Record<Kind, number> = { lead: 1.6, native: 0.9, google: 0.8, hermes: 0.8, free: 0.7, economy: 0.6, neutral: 0.5, optional: 0.35 };
-const KIND_COLOR_KEY = (k: Kind): keyof KindColors => (k === "hermes" ? "free" : k === "economy" ? "google" : k);
 
 type Ctx = { lift: number };
 
@@ -337,7 +336,7 @@ function World({ graph, visibleIds, highlightId, explode = 0, onSelect }: Props)
             ctx={ctxRef}
             visible={isVisible(e.from) && isVisible(e.to)}
             dimmed={!!connected && !(e.from === highlightId || e.to === highlightId)}
-            color={colors[KIND_COLOR_KEY(e.kind)]}
+            color={colors[e.kind]}
           />
         ))}
         {graph.nodes.map((n) => (
@@ -348,7 +347,7 @@ function World({ graph, visibleIds, highlightId, explode = 0, onSelect }: Props)
             visible={isVisible(n.id)}
             highlighted={highlightId === n.id}
             dimmed={!!connected && highlightId !== n.id}
-            color={colors[KIND_COLOR_KEY(n.kind)]}
+            color={colors[n.kind]}
             onSelect={onSelect}
           />
         ))}
