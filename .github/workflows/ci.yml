@@ -18,7 +18,7 @@ jobs:
     env:
       NO_COLOR: "1"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
@@ -72,7 +72,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: shellcheck
         run: shellcheck -S warning install.sh bin/opencode-safe bin/opencode-safe-linux
       - name: npx entrypoint from the repo
