@@ -25,7 +25,8 @@ Dark is the native look. Light is derived (section 12). All names are shadcn var
 | `--primary` / `-foreground` | `#ffffff` / `#000000` | `#000000` / `#ffffff` |
 | `--secondary`, `--muted` | `#141414` | `#eef2f4` |
 | `--muted-foreground` | `#8a8a8a` | `#4f5459` |
-| `--subtle-foreground` | `#7a7a7a` | `#6b7177` |
+| `--subtle-foreground` | `#808080` | `#656b71` |
+| `--code-muted` | `#8a8a8a` | `#8a8a8a` |
 | `--accent` | `#101a1c` | `#e3f8fd` |
 | `--destructive` | `#ff5a5f` | `#c8102e` |
 | `--success` | `#3ddc84` | `#0b7a52` |
@@ -67,8 +68,11 @@ Text needs 4.5:1, large text and UI components 3:1. All text pairs below pass.
 | dark muted / band | 5.77 |
 | dark muted / card | 5.63 |
 | dark muted / secondary | 5.34 |
-| dark subtle `#7a7a7a` / background | 4.89 |
-| dark subtle / card | 4.53 |
+| dark subtle `#808080` / background | 5.32 |
+| dark subtle / band | 5.04 |
+| dark subtle / card | 4.92 |
+| dark subtle / secondary | 4.66 |
+| dark code-muted `#8a8a8a` / code-bg | 5.63 to 5.70 |
 | dark link `#6ee6ff` / background | 14.43 |
 | dark link / card | 13.35 |
 | dark destructive / background | 6.88 |
@@ -82,8 +86,10 @@ Text needs 4.5:1, large text and UI components 3:1. All text pairs below pass.
 | light muted `#4f5459` / background | 7.65 |
 | light muted / band | 7.04 |
 | light muted / card | 7.24 |
-| light subtle `#6b7177` / background | 4.94 |
-| light subtle / card | 4.67 |
+| light subtle `#656b71` / background | 5.39 |
+| light subtle / band | 4.96 |
+| light subtle / card | 5.11 |
+| light subtle / secondary | 4.79 |
 | light link `#0a6f91` / background | 5.68 |
 | light link / card | 5.38 |
 | light destructive / background | 5.88 |
@@ -92,7 +98,7 @@ Text needs 4.5:1, large text and UI components 3:1. All text pairs below pass.
 | non-text: light ring `#0a7ea4` / background | 4.63 |
 | non-text: dark ring / background | 14.43 |
 
-Fixes recorded: measured reference body grey `#707070` raised to `#8a8a8a`; primary label is black, not white; `--kind-optional` was `#8a8a8a` in both themes (3.45 on white, fails as text) and is now `#6b7177` in light. `--border` is decorative (1.27 to 1.30) and never the only cue for an interactive control: interactive borders use `--foreground` (secondary button) or the focus ring.
+Fixes recorded: `--subtle-foreground` was `#7a7a7a` / `#6b7177` and failed on `--secondary` (4.29 / 4.38), now `#808080` / `#656b71`; measured reference body grey `#707070` raised to `#8a8a8a`; primary label is black, not white; `--kind-optional` was `#8a8a8a` in both themes (3.45 on white, fails as text) and is now `#6b7177` in light. `--border` is decorative (1.27 to 1.30) and never the only cue for an interactive control: interactive borders use `--foreground` (secondary button) or the focus ring.
 
 ## 4. Type scale
 

@@ -18,7 +18,7 @@ export function CodeWindow({ filename, code, copyLabel, copiedLabel, className }
           <span className="size-2.5 bg-peach" />
           <span className="size-2.5 bg-mint" />
         </span>
-        <span className="flex-1 truncate text-[length:var(--text-label)] tracking-wide text-[#8a8a8a]">{filename}</span>
+        <span className="flex-1 truncate text-[length:var(--text-label)] tracking-wide text-code-muted">{filename}</span>
         {copyLabel && copiedLabel ? <CopyButton text={code} label={copyLabel} doneLabel={copiedLabel} /> : null}
       </figcaption>
       <pre className="overflow-x-auto p-5 text-[length:var(--text-small)] leading-relaxed" tabIndex={0}>

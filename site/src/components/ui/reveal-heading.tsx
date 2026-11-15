@@ -23,7 +23,7 @@ export function RevealHeading({ as: Tag = "h2", text, className, id }: Props) {
   const inView = useInView(ref, 0.3);
   const lines = text.split("\n");
   return (
-    <Tag ref={ref} id={id} className={cn("text-h2 font-bold", className)}>
+    <Tag ref={ref} id={id} data-reveal className={cn("text-h2 font-bold", className)}>
       {lines.map((line, i) => (
         <span key={i} className="block">
           <TextReveal text={line} play={inView} />

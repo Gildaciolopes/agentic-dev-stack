@@ -75,7 +75,7 @@
   --secondary-foreground: #000000;
   --muted: #eef2f4;
   --muted-foreground: #4f5459;
-  --subtle-foreground: #6b7177;
+  --subtle-foreground: #656b71;
   --accent: #e3f8fd;
   --accent-foreground: #000000;
   --destructive: #c8102e;
@@ -86,6 +86,7 @@
   --link: #0a6f91;
   --code-bg: #0b0b0b;
   --code-fg: #e8e8e8;
+  --code-muted: #8a8a8a;
   --shadow-color: 0 0% 0%;
   --elev-1: 0 1px 0 rgb(0 0 0 / 0.04), 0 8px 24px rgb(0 0 0 / 0.06);
   --elev-2: 0 30px 80px rgb(0 0 0 / 0.12), inset 0 1px 0 rgb(255 255 255 / 0.6);
@@ -107,7 +108,7 @@
   --secondary-foreground: #ffffff;
   --muted: #141414;
   --muted-foreground: #8a8a8a;
-  --subtle-foreground: #7a7a7a;
+  --subtle-foreground: #808080;
   --accent: #101a1c;
   --accent-foreground: #ffffff;
   --destructive: #ff5a5f;
@@ -119,6 +120,7 @@
   --link: #6ee6ff;
   --code-bg: #0d0d0d;
   --code-fg: #e8e8e8;
+  --code-muted: #8a8a8a;
   --elev-1: 0 1px 0 rgb(255 255 255 / 0.04);
   --elev-2: 0 30px 80px rgb(0 0 0 / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.06);
   --glow-under: rgb(42 216 196 / 0.45);
@@ -169,6 +171,7 @@
   --color-link: var(--link);
   --color-code: var(--code-bg);
   --color-code-foreground: var(--code-fg);
+  --color-code-muted: var(--code-muted);
 
   --color-sky: var(--spectrum-sky);
   --color-cyan: var(--spectrum-cyan);
@@ -320,7 +323,8 @@
     padding-right: 16px;
   }
   .marquee:hover .marquee-track,
-  .marquee:focus-within .marquee-track {
+  .marquee:focus-within .marquee-track,
+  .marquee[data-paused] .marquee-track {
     animation-play-state: paused;
   }
 
@@ -363,7 +367,8 @@
     flex-wrap: wrap;
     padding-right: 0;
   }
-  .marquee-dup {
+  .marquee-dup,
+  .marquee-toggle {
     display: none;
   }
   *,

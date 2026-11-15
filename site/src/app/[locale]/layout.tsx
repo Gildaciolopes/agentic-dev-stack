@@ -35,6 +35,11 @@ export default async function LocaleLayout({ children, params }: { children: Rea
   const t = await getTranslations("shell");
   return (
     <html lang={locale} className={mono.variable} suppressHydrationWarning>
+      <head>
+        <noscript>
+          <style>{"[data-reveal] *{opacity:1!important;filter:none!important;transform:none!important}"}</style>
+        </noscript>
+      </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <NextIntlClientProvider>

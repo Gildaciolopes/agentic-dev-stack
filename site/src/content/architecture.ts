@@ -625,7 +625,6 @@ export const workflow: Graph = {
     },
   ],
   edges: [
-    { id: "lead-specify", from: "lead", to: "specify", kind: "lead", flow: "plan" },
     { id: "hermes-specify", from: "hermes", to: "specify", kind: "hermes", flow: "status" },
     { id: "specify-clarify", from: "specify", to: "clarify", kind: "neutral", flow: "plan" },
     { id: "clarify-plan", from: "clarify", to: "plan", kind: "neutral", flow: "plan" },
@@ -749,6 +748,8 @@ export type CuratorRow = {
   chat: ProbeResult;
   /** probe 2: get_time tool call; null when probe 1 failed (curate.py stops at the first error) */
   tool: (ProbeResult & { toolCall: boolean }) | null;
+  /** probe 1 returned HTTP 200 but content and reasoning_content were both empty (curate.py "empty answer") */
+  empty?: boolean;
 };
 
 export type CuratorStep = { id: string; title: string; detail: string };
@@ -773,18 +774,18 @@ export const curatorRows: CuratorRow[] = [
     tool: null,
   },
   {
-    model: "nvidia/deepseek-v4",
-    family: "deepseek-v4",
-    rank: 3,
-    chat: { ok: true, latencySec: 8.4 },
-    tool: { ok: true, latencySec: 12.8, toolCall: true },
-  },
-  {
     model: "nvidia/minimax-m3",
     family: "minimax-m3",
     rank: 6,
     chat: { ok: true, latencySec: 11.7 },
     tool: { ok: true, latencySec: 19.4, toolCall: true },
+  },
+  {
+    model: "nvidia/nemotron-3-super",
+    family: "nemotron-3-super",
+    rank: 7,
+    chat: { ok: true, latencySec: 6.8 },
+    tool: { ok: true, latencySec: 14.3, toolCall: true },
   },
   {
     model: "nvidia/gpt-oss-120b",
@@ -804,7 +805,7 @@ export function probeLatency(row: CuratorRow): number | null {
 /** healthy = answered AND made a tool call AND latency <= 30 s. */
 export function isHealthy(row: CuratorRow, maxLatencySec: number = curatorConfig.maxLatencySec): boolean {
   const lat = probeLatency(row);
-  return row.chat.ok && !!row.tool && row.tool.ok && row.tool.toolCall && lat !== null && lat <= maxLatencySec;
+  return !row.empty && row.chat.ok && !!row.tool && row.tool.ok && row.tool.toolCall && lat !== null && lat <= maxLatencySec;
 }
 
 /** Best `keep` healthy models by family rank, then latency (what gets written to the combo). */
@@ -814,6 +815,15 @@ export function selectKept(rows: CuratorRow[], keep: number = curatorConfig.keep
     .sort((a, b) => a.rank - b.rank || (probeLatency(a) ?? 0) - (probeLatency(b) ?? 0))
     .slice(0, keep)
     .map((r) => r.model);
+}
+
+/**
+ * What curate.py writes: the best `keep` healthy models, or, when none is healthy,
+ * the current combo unchanged ("no healthy model passed; combo left unchanged").
+ */
+export function selectOrKeep(rows: CuratorRow[], current: string[], keep: number = curatorConfig.keep): string[] {
+  const kept = selectKept(rows, keep);
+  return kept.length > 0 ? kept : current;
 }
 
 export const curatorSteps: CuratorStep[] = [
@@ -844,11 +854,13 @@ export const curatorSteps: CuratorStep[] = [
   },
 ];
 
+const curatorBefore = ["nvidia/glm-5.2", "nvidia/nemotron-3-super", "nvidia/minimax-m3", "nvidia/gpt-oss-120b"];
+
 export const curatorDemo = {
   config: curatorConfig,
   steps: curatorSteps,
   rows: curatorRows,
   /** combo before the run; the dead model sits in it, which takes down every call until the curator drops it */
-  before: ["nvidia/glm-5.2", "nvidia/deepseek-v4", "nvidia/minimax-m3", "nvidia/gpt-oss-120b"],
-  after: selectKept(curatorRows),
+  before: curatorBefore,
+  after: selectOrKeep(curatorRows, curatorBefore),
 };
