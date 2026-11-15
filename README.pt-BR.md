@@ -123,7 +123,7 @@ Tudo pode ser rodado de novo, faz backup do que edita e nunca apaga conteúdo se
 | Linux | Completo (crontab/systemd, sandbox bubblewrap) |
 | Windows | Core, workers, alethe, 9Router, Agendador de Tarefas. O worker grátis vem desligado (sem sandbox de kernel; use WSL2). Hermes via WSL2 |
 
-O CI roda os testes (incluindo o wizard) e uma instalação `--core` real no **Ubuntu, macOS e Windows (PowerShell)**, em Node 20 e 22.
+O CI roda os testes (incluindo o wizard) e uma instalação `--core` real no **Ubuntu, macOS e Windows (PowerShell)**, em Node 22 e 24.
 
 ## Templates para os seus projetos
 
