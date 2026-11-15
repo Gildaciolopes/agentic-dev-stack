@@ -123,7 +123,7 @@ Everything is re-runnable, backs up what it edits and never deletes your content
 | Linux | Full (crontab/systemd, bubblewrap sandbox) |
 | Windows | Core, workers, alethe, 9Router, Task Scheduler. The free worker is off by default (no kernel sandbox; use WSL2). Hermes via WSL2 |
 
-CI runs the test suite (including the wizard) and a real `--core` install on **Ubuntu, macOS and Windows (PowerShell)**, on Node 20 and 22.
+CI runs the test suite (including the wizard) and a real `--core` install on **Ubuntu, macOS and Windows (PowerShell)**, on Node 22 and 24.
 
 ## Templates for your projects
 

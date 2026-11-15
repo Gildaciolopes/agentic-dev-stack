@@ -4,6 +4,9 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 
+### Changed
+- CI runs on Node 22 and 24 (Node 20 reached end of life in April 2026); GitHub Actions bumped to `checkout@v7`, `setup-node@v7`, `setup-python@v7`, which run on Node 24.
+
 ## [1.3.2] - 2026-11-15
 
 ### Fixed
