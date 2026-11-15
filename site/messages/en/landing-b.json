@@ -1,0 +1,254 @@
+{
+  "_sources": {
+    "free": "docs/05-free-models.md:9-14 (components), :18-26 (incidents), :30-40 (probe rule), :51 (schedule); scripts/model-curator/models.json:3-9",
+    "security": "docs/07-security.md:15-26 (layers), :28-50 (leak tests), :52-58 (macOS), :60-66 (Linux), :68-74 (Windows), :90-92 (pins); sandbox/deny-secrets.sb.template:3-19; README.md:94 (agent-model-guard); .github/workflows/release.yml:2,18,47 (provenance)",
+    "hermes": "README.md:136-142 (digest, recipes); docs/06-hermes.md:58-71 (no shell), :164-166 (digest), :168-224 (recipes)",
+    "oneCommand": "README.md:106-124 (install, other ways, platforms); lib/doctor.mjs:24-46 (check names)",
+    "replay": "docs/assets/demo/demo.html (wizard script); lib/i18n.mjs:8-63 (prompts and options); lib/doctor.mjs:24-46 (doctor names)",
+    "faq": "README.md:159-193 (exact wording)",
+    "cta": "README.md:195-200 (principles, line 197), :9-14 (description)"
+  },
+  "free": {
+    "index": "05",
+    "label": "Free models",
+    "title": "Self-healing\nfree models.",
+    "intro": "Free models die without notice. A curator probes them three times a day and rewrites the combo, so the free worker keeps answering.",
+    "facts": {
+      "router": "9Router free combo",
+      "routerValue": "127.0.0.1:20128",
+      "nim": "NVIDIA NIM limit",
+      "nimValue": "40 req/min",
+      "curator": "Curator runs",
+      "curatorValue": "3 times a day"
+    },
+    "dial": {
+      "title": "The curator clock",
+      "caption": "Default schedule (CURATOR_TIMES). The marker for the next run follows your local clock.",
+      "svgLabel": "A 24 hour dial with the three daily curator runs at 07:30, 13:30 and 19:30.",
+      "next": "next run",
+      "runs": "Runs per day",
+      "nextLabel": "Next run on your clock",
+      "now": "now"
+    },
+    "probe": {
+      "title": "The probe rule",
+      "intro": "Up to 14 candidates, two requests each, within the 40 req/min limit. A model stays in the combo only if all three hold.",
+      "items": [
+        { "q": "Does it answer?", "d": "Prompt: Reply with exactly: OK" },
+        { "q": "Does it call a tool?", "d": "A request with a get_time tool. OpenCode does not work without tool calling." },
+        { "q": "Latency 30 s or less?", "d": "Slow models are dropped." }
+      ],
+      "outcome": "The 4 best go into 9Router's database after a backup. If none pass, the combo is left alone and an alert is recorded."
+    },
+    "incidents": {
+      "title": "Real incidents, one day of testing",
+      "items": [
+        { "model": "GLM 5.2", "what": "410 Gone: reached its end of life" },
+        { "model": "DeepSeek V4 Pro", "what": "410 Gone" },
+        { "model": "Kimi K2.6", "what": "404 Function not found for account. It shows up in the list; the account has no access." },
+        { "model": "GLM 5.3 Flash, DeepSeek V4.1 Flash", "what": "More than 200 s to answer" }
+      ],
+      "why": "9Router does not skip to the next model on a 410 or 404, only on rate limits and server errors. One dead model at the top takes down every call."
+    },
+    "code": {
+      "caption": "Single source of the ranking. Lower rank is better for coding."
+    },
+    "arch": "See the curator work in the architecture"
+  },
+  "security": {
+    "index": "06",
+    "label": "Security",
+    "title": "Secrets never\nleave the machine.",
+    "intro": "Command-pattern filtering is decorative. Only the kernel holds the line, so the free worker runs inside one.",
+    "cards": {
+      "kernel": {
+        "tag": "Kernel sandbox",
+        "title": "The kernel says no.",
+        "body": "opencode-safe denies reads of .env files, keys, credentials, ~/.ssh and ~/.aws, whatever the command.",
+        "points": ["macOS: sandbox-exec", "Linux: bubblewrap", "Windows: free worker off, use WSL2"]
+      },
+      "hermes": {
+        "tag": "Hermes",
+        "title": "No shell on chat.",
+        "body": "A prompt injection cannot execute anything. Approvals are manual and only your ID can talk to the bot.",
+        "points": ["Terminal tool disabled", "approvals.mode manual", "Chat allowlist"]
+      },
+      "pinned": {
+        "tag": "Supply chain",
+        "title": "Pinned and audited.",
+        "body": "Third-party tools install at reviewed versions, so a compromised upstream main never reaches your machine.",
+        "points": ["config/versions.json", "alethe pinned by commit", "npm provenance on release"]
+      }
+    },
+    "guard": {
+      "title": "Enforcement over instructions",
+      "body": "agent-model-guard is a hook that denies Opus subagents. Text rules do not work; enforcement does."
+    },
+    "terminal": {
+      "title": "Try to read a secret",
+      "intro": "You are the free worker. Pick a command and see what the kernel does.",
+      "windowTitle": "opencode-safe, free worker",
+      "illustration": "Illustration of the leak tests in docs/07-security.md. The denial text is the OS error, and the rule shown is quoted from the sandbox profile.",
+      "commands": "Commands the worker tries",
+      "clear": "Clear",
+      "empty": "Pick a command above.",
+      "denied": "Operation not permitted",
+      "deniedNote": "This is the kernel's EPERM, not a message written by the stack.",
+      "linuxNote": "macOS shown. On Linux, bubblewrap binds /dev/null over the file, so cat prints an empty file instead.",
+      "rule": "Rule in sandbox/deny-secrets.sb.template",
+      "allowed": "Allowed. Nothing secret in this file.",
+      "fileContent": "export const add = (a: number, b: number) => a + b;",
+      "announceDenied": "Command {command}: denied. Operation not permitted.",
+      "announceAllowed": "Command {command}: allowed.",
+      "runLabel": "Run {command}"
+    }
+  },
+  "hermes": {
+    "index": "07",
+    "label": "Hermes",
+    "title": "An assistant\nthat never sleeps.",
+    "intro": "Hermes lives on Discord or Telegram, without a shell. Scripts collect the data; Hermes summarizes it.",
+    "digestTitle": "The 08:00 digest",
+    "digestIntro": "Every morning you get:",
+    "digest": [
+      "Free-model status, token usage and available updates",
+      "Spec Kit progress and an AI radar",
+      "Yesterday's work and hours per project",
+      "3 priorities for today"
+    ],
+    "safe": "Hermes runs without a shell. Only your ID can talk to the bot.",
+    "recipesTitle": "A few of the 10 recipes",
+    "recipes": [
+      "Ready-to-paste standup",
+      "Failed CI and stale PR triage",
+      "Production uptime and SSL expiry",
+      "New CVEs, weekly",
+      "Phone inbox for ideas, bugs and tasks",
+      "Weekly timesheet for client billing",
+      "Release notes for non-technical readers"
+    ],
+    "phone": {
+      "label": "Illustration of a chat with Hermes. Values are placeholders, not real metrics.",
+      "header": "Hermes",
+      "bot": "Hermes",
+      "digestHead": "Daily digest, 08:00",
+      "sections": [
+        { "title": "Free models", "body": "Combo status: —" },
+        { "title": "Tokens and updates", "body": "Usage: — · Updates: —" },
+        { "title": "Spec Kit and AI radar", "body": "Progress: — · Radar: —" },
+        { "title": "Yesterday", "body": "Work: — · Hours per project: —" },
+        { "title": "3 priorities for today", "body": "1. — 2. — 3. —" }
+      ],
+      "question": "where did I stop?",
+      "answer": "Last session: — (project, branch and next task come from your digest file).",
+      "replay": "Replay",
+      "srSummary": "Chat illustration: Hermes sends the 08:00 digest with free-model status, tokens and updates, Spec Kit and AI radar, yesterday and hours per project, and 3 priorities. You ask where you stopped and Hermes answers."
+    }
+  },
+  "one": {
+    "index": "08",
+    "label": "Install",
+    "title": "One command.",
+    "intro": "A short setup wizard asks what you want, then installs and configures everything. Re-run it any time to update or change settings.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "otherTitle": "Other ways",
+    "otherHead": ["Other ways", "Command"],
+    "other": [
+      { "what": "Accept the recommended answers", "cmd": "npx agentic-dev-stack setup --yes" },
+      { "what": "Answers from a file (CI, dotfiles)", "cmd": "ADS_ANSWERS=answers.json npx agentic-dev-stack setup" },
+      { "what": "By phase, no questions", "cmd": "npx agentic-dev-stack install --core --workers --free-models --extras --hermes" },
+      { "what": "From a clone", "cmd": "./install.sh --all (macOS/Linux) · .\\install.ps1 --all (Windows)" },
+      { "what": "One project", "cmd": "npx agentic-dev-stack add-project <dir>" },
+      { "what": "Already set something up by hand", "cmd": "npx agentic-dev-stack adopt" },
+      { "what": "Check / repair / undo", "cmd": "npx agentic-dev-stack doctor [--fix] · npx agentic-dev-stack uninstall" }
+    ],
+    "platformsTitle": "Platforms",
+    "platformsHead": ["Platform", "Support"],
+    "platforms": [
+      { "os": "macOS", "support": "Full (launchd, sandbox-exec for the free worker)" },
+      { "os": "Linux", "support": "Full (crontab/systemd, bubblewrap sandbox)" },
+      { "os": "Windows", "support": "Core, workers, alethe, 9Router, Task Scheduler. The free worker is off by default (no kernel sandbox; use WSL2). Hermes via WSL2" }
+    ],
+    "prereq": "Prerequisites: Node 18 or newer, git and Claude Code. Python 3.9 or newer for alethe, the curator and the digest.",
+    "doctor": {
+      "title": "Run doctor",
+      "intro": "doctor checks what is installed and healthy, judged against what you enabled.",
+      "illustration": "Illustration of a healthy machine. Real results depend on your setup; checks you turned off show as disabled.",
+      "run": "Run doctor",
+      "again": "Run again",
+      "running": "Running doctor",
+      "doneLabel": "doctor finished",
+      "windowTitle": "npx agentic-dev-stack doctor",
+      "disabled": "(disabled)",
+      "summary": "{ok} passed · {off} disabled · 0 failed",
+      "announceStart": "doctor started.",
+      "announceDone": "doctor finished. {ok} checks passed, {off} disabled, none failed.",
+      "toast": "Install complete",
+      "platform": "platform:"
+    }
+  },
+  "replay": {
+    "index": "09",
+    "label": "Wizard",
+    "title": "See the wizard.",
+    "intro": "The real prompts and options, replayed. Nothing is written until you confirm.",
+    "windowTitle": "~ — zsh",
+    "play": "Play",
+    "pause": "Pause",
+    "replay": "Replay",
+    "region": "Terminal replay of the setup wizard",
+    "controls": "Replay controls",
+    "summary": "Replay finished. The wizard asked how much to install, picked components, saved the NVIDIA key, connected Hermes on Discord, and installed. Running it again opens a menu with Update / repair, Change settings, Wire more projects, New project, doctor and Uninstall. doctor then checked the installation.",
+    "note": "Illustration of the demo script. Bot name and values are examples."
+  },
+  "faq": {
+    "index": "10",
+    "label": "FAQ",
+    "title": "Questions.",
+    "items": [
+      {
+        "question": "What is \"smart vibe coding\"?",
+        "answer": "You steer intent and decisions; agents do the typing. \"Smart\" means spec first, cheap models for volume, independent review, verification before \"done\", and minimal tokens. See the [guide](docs/00-smart-vibe-coding.md)."
+      },
+      {
+        "question": "How do I save tokens in Claude Code?",
+        "answer": "Stack four things:\n1. RTK, for shell output;\n2. caveman, for replies;\n3. graphify, for reading code;\n4. a lean CLAUDE.md, with one topic per chat.\nThen stop paying Opus prices for reading and boilerplate: delegate those to Haiku, Gemini, Sonnet and free models."
+      },
+      {
+        "question": "Can I use free models with Claude Code?",
+        "answer": "Yes, as workers: OpenCode + 9Router with free NVIDIA NIM models. The curator keeps them healthy, and the sandbox makes sure they never see your secrets."
+      },
+      {
+        "question": "How do I run multiple Claude Code agents in parallel?",
+        "answer": "Two ways: native subagents (`scout`/`builder`/`reviewer`) with worktree isolation, or alethe playbooks such as `parallel-worktrees` for Spec Kit `[P]` tasks."
+      },
+      {
+        "question": "Does it work with Codex, Gemini, Kiro or Copilot CLI?",
+        "answer": "Codex is a native alethe provider (`WITH_CODEX=1`); the others plug in as custom workers. See [docs/04](docs/04-codex-and-other-clis.md)."
+      },
+      {
+        "question": "Does it work on Windows?",
+        "answer": "Yes for the core, workers, orchestration and schedules (PowerShell, Task Scheduler). The free-model worker needs a kernel sandbox, so on Windows run it under WSL2."
+      },
+      {
+        "question": "Will it delete or overwrite my files?",
+        "answer": "No. It only appends blocks between `BEGIN/END` markers, merges JSON settings, and backs up every file it edits to `~/.local/share/agentic-dev-stack/backups/`. `uninstall` and `add-project --remove` take out only those blocks and entries."
+      },
+      {
+        "question": "Is it safe?",
+        "answer": "- Third-party pieces were audited and pinned to a reviewed version.\n- The free worker is blocked from reading secrets at the kernel level.\n- Hermes runs without a shell.\nSee [docs/07-security.md](docs/07-security.md)."
+      }
+    ]
+  },
+  "cta": {
+    "title": "Plan big,\nexecute small.",
+    "line": "Strong model for decisions, cheap model for volume.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "start": "Get started",
+    "github": "GitHub",
+    "panelLabel": "agentic-dev-stack mark",
+    "panelText": "Stop running one AI agent at a time. The expensive model plans, cheap and free models execute, a reviewer from another provider checks the diff, and every turn spends the minimum number of tokens."
+  }
+}
