@@ -65,9 +65,17 @@ export function PhoneChat() {
     <div ref={ref} className="mx-auto flex w-full max-w-[360px] flex-col gap-3">
       <div className="border border-white/20 bg-black text-white shadow-[var(--elev-2)]">
         <div className="flex items-center gap-3 border-b border-white/10 px-4 py-3">
-          <span aria-hidden className="grid size-8 place-items-center rounded-[var(--radius-round)] bg-[image:var(--grad-primary)] font-bold text-black">
-            H
-          </span>
+          {/* eslint-disable-next-line @next/next/no-img-element -- 96px static avatar, next/image adds nothing here */}
+          <img
+            src="/hermes-avatar.jpg"
+            alt=""
+            aria-hidden
+            width={32}
+            height={32}
+            loading="lazy"
+            decoding="async"
+            className="size-8 rounded-[var(--radius-round)] bg-white object-cover"
+          />
           <span className="font-bold">{t("header")}</span>
         </div>
         <p className="sr-only">{t("srSummary")}</p>
