@@ -4,6 +4,9 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 
+### Added
+- Website in `site/` (Next.js): landing page with an interactive architecture diagram, docs and changelog rendered from this repo, `llms.txt`. It is not part of the npm package, and its own workflow (`.github/workflows/site.yml`) runs only when the site, docs or README change.
+
 ### Changed
 - CI runs on Node 22 and 24 (Node 20 reached end of life in April 2026); GitHub Actions bumped to `checkout@v7`, `setup-node@v7`, `setup-python@v7`, which run on Node 24.
 

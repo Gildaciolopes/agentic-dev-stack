@@ -1,0 +1,47 @@
+name: site
+
+# The website lives in site/ and never ships in the npm package.
+# This workflow runs only when site/ changes, so it cannot slow down
+# or break the stack's own CI.
+on:
+  push:
+    branches: [main]
+    paths: ["site/**", ".github/workflows/site.yml", "docs/**", "CHANGELOG.md", "README.md"]
+  pull_request:
+    paths: ["site/**", ".github/workflows/site.yml", "docs/**", "CHANGELOG.md", "README.md"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: site
+
+jobs:
+  build:
+    name: lint · typecheck · test · build · lighthouse
+    runs-on: ubuntu-latest
+    env:
+      NO_COLOR: "1"
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+      - name: Lighthouse CI (mobile)
+        run: npx --yes @lhci/cli@0.15.1 autorun --config=./lighthouserc.json
