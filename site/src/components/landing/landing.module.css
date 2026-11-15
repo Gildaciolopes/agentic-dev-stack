@@ -1,0 +1,39 @@
+/* CSS-only float for the static isometric fragments. Off in reduced motion. */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.float {
+  animation: float var(--float-d, 7s) ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .float {
+    animation: none;
+  }
+}
+
+/* why table: rows light up in sequence */
+.cell {
+  transition:
+    opacity 300ms ease-out,
+    color 300ms ease-out,
+    background-color 300ms ease-out;
+}
+.without[data-lit="true"] {
+  opacity: 0.55;
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+.with[data-lit="true"] {
+  background-color: var(--accent);
+  color: var(--foreground);
+  box-shadow: inset 3px 0 0 var(--spectrum-mint);
+}
