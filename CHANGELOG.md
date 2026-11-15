@@ -4,6 +4,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 
+## [1.3.2] - 2026-11-15
+
 ### Fixed
 - Hermes routines failed with `HTTP 422: input rejected by content safety screening` on some NVIDIA NIM models (for example `minimax-m3.1-flash`). NVIDIA returns that error for any `reasoning_effort` field, and Hermes sends `medium` to custom endpoints by default. `install --hermes` now keeps the field off the wire (`agent.reasoning_effort` unset, `model_overrides.custom.free.supports_reasoning false`).
 - A hung free model held a Hermes routine for 47 minutes: a local endpoint gets a 1800 s timeout and no stale-call detector. `install --hermes` sets `providers.custom.request_timeout_seconds 180`, `stale_timeout_seconds 240` and `agent.api_max_retries 1`.
@@ -73,7 +75,10 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 - Smart vibe coding guide and 10 docs in English and Portuguese, dark Excalidraw diagrams, CLAUDE.md/AGENTS.md starter templates.
 - CI on Ubuntu, macOS and Windows (Node 20 and 22).
 
-[Unreleased]: https://github.com/Gildaciolopes/agentic-dev-stack/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/Gildaciolopes/agentic-dev-stack/compare/v1.3.2...HEAD
+[1.3.2]: https://github.com/Gildaciolopes/agentic-dev-stack/compare/v1.3.1...v1.3.2
+[1.3.1]: https://github.com/Gildaciolopes/agentic-dev-stack/compare/v1.3.0...v1.3.1
+[1.3.0]: https://github.com/Gildaciolopes/agentic-dev-stack/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/Gildaciolopes/agentic-dev-stack/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/Gildaciolopes/agentic-dev-stack/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/Gildaciolopes/agentic-dev-stack/releases/tag/v1.0.0
