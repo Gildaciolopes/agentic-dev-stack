@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { useReducedMotion } from "@usefluid/motion/react";
 import { Pet } from "@/components/fluid/pet/Pet";
 import { ShapeMorph } from "@/components/fluid/shape-morph/ShapeMorph";
 import { WordCycle } from "@/components/fluid/word-cycle/WordCycle";
@@ -8,13 +9,16 @@ import { InstallCommand } from "@/components/ui/install-command";
 import { logo } from "@/lib/logo";
 import { useVisible } from "./use-visible";
 
-/** Shapes flow into the logo; plays only while on screen. */
+/** Shapes flow into the logo once, the first time it is on screen, and then stay on the logo. Reduced motion: logo straight away. */
 export function HeroMark({ label }: { label: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const visible = useVisible(ref, 0.3);
+  const reduced = useReducedMotion();
+  const [started, setStarted] = useState(false);
+  if (visible && !started) setStarted(true); // latch: never goes back, so the route is not restarted
   return (
     <div ref={ref} className="mx-auto size-24 text-foreground md:size-28">
-      <ShapeMorph logo={logo} label={label} play={visible} className="size-full" />
+      <ShapeMorph logo={logo} label={label} route={reduced ? [] : undefined} play={started} className="size-full" />
     </div>
   );
 }

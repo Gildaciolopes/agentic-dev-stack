@@ -11,9 +11,9 @@ function GraphText({ g, layersLabel, flowsLabel, optional }: { g: Graph; layersL
   const rootNodes = g.nodes.filter((n) => n.group === "root");
   return (
     <section>
-      <h4 className="text-h3">{g.title}</h4>
+      <h2 className="text-h3">{g.title}</h2>
       <p>{g.subtitle}</p>
-      <h5 className="section-label mt-4">{layersLabel}</h5>
+      <h3 className="section-label mt-4">{layersLabel}</h3>
       <ol className="mt-2 list-decimal space-y-3 pl-6">
         {rootNodes.length ? (
           <li>
@@ -42,7 +42,7 @@ function GraphText({ g, layersLabel, flowsLabel, optional }: { g: Graph; layersL
           </li>
         ))}
       </ol>
-      <h5 className="section-label mt-4">{flowsLabel}</h5>
+      <h3 className="section-label mt-4">{flowsLabel}</h3>
       <ol className="mt-2 list-decimal space-y-1 pl-6">
         {g.edges.map((e) => (
           <li key={e.id}>
@@ -75,7 +75,7 @@ export async function ArchitectureFigure() {
       <ReadAsText showLabel={t("readAsText")} hideLabel={t("hideText")}>
         <div className="space-y-8 text-[length:var(--text-small)] text-muted-foreground">
           <section>
-            <h4 className="text-h3">{t("stepsTitle")}</h4>
+            <h2 className="text-h3">{t("stepsTitle")}</h2>
             <ol className="mt-2 list-decimal space-y-1 pl-6">
               {assemblySteps.map((s) => (
                 <li key={s.id}>{s.caption}</li>

@@ -156,7 +156,7 @@ export default function TokenFunnel() {
         overlay={
           <ul className="pointer-events-none absolute inset-y-0 left-0 m-0 list-none p-0 text-xs">
             {labels.map((l, i) => (
-              <li key={l.name} className="absolute left-3 -translate-y-1/2 bg-background/70 px-2 py-1" style={{ top: `${FUNNEL_STAGE_Y[i] * 100}%` }}>
+              <li key={l.name} className="absolute left-3 w-36 -translate-y-1/2 bg-background/70 px-2 py-1 sm:w-44" style={{ top: `${FUNNEL_STAGE_Y[i] * 100}%` }}>
                 <span className="block font-medium text-foreground">{l.name}</span>
                 <span className="block text-muted-foreground">{l.note}</span>
               </li>

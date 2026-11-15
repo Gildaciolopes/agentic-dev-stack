@@ -68,7 +68,6 @@ const subscribeDesktop = (cb: () => void) => {
   return () => mq.removeEventListener("change", cb);
 };
 const noopSubscribe = () => () => {};
-const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 
 function NodeText({ n }: { n: GraphNode }) {
   return (
@@ -194,14 +193,15 @@ export function ArchitectureExplorer() {
       const r = wrap.getBoundingClientRect(); // one cached read per resize / entry
       const navH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--nav-h")) || 64;
       top = r.top + window.scrollY - navH;
-      span = Math.max(1, r.height - (window.innerHeight - navH));
+      // Steps 1..N-1 are spread over (N-1) x 70vh of pinned scroll; the last step starts after that and shows the full-size diagram.
+      span = Math.max(1, (STEPS.length - 1) * 0.7 * window.innerHeight);
     };
     let raf = 0;
     const update = () => {
       ticking = false;
       raf = 0;
-      const p = clamp((window.scrollY - top) / span, 0, 0.9999);
-      const s = Math.min(STEPS.length, Math.floor(p * STEPS.length) + 1);
+      const p = Math.max(0, (window.scrollY - top) / span);
+      const s = p >= 1 ? STEPS.length : Math.floor(p * (STEPS.length - 1)) + 1;
       setStep((prev) => (prev === s ? prev : s));
     };
     const onScroll = () => {
@@ -411,6 +411,8 @@ export function ArchitectureExplorer() {
   /* ------------------------------------------------------------ render */
   const scroll = mounted && mode === "desktop" && !reduced;
   const story = mounted && mode === "mobile" && !reduced;
+  /* Last scroll step (or the workflow view): the pinned stage grows to the full container width at the diagram's own aspect. */
+  const finalState = view === "workflow" || effStep >= STEPS.length;
   const L = layouts[view];
   const lead = L.nodes.lead;
   const leadShape = view === "workflow" || formed ? rectPath(lead.w, lead.h) : logoPath(lead.w, lead.h);
@@ -436,8 +438,8 @@ export function ArchitectureExplorer() {
       data-view={view}
       data-reduced={reduced ? "1" : "0"}
     >
-      <div ref={wrapRef} className={styles.wrap} style={{ "--arch-steps": STEPS.length, ...(scroll ? { height: `${STEPS.length * 70}vh` } : {}) } as CSSProperties}>
-        <div className={cn(styles.stage, scroll && styles.pinned)}>
+      <div ref={wrapRef} className={styles.wrap} style={{ "--arch-steps": STEPS.length - 1 } as CSSProperties}>
+        <div className={cn(styles.stage, scroll && styles.pinned, scroll && finalState && styles.final)}>
           <div className={styles.toolbar}>
             <SegmentedPicker
               label={t("toolbar.view")}
@@ -581,7 +583,7 @@ export function ArchitectureExplorer() {
                         <button
                           type="button"
                           className={styles.nodeBtn}
-                          aria-label={`${cur.label}, ${t(`kinds.${cur.kind}`)}`}
+                          aria-label={`${[cur.label, ...(cur.sub ?? [])].join(" ")}, ${t(`kinds.${cur.kind}`)}`}
                           aria-hidden={!present || undefined}
                           tabIndex={present ? 0 : -1}
                           onClick={(ev) => openNode(cur, ev.currentTarget)}

@@ -20,9 +20,9 @@ export async function PillarTokens({ visual }: { visual?: ReactNode }) {
   return (
     <section id="tokens" className="section container-site flex flex-col gap-12">
       <SectionHeader index={t("index")} label={t("label")} title={t("title")} intro={t("intro")} />
-      {visual ? <div>{visual}</div> : null}
       <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-2">
-        <div className="flex flex-col gap-8">
+        {visual ? <div className="mx-auto w-full max-w-xl lg:order-2 lg:max-w-none">{visual}</div> : null}
+        <div className="flex flex-col gap-8 lg:order-1">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left text-small">
               <caption className="sr-only">{t("tableCaption")}</caption>
@@ -54,10 +54,10 @@ export async function PillarTokens({ visual }: { visual?: ReactNode }) {
           </div>
           <p className="text-small text-muted-foreground">{t("footnote")}</p>
         </div>
-        <div className="flex flex-col gap-8">
-          <TokenBars rows={rows} label={t("barsLabel")} />
-          <CodeWindow filename={t("codeFile")} code={CODE} copyLabel={t("copy")} copiedLabel={t("copied")} />
-        </div>
+      </div>
+      <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-2">
+        <TokenBars rows={rows} label={t("barsLabel")} />
+        <CodeWindow filename={t("codeFile")} code={CODE} copyLabel={t("copy")} copiedLabel={t("copied")} />
       </div>
       <ul aria-label={t("cardsLabel")} className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {cards.map((c) => (

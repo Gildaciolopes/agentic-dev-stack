@@ -41,7 +41,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       <ToolsBand />
       <Stats />
       <HydrateOnView><Why /></HydrateOnView>
-      <SectionArchitecture />
+      <HydrateOnView><SectionArchitecture /></HydrateOnView>
       <HydrateOnView><PillarOrchestration /></HydrateOnView>
       <HydrateOnView><PillarSdd /></HydrateOnView>
       <HydrateOnView><PillarTokens visual={<LazyTokenFunnel />} /></HydrateOnView>
