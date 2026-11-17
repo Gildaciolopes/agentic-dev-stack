@@ -165,7 +165,6 @@ Headlines end with a period and may use two lines (`\n`). Body copy max width ab
 
 **Section header** (`ui/section-header.tsx`). Numbered label ("01 Architecture", label style), giant two-line headline via Text Reveal (plays once in view), short muted paragraph. Reveal reserves its layout box so there is no CLS; full text is in the server HTML and an sr-only span.
 
-**Gradient page frame.** `.page-frame` fixed 6px strips: left `#309fe5` to `#3d74ef`, right `#02bdff` to `#01e2ff`, z-index 60, pointer-events none. Hidden below 768px.
 
 **Legend chip** (`ui/legend-chip.tsx`). Toggle button, 44px, square, 12px swatch of `--kind-*`, `aria-pressed`. Pressed = inverted fill.
 

@@ -61,7 +61,6 @@
   --radius: 0px;
   --radius-pill: 0px;
   --radius-round: 999px; /* avatars, toggles, packets only */
-  --frame-width: 6px;
 
   /* motion: one spring scale for the whole site (w = rad/s, z = damping ratio) */
   --spring-snappy-w: 22;
@@ -278,20 +277,6 @@
 }
 
 @layer components {
-  /* thin vertical gradient frame around the page (Sbont) */
-  .page-frame {
-    position: fixed;
-    inset: 0 auto 0 0;
-    width: var(--frame-width);
-    background: linear-gradient(180deg, #309fe5, #3d74ef);
-    z-index: 60;
-    pointer-events: none;
-  }
-  .page-frame--right {
-    inset: 0 0 0 auto;
-    background: linear-gradient(180deg, #02bdff, #01e2ff);
-  }
-
   .container-site {
     width: 100%;
     max-width: var(--container);

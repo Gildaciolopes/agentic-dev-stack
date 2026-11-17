@@ -51,8 +51,6 @@ export default async function LocaleLayout({ children, params }: { children: Rea
                 >
                   {t("skip")}
                 </a>
-                <div className="page-frame max-md:hidden" aria-hidden />
-                <div className="page-frame page-frame--right max-md:hidden" aria-hidden />
                 <Nav />
                 {children}
                 <Footer />
