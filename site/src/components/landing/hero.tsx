@@ -8,8 +8,8 @@ export async function Hero({ teaser }: { teaser?: ReactNode }) {
   const t = await getTranslations("landing-a.hero");
   return (
     <section id="top" aria-labelledby="hero-title" className="relative overflow-hidden pb-16 pt-32 md:pb-24 md:pt-40">
-      <IsoScene side="left" className="pointer-events-none absolute left-0 top-12 hidden w-[clamp(180px,22vw,320px)] lg:block" />
-      <IsoScene side="right" className="pointer-events-none absolute right-0 top-12 hidden w-[clamp(180px,22vw,320px)] lg:block" />
+      <IsoScene side="left" className="pointer-events-none absolute left-0 top-28 hidden w-[clamp(180px,22vw,320px)] lg:block" />
+      <IsoScene side="right" className="pointer-events-none absolute right-0 top-28 hidden w-[clamp(180px,22vw,320px)] lg:block" />
       <div className="container-site relative flex flex-col items-center gap-8 text-center">
         <HeroMark label={t("logoLabel")} />
         <h1 id="hero-title" className="text-display max-w-4xl font-bold text-balance">

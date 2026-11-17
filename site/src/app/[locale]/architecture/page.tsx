@@ -19,7 +19,7 @@ export default async function ArchitecturePage({ params }: { params: Promise<{ l
   setRequestLocale(locale);
   const [t, docs] = await Promise.all([getTranslations("architecture.page"), getTranslations("docs")]);
   return (
-    <main id="main" className="container-site section flex flex-col gap-12">
+    <main id="main" className="container-site section flex flex-col gap-12 pt-[max(var(--section-y),calc(var(--nav-h)+52px))]">
       <SectionHeader index={t("index")} label={t("label")} title={t("title")} titleAs="h1" />
       <ArchitectureFigure />
       <JsonLd

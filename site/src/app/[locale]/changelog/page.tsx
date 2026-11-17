@@ -28,7 +28,7 @@ export default async function ChangelogPage({ params }: Props) {
   ];
   const { intro, entries } = await getChangelog(locale as Locale);
   return (
-    <main id="main" className="container-site pb-24 pt-10">
+    <main id="main" className="container-site pb-24 pt-[calc(var(--nav-h)+52px)]">
       <JsonLd data={breadcrumbList(crumbs.map((c) => ({ name: c.name, url: absoluteUrl(locale as Locale, c.href) })))} />
       <Breadcrumb items={crumbs} label={t("breadcrumbLabel")} />
       <h1 className="text-display">{t("changelogPage.title")}</h1>
